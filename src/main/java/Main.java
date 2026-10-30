@@ -1,14 +1,10 @@
+import Controller.GameController;
+
 public class Main {
-    public static void main(String[] args) {
-        System.out.println("Hello Team Cobra!");
 
+	public static void main(String[] args) {
+		// Start the game
+		GameController.start();
+	}
 
-        System.out.println("Dylan was here.");
-
-        System.out.println("Priscilla was here.");
-        
-        System.out.println("Danh was here.");
-        
-        System.out.println("this is a tester line");
-    }
 }
