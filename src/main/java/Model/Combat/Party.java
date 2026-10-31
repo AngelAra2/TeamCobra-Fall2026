@@ -15,10 +15,11 @@ public class Party {
     private List<Companion> activeCompanions;
     private List<Companion> inactiveCompanions;
     private int maxActiveCompanions = 2;
-    private boolean isDefeated;
 
     public Party(Player player){
         this.player = player;
+        this.activeCompanions = new ArrayList<>();
+        this.inactiveCompanions = new ArrayList<>();
     }
 
 
@@ -27,6 +28,16 @@ public class Party {
     //per inheritor documentation, player MUST have talked to the companion before they can be recruited.
     //ID: FR32
     public boolean recruit(Companion companion){
+
+        //if companion already exists in player's party, disp message, and return false.
+        if (activeCompanions.contains(companion) || inactiveCompanions.contains(companion)){
+            System.out.println(companion.getName() + " already exists in party.");
+            return false;
+        }
+
+        //updates companion's party status to recruited
+        companion.setPartyStatus("Recruited");
+
         //if statement checks if party has max active companions, if so, add companion to inactiveCompanions list
         if(activeCompanions.size() == maxActiveCompanions){
             System.out.println("New companion recruited!" + companion.getName() + " added to inactive party.");
@@ -56,6 +67,7 @@ public class Party {
         if(activeCompanions.size() != maxActiveCompanions){
             System.out.println(companion.getName() + " moved to active party!");
             activeCompanions.add(companion);
+            inactiveCompanions.remove(companion);
             return true;
         } else{
             //display error message and return false.
@@ -120,14 +132,19 @@ public class Party {
     //returns false if at least one member does not have 0 hp.
     public boolean isPartyDefeated(){
 
-        //checks if player, and active companions currentHp is 0, if it is, return true.
-        if(player.getCurrentHP() == 0 &&
-                activeCompanions.get(0).getCurrentHP() == 0 &&
-                activeCompanions.get(1).getCurrentHP() == 0){
-            return true;
+        //if player is still alive, party isn't defeated.
+        if (player.getCurrentHP() > 0){
+            return false;
         }
 
-        return false;
+        //checks if any companion is still alive.
+        for (Companion companion : activeCompanions){
+            if (companion.getCurrentHP() > 0){
+                return false;
+            }
+        }
+
+        return true;
     }
 
 
@@ -158,14 +175,6 @@ public class Party {
 
     public void setMaxActiveCompanions(int maxActiveCompanions) {
         this.maxActiveCompanions = maxActiveCompanions;
-    }
-
-    public boolean isDefeated() {
-        return isDefeated;
-    }
-
-    public void setDefeated(boolean defeated) {
-        isDefeated = defeated;
     }
 
 
