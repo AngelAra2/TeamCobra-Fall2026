@@ -7,7 +7,7 @@ import java.util.List;
 /*
 Party class
 Refer to 3.2.2 User Class 2: NPC Companions
-ID: FR32, FR33, FR34, FR35,
+ID: FR32, FR33, FR34, FR35
  */
 public class Party {
     private Player player;
@@ -25,6 +25,7 @@ public class Party {
 
 
     //per inheritor documentation, player MUST have talked to the companion before they can be recruited.
+    //ID: FR32
     public boolean recruit(Companion companion){
         //if statement checks if party has max active companions, if so, add companion to inactiveCompanions list
         if(activeCompanions.size() == maxActiveCompanions){
@@ -71,13 +72,21 @@ public class Party {
     This method handles the player's request on adding a companion to their active party.
      */
     public boolean removeCompanionFromActiveParty(Companion companion){
-        if (inactiveCompanions.contains(companion)){
+        //checks if companion is in active party.
+        if (!activeCompanions.contains(companion)){
             System.out.println(companion.getName() + " is not currently in the active party.");
             return true;
         }
 
+        //removes companion from active party
         activeCompanions.remove(companion);
 
+        //adds companion to inactive party
+        inactiveCompanions.add(companion);
+
+        System.out.println(companion.getName() + " moved to inactive party.");
+
+        return true;
     }
 
 
@@ -105,12 +114,22 @@ public class Party {
 
     }
 
-    /*
 
-    method checks if party is defeated
-    public void isPartyDefeated(){
+    //method checks if party is defeated
+    //if method returns true, that indicates that player and active party have 0 hp.
+    //returns false if at least one member does not have 0 hp.
+    public boolean isPartyDefeated(){
+
+        //checks if player, and active companions currentHp is 0, if it is, return true.
+        if(player.getCurrentHP() == 0 &&
+                activeCompanions.get(0).getCurrentHP() == 0 &&
+                activeCompanions.get(1).getCurrentHP() == 0){
+            return true;
+        }
+
+        return false;
     }
-     */
+
 
 
     /*

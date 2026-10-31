@@ -2,17 +2,23 @@ package Model;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import Model.Combat.Character;
 import View.View;
+import java.util.List;
 
-public class Player
+public class Player extends Character
 {
 	/* Data Fields */
 	private Room currentRoom;
 	private HashMap<String, ArrayList<Item>> inventory;
+	private int health;
 
 	/* Constructors */
 	public Player(Room startingRoom)
 	{
+		super("Name", 100, 10, 10, 10,
+				10, 10, 100, 10, 10, 10,
+				10, 10,new ArrayList<>());
 		this.currentRoom = startingRoom;
 		this.inventory = new HashMap<>();
 	}
@@ -82,7 +88,7 @@ public class Player
 	{
 		return this.currentRoom.getPuzzle();
 	}
-	
+
 	public Item getItemFromInventoryByName(String itemName)
 	{
 		// Check if the inventory contains this item name
