@@ -4,6 +4,7 @@ import java.util.List;
 
 public abstract class Character extends Combatant {
 	/* Data Fields */
+
 	protected int currentLevel;
 	protected int currentXP;
 	protected int currentMana;
@@ -15,6 +16,7 @@ public abstract class Character extends Combatant {
 	protected int endurance;
 	// protected Equipment equipment; // Need to implement Equipment class; uncomment as needed
 	protected List<CombatSkill> skills;
+    protected EquipmentLoadout equipmentLoadout;
 
 	/* Constructors */
 	public Character(
@@ -22,7 +24,7 @@ public abstract class Character extends Combatant {
 			int maxHP,
 			int physicalDEF,
 			int magicDEF,
-			
+
 			int currentLevel,
 			int currentXP,
 			int currentMana,
@@ -36,7 +38,8 @@ public abstract class Character extends Combatant {
 		) 
 	{
 		super(name, maxHP, physicalDEF, magicDEF);
-		
+
+
 		this.currentLevel = currentLevel;
 		this.currentXP = currentXP;
 		this.currentMana = currentMana;
@@ -47,6 +50,7 @@ public abstract class Character extends Combatant {
 		this.arcane = arcane;
 		this.endurance = endurance;
 		this.skills = skills;
+        this.equipmentLoadout = new EquipmentLoadout();
 	}
 	
 	/* Methods */
@@ -58,6 +62,18 @@ public abstract class Character extends Combatant {
 	}
 
 	// Getters //
+    public EquipmentLoadout getEquipmentLoadout() {
+        return this.equipmentLoadout;
+    }
+
+    public int getEndurance() {
+        return this.endurance;
+    }
+
+    // Calculate maximum equipment load
+    public double calculateEquipLoad() {
+        return 15 + this.endurance;
+    }
 
 	// Setters //
 

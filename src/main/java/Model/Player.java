@@ -10,7 +10,7 @@ public class Player extends Character
 {
 	/* Data Fields */
 	private Room currentRoom;
-	private HashMap<String, ArrayList<Item>> inventory;
+    private Inventory inventory;
 	private int health;
 
 	/* Constructors */
@@ -20,7 +20,7 @@ public class Player extends Character
 				10, 10, 100, 10, 10, 10,
 				10, 10,new ArrayList<>());
 		this.currentRoom = startingRoom;
-		this.inventory = new HashMap<>();
+		this.inventory = new Inventory();
 	}
 	
 	/* Methods */
@@ -101,8 +101,28 @@ public class Player extends Character
 		
 		return null;
 	}
-	
-	// Setters //
+    // Get inventory
+    public Inventory getInventory() {
+        return this.inventory;
+    }
+
+    // Equip an item from inventory
+    public boolean equipItem(String itemName) {
+        Item item = this.inventory.findItem(itemName);
+
+        if (item instanceof EquipmentItem) {
+            EquipmentItem equipment = (EquipmentItem) item;
+
+            if (this.equipmentLoadout.equipItem(
+                    equipment, this.calculateEquipLoad())) {
+
+                this.inventory.removeItem(item);
+                return true;
+            }
+        }
+
+        return false;
+    }
 
 	// Custom //
 	public boolean moveToRoom(Map worldMap, String direction)
@@ -169,7 +189,7 @@ public class Player extends Character
 				String itemName = getFirstItem.getItemName();
 				int itemQuantity = itemList.size();
 				
-				View.println("- " + itemName + " (×" + itemQuantity + ")");
+				View.println("- " + itemName + " (ï¿½" + itemQuantity + ")");
 			}
 		}
 		
@@ -195,7 +215,7 @@ public class Player extends Character
 				String itemName = getFirstItem.getItemName();
 				int itemQuantity = this._getQuantityOfItemsInInventory(itemName);
 				
-				View.println("- " + itemName + " (×" + itemQuantity + ")");
+				View.println("- " + itemName + " (ï¿½" + itemQuantity + ")");
 			}
 		}
 		
