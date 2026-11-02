@@ -117,7 +117,7 @@ public class Puzzle {
 	@Override
 	public String toString()
 	{
-		return "[" + this.puzzleName + " — " 
+		return "[" + this.puzzleName + " - "
 				+ this.remainingAttempts + "/" 
 				+ this.maxAttempts + " attempts remaining]\n" 
 				+ "- Puzzle prompt: " + this.puzzleDesc + "\n" 
