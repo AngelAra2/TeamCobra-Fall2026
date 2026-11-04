@@ -169,7 +169,7 @@ public class Player extends Character
 				String itemName = getFirstItem.getItemName();
 				int itemQuantity = itemList.size();
 				
-				View.println("- " + itemName + " (×" + itemQuantity + ")");
+				View.println("- " + itemName + " (x" + itemQuantity + ")");
 			}
 		}
 		
@@ -195,7 +195,7 @@ public class Player extends Character
 				String itemName = getFirstItem.getItemName();
 				int itemQuantity = this._getQuantityOfItemsInInventory(itemName);
 				
-				View.println("- " + itemName + " (×" + itemQuantity + ")");
+				View.println("- " + itemName + " (x" + itemQuantity + ")");
 			}
 		}
 		
@@ -203,89 +203,87 @@ public class Player extends Character
 		else
 			View.println("Your inventory is empty. Pick up some items!");
 	}
-	
-	public void handleItemInteraction(String cmd)	
-	{
-		/* Handles item interaction commands */
-		// Replace first space in userCmd with an underscore to prevent issues with item names that have spaces
-		cmd = cmd.replaceFirst(" ", "_");
 
-		// Split the command into parts
-		String[] cmdParts = cmd.split("_");
-		
-		// Declare attributes
-		String action = cmdParts[0];
-		String itemName = (cmdParts.length > 1) ? cmdParts[1] : "";
-		
-		/* Handle the proper interaction with the given item name */
-		if (!itemName.isEmpty())
-		{
-			Item targetItem;
-			
-			// Pickup item
-			if (action.equals("pickup"))
-			{
-				// The player picks up the item from the current room and adds it to their inventory
-				// The item is removed from the current room's items
-				targetItem = this.currentRoom.getItemByName(itemName);
-				if (targetItem != null)
-				{
-					// Add item to inventory
-					this._addItemToInventory(targetItem);
+    public void handleItemInteraction(String cmd)
+    {
+        /* Handles item interaction commands */
+        // Normalize the command (item names are stored in lowercase), then split it into
+        // the action and the item name at the first run of whitespace. This keeps item
+        // names that contain spaces (e.g. "collector's coin") intact.
+        String[] cmdParts = cmd.trim().toLowerCase().split("\\s+", 2);
 
-					// Remove item from current room
-					this.currentRoom.removeItem(itemName, targetItem);
-					
-					View.println("Picked up " + targetItem.getItemName() + ". Added to Inventory");
-				}
-				else
-					View.println("No such item to pick up in the current room.");
-			}
-			
-			// Inspect item
-			else if (action.equals("inspect"))
-			{
-				// The player inspects the item in their inventory and prints its details to console
-				// The item is not removed from the inventory
-				targetItem = this.getItemFromInventoryByName(itemName);
-				if (targetItem != null)
-				{
-					View.println("Inspecting item in inventory...");
-					View.println("");
-					View.println(targetItem.toString());
-					View.println("");
-					View.println("Number owned in inventory: " + this._getQuantityOfItemsInInventory(itemName));
-				}
-				else
-					View.println("No such item to inspect in your inventory.");
-			}
-			
-			// Drop item
-			else if (action.equals("drop"))
-			{
-				// The player drops the item from their inventory and adds it to the current room's items HashMap
-				// The item is removed from the inventory
-				targetItem = this.getItemFromInventoryByName(itemName);
-				if (targetItem != null)
-				{
-					// Remove item from inventory
-					this._removeItemFromInventory(targetItem);
+        // Declare attributes
+        String action = cmdParts[0];
+        String itemName = (cmdParts.length > 1) ? cmdParts[1].trim() : "";
 
-					// Add item to current room
-					this.currentRoom.addItem(itemName, targetItem);
-					
-					View.println("Dropped " + targetItem.getItemName() + ". Added to " + this.currentRoom.getRoomName());
-				}
-				else
-					View.println("No such item to drop in your inventory.");
-			}
-		}
-		
-		// If item name is empty, print error message and return
-		else
-			View.println("Invalid command: no item name provided.");		
-	}
-	
+        /* Handle the proper interaction with the given item name */
+        if (!itemName.isEmpty())
+        {
+            Item targetItem;
+
+            // Pickup item
+            if (action.equals("pickup"))
+            {
+                // The player picks up the item from the current room and adds it to their inventory
+                // The item is removed from the current room's items
+                targetItem = this.currentRoom.getItemByName(itemName);
+                if (targetItem != null)
+                {
+                    // Add item to inventory
+                    this._addItemToInventory(targetItem);
+
+                    // Remove item from current room
+                    this.currentRoom.removeItem(itemName, targetItem);
+
+                    View.println("Picked up " + targetItem.getItemName() + ". Added to Inventory");
+                }
+                else
+                    View.println("No such item to pick up in the current room.");
+            }
+
+            // Inspect item
+            else if (action.equals("inspect"))
+            {
+                // The player inspects the item in their inventory and prints its details to console
+                // The item is not removed from the inventory
+                targetItem = this.getItemFromInventoryByName(itemName);
+                if (targetItem != null)
+                {
+                    View.println("Inspecting item in inventory...");
+                    View.println("");
+                    View.println(targetItem.toString());
+                    View.println("");
+                    View.println("Number owned in inventory: " + this._getQuantityOfItemsInInventory(itemName));
+                }
+                else
+                    View.println("No such item to inspect in your inventory.");
+            }
+
+            // Drop item
+            else if (action.equals("drop"))
+            {
+                // The player drops the item from their inventory and adds it to the current room's items HashMap
+                // The item is removed from the inventory
+                targetItem = this.getItemFromInventoryByName(itemName);
+                if (targetItem != null)
+                {
+                    // Remove item from inventory
+                    this._removeItemFromInventory(targetItem);
+
+                    // Add item to current room
+                    this.currentRoom.addItem(itemName, targetItem);
+
+                    View.println("Dropped " + targetItem.getItemName() + ". Added to " + this.currentRoom.getRoomName());
+                }
+                else
+                    View.println("No such item to drop in your inventory.");
+            }
+        }
+
+        // If item name is empty, print error message and return
+        else
+            View.println("Invalid command: no item name provided.");
+    }
 	public boolean attemptToSolvePuzzle(String userInput)
 	{
 		/* Guard Clauses */
@@ -304,6 +302,10 @@ public class Player extends Character
 		// Attempt to solve the puzzle
 		return this.currentRoom.getPuzzle().checkSolution(userInput);
 	}
+
+    public void addItemToInventory(Item item) {
+        this._addItemToInventory(item);
+    }
 }
 
 
