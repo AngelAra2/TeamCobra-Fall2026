@@ -12,6 +12,16 @@ public class View {
 		System.out.println(line);
 	}
 	
+	public static void printObject(Object obj)
+	{
+		System.out.print(obj);
+	}
+	
+	public static void printlnObject(Object obj)
+	{
+		System.out.println(obj);
+	}
+	
 	public static void separate(int iterations)
 	{
 		/* Used for separating sections of the console output for easier reading */

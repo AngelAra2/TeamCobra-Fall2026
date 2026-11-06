@@ -1,5 +1,8 @@
 package Model.Combat;
 
+import Model.*;
+import Model.Util.*;
+
 public abstract class Combatant 
 {
 	/* Data Fields */
@@ -8,6 +11,8 @@ public abstract class Combatant
 	protected int maxHP;
 	protected int physicalDEF;
 	protected int magicDEF;
+	protected Room currentRoom;
+	protected FiniteStateMachine stateMachine;
 
 	/* Constructors */
 	public Combatant(
@@ -22,6 +27,7 @@ public abstract class Combatant
 		this.currentHP = maxHP;
 		this.physicalDEF = physicalDEF;
 		this.magicDEF = magicDEF;
+		this.currentRoom = null;
 	}
 
 	/* Methods */
@@ -41,8 +47,17 @@ public abstract class Combatant
 	public boolean isAlive() { return (currentHP > 0); }
 
 	// Setters //
+	public void setCurrentRoom(Room room)
+	{
+		this.currentRoom = room;
+	}
 
 	// Custom //
+	public void removeFromCurrentRoom()
+	{
+		this.currentRoom = null;
+	}
+
 	public void takeDamage(int damage, String dmgType)
 	{
 		// Calculate effective damage based on damage type and defense

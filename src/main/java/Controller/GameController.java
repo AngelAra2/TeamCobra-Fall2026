@@ -1,4 +1,5 @@
 package Controller;
+
 import Model.CommandProcessor;
 import Model.Map;
 import Model.Player;
@@ -58,7 +59,7 @@ public class GameController
 		
 		/* Create core game objects */
 		cmdProcessor = new CommandProcessor();
-		worldMap = new Map("Rooms", "Items", "Puzzles");
+		worldMap = new Map();
 		
 		// Start the player in the first room of the map
 		player = new Player(worldMap.getRoomById(1));

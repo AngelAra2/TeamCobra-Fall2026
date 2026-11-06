@@ -1,7 +1,9 @@
 package Model;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import Model.Combat.Monster;
 import View.View;
 
 public class Player
@@ -149,7 +151,7 @@ public class Player
 	
 	public void exploreCurrentRoom()
 	{
-		/* Return the HashMap of items in the current room */
+		/* Explore the current room for items/puzzles/monsters */
 		
 		// Get all items in the current room
 		HashMap<String, ArrayList<Item>> allItems = this.currentRoom.getItems();
@@ -163,13 +165,35 @@ public class Player
 				String itemName = getFirstItem.getItemName();
 				int itemQuantity = itemList.size();
 				
-				View.println("- " + itemName + " (×" + itemQuantity + ")");
+				View.println("- " + itemName + " (x" + itemQuantity + ")");
 			}
 		}
 		
 		// If no items were found, print message
 		else
 			View.println("No items found in this room.");
+		
+		View.println(""); // Add a blank line for spacing
+		
+		// Get all monsters in the current room //
+		HashMap<String, ArrayList<Monster>> allMonsters = this.currentRoom.getMonsters();
+		if (allMonsters.size() > 0)
+		{
+			View.println("Monsters found in this room:");
+			for (ArrayList<Monster> monsterList: allMonsters.values())
+			{
+				// Print out item name and quantity of each item in the room
+				Monster getFirstMonster = monsterList.get(0);
+				String monsterName = getFirstMonster.getName();
+				int monsterQuantity = monsterList.size();
+				
+				View.println("- " + monsterName + " (x" + monsterQuantity + ")");
+			}
+		}
+		
+		// If no monsters were found, print message
+		else
+			View.println("No monsters found in this room.");
 	}
 	
 	public void viewInventory()
@@ -189,7 +213,7 @@ public class Player
 				String itemName = getFirstItem.getItemName();
 				int itemQuantity = this._getQuantityOfItemsInInventory(itemName);
 				
-				View.println("- " + itemName + " (×" + itemQuantity + ")");
+				View.println("- " + itemName + " (x" + itemQuantity + ")");
 			}
 		}
 		
@@ -210,6 +234,7 @@ public class Player
 		// Declare attributes
 		String action = cmdParts[0];
 		String itemName = (cmdParts.length > 1) ? cmdParts[1] : "";
+		itemName = itemName.toLowerCase();
 		
 		/* Handle the proper interaction with the given item name */
 		if (!itemName.isEmpty())
