@@ -190,7 +190,7 @@ public class Player extends Character
 		HashMap<String, ArrayList<Item>> allItems = this.currentRoom.getItems();
 		if (allItems.size() > 0)
 		{
-			View.printColored("Items found in this room:", "orange", true);
+			View.println("Items found in this room:");
 			for (ArrayList<Item> itemList: allItems.values())
 			{
 				// Print out item name and quantity of each item in the room
@@ -204,7 +204,7 @@ public class Player extends Character
 		
 		// If no items were found, print message
 		else
-			View.printColored("No items found in this room", "orange", true);
+			View.println("No items found in this room");
 		
 		View.println("");
 		
@@ -212,7 +212,7 @@ public class Player extends Character
 		HashMap<String, ArrayList<Monster>> allMonsters = this.currentRoom.getMonsters();
 		if (allMonsters.size() > 0)
 		{
-			View.printColored("Monsters found in this room:", "red", true);
+			View.println("Monsters found in this room:");
 			for (ArrayList<Monster> monsterList: allMonsters.values())
 			{
 				// Print out item name and quantity of each item in the room
@@ -237,7 +237,7 @@ public class Player extends Character
 		// Get all items in the player's inventory
 		if (this.inventory.size() > 0)
 		{
-			View.printColored("Inventory:", "orange", true);
+			View.println("Inventory:");
 			for (ArrayList<Item> itemList: this.inventory.values())
 			{
 				// Print out item name and quantity of each item in the room
@@ -251,7 +251,7 @@ public class Player extends Character
 		
 		// If no items were found, print message
 		else
-			View.printColored("Inventory empty", "orange", true);
+			View.println("Inventory empty");
 	}
 
     public void handleItemInteraction(String cmd)
@@ -285,7 +285,7 @@ public class Player extends Character
                     // Remove item from current room
                     this.currentRoom.removeItem(itemName, targetItem);
 
-                    View.printColored("Picked up " + targetItem.getItemName(), "orange", true);
+                    View.println("Picked up " + targetItem.getItemName() + ". Added to Inventory");
                 }
                 else
                     View.println("No such item to pick up in the current room.");
@@ -301,7 +301,7 @@ public class Player extends Character
                 {
                     View.println("Inspecting item in inventory...");
                     View.println("");
-                    View.printColored(targetItem.toString(), "orange", true);
+                    View.println(targetItem.toString());
                     View.println("");
                     View.println("Number owned in inventory: " + this._getQuantityOfItemsInInventory(itemName));
                 }
@@ -323,13 +323,14 @@ public class Player extends Character
                     // Add item to current room
                     this.currentRoom.addItem(itemName, targetItem);
 
-                    View.printColored("Dropped " + targetItem.getItemName(), "orange", true);
+                    View.println("Dropped " + targetItem.getItemName() + ". Added to " + this.currentRoom.getRoomName());
                     
                     // If the dropped item was the currently equipped weapon, unequip it
                     if (targetItem instanceof Weapon && this.equippedWeapon == targetItem)
+                    {
                     	this.handleItemInteraction("unequip " + itemName);
+                    }
                 }
-                
                 else
                     View.println("No such item to drop in your inventory");
             }
@@ -351,10 +352,10 @@ public class Player extends Character
 						
 						// Equip the weapon
 						this.equipWeapon((Weapon) targetItem);
-						View.printColored("Equipped " + targetItem.getItemName(), "orange", true);
+						View.println("Equipped " + targetItem.getItemName());
 					}
 					else
-						View.printColored("Cannot equip " + targetItem.getItemName() + " since it isn't a weapon", "red", true);
+						View.println("Cannot equip " + targetItem.getItemName() + " since it isn't a weapon");
 				}
 				else
 					View.println("No such weapon to equip in your inventory");
@@ -370,7 +371,7 @@ public class Player extends Character
 					Weapon unequippedWeapon = this.equippedWeapon;
 					
 					this.unequipWeapon();
-					View.printColored("Unequipped " + unequippedWeapon.getItemName(), "orange", true);
+					View.println("Unequipped " + unequippedWeapon.getItemName());
 				}				
 				else
 					View.println("No weapon is currently equipped");
@@ -401,13 +402,11 @@ public class Player extends Character
 						// Remove the consumable from the player's inventory after use
 						this._removeItemFromInventory(consumable);
 						
-						View.printColored("Used " + consumable.getItemName() + " to heal " + healingAmount + " HP", "green", true);
+						View.println("Used " + consumable.getItemName() + " to heal " + healingAmount + " HP");
 					}
-					
 					else
 						View.println("Cannot use " + targetItem.getItemName() + " to heal since it isn't a consumable");
 				}
-				
 				else
 					View.println("No such consumable to use in your inventory");
 				
@@ -417,7 +416,7 @@ public class Player extends Character
 
         // If item name is empty, print error message and return
         else
-            View.println("Invalid command: no item name provided");
+            View.println("Invalid command: no item name provided.");
     }
     
     public void handleMonsterInteraction(String cmd)
@@ -456,7 +455,6 @@ public class Player extends Character
 
     					View.println("You've attacked " + targetMonster.getName() + "!");
     				}
-        			
     				else
     					View.println("No such monster to attack in the current room");
         		}
@@ -468,7 +466,7 @@ public class Player extends Character
 					monsterName = targetMonster.getName();
 					this.getCurrentRoom().removeMonster(monsterName, targetMonster);
 
-					View.printColored("You've chosen to ignore " + monsterName + ". You won't see them again...for now", "green", true);
+					View.println("You've chosen to ignore " + monsterName + ". You won't see them again...for now");
 				}
         		
         		// Reset the examined monster after taking action
@@ -492,9 +490,8 @@ public class Player extends Character
     					this.setExaminedMonster(targetMonster);
 
     					View.println("");
-    					View.printColored(targetMonster.toString(), "red", true);
+    					View.printlnObject(targetMonster);
     				}
-    				
     				else
     					View.println("No such monster to examine in the current room");
             	}

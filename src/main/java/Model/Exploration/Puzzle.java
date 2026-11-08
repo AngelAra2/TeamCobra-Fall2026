@@ -95,4 +95,3 @@ public class Puzzle
 				+ "Puzzle prompt: " + this.puzzleDesc;
 	}
 }
-

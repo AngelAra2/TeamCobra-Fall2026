@@ -82,7 +82,7 @@ public class Monster extends Combatant
 	{
 		return "[" + this.name + "]\n"
 				+ this.description + "\n\n"
-				+ "---< STATS >---\n"
+				+ "=== STATS ===\n"
 				+ "- HP: " + this.currentHP + "/" + this.maxHP + "\n"
 				+ "- Attack: " + this.attack;
 	}

@@ -78,13 +78,13 @@ public class Battlefield
 		if (!Battlefield.canBattleContinue())
 			return;
 		
-		View.printColored("-----<< BATTLE STATUS >>-----", "yellow", true);
+		View.println("=== BATTLE STATUS ===");
 		
 		/* Print player's party status */
 		View.println("");
 		BattleView.printCombatantStatus(Battlefield.playerCombatant);
 
-		View.printColored("\n-------------------- VS. --------------------\n", "yellow", true);
+		View.println("\n-------------------- VS. --------------------\n");
 		
 		/* Print monsters' statuses */
 		for (Monster monster: Battlefield.monsters)
