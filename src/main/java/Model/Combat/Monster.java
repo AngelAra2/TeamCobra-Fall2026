@@ -2,9 +2,11 @@ package Model.Combat;
 
 import java.util.List;
 
-import Model.Item;
+import Model.AbstractClasses.Combatant;
+import Model.AbstractClasses.Item;
 
-public class Monster extends Combatant {
+public class Monster extends Combatant 
+{
 	/* Data Fields */
 	private int id;
 	private String description;
@@ -21,6 +23,7 @@ public class Monster extends Combatant {
 			int maxHP,
 			int physicalDEF,
 			int magicDEF,
+			int attack,
 			
 			int id,
 			String description,
@@ -29,7 +32,13 @@ public class Monster extends Combatant {
 			boolean isBoss
 		) 
 	{
-		super(name, maxHP, physicalDEF, magicDEF);
+		super(
+			name, 
+			maxHP, 
+			physicalDEF,
+			magicDEF, 
+			attack
+		);
 		
 		this.id = id;
 		this.description = description;
@@ -44,6 +53,7 @@ public class Monster extends Combatant {
 	
 	// Getters //
 	public boolean isBossMonster() { return this.isBoss; }
+	public String getDescription() { return this.description; }
 
 	// Setters //
 	public void markDefeated() { this.isDefeated = true; }
@@ -65,4 +75,15 @@ public class Monster extends Combatant {
 		return null;
 	}
 	*/
+	
+	// Overrides //
+	@Override
+	public String toString()
+	{
+		return "[" + this.name + "]\n"
+				+ this.description + "\n\n"
+				+ "=== STATS ===\n"
+				+ "- HP: " + this.currentHP + "/" + this.maxHP + "\n"
+				+ "- Attack: " + this.attack;
+	}
 }

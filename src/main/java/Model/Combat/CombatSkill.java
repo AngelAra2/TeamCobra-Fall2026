@@ -1,6 +1,10 @@
 package Model.Combat;
 
-public class CombatSkill {
+import Model.AbstractClasses.Character;
+import Model.AbstractClasses.Combatant;
+
+public class CombatSkill 
+{
 	/* Data Fields */
 	private int id;
 	private String name;
@@ -13,8 +17,7 @@ public class CombatSkill {
 	private int manaCost;
 	private int hitCount;
 	// private List<Weapon> usuableWeapons; // Need to implement Weapon class; uncomment as needed
-	
-	
+
 	// Added list of usable weapons
 
 	/* Constructors */
@@ -68,7 +71,8 @@ public class CombatSkill {
 	// (WIP 10.29.2026)
 	public void castSkill(Combatant user, Combatant target)
 	{
-		
+		return;
 	}
+	
 	// Overrides //
 }

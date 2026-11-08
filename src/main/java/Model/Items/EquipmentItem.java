@@ -1,4 +1,4 @@
-package Model.Item;
+package Model.Items;
 
 public class EquipmentItem {
 

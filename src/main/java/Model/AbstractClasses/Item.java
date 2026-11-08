@@ -1,5 +1,9 @@
-package Model;
-public abstract class Item {
+package Model.AbstractClasses;
+
+import Model.Exploration.Room;
+
+public abstract class Item 
+{
 	/* Data Fields */
     private Room currentRoom;
     private int itemId;
@@ -28,9 +32,7 @@ public abstract class Item {
     }
 	
 	/* Methods */
-	
-	// Private //
-	
+
 	// Getters //
     public double getWeight() {
         return this.weight;
@@ -51,17 +53,12 @@ public abstract class Item {
 		return this.itemDesc;
 	}
 
+
 	// Setters //
-	public void setCurrentRoom(Room room)
-	{
-		this.currentRoom = room;
-	}
+	public void setCurrentRoom(Room room) { this.currentRoom = room; }
 
 	// Custom //
-	public void removeFromCurrentRoom()
-	{
-		this.currentRoom = null;
-	}
+	public void removeFromCurrentRoom() { this.currentRoom = null; }
 	
 	// Overrides //
 	@Override

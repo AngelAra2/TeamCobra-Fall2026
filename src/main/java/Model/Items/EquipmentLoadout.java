@@ -1,4 +1,4 @@
-package Model.Item;
+package Model.Items;
 import java.util.HashMap;
 
 public class EquipmentLoadout {

@@ -1,8 +1,12 @@
-package Model.Combat;
+package Model.AbstractClasses;
 
 import java.util.List;
 
-public abstract class Character extends Combatant {
+import Model.Combat.CombatSkill;
+import Model.Items.*;
+
+public abstract class Character extends Combatant 
+{
 	/* Data Fields */
 
 	protected int currentLevel;
@@ -14,7 +18,7 @@ public abstract class Character extends Combatant {
 	protected int dexterity;
 	protected int arcane;
 	protected int endurance;
-	// protected Equipment equipment; // Need to implement Equipment class; uncomment as needed
+	protected Weapon equippedWeapon;
 	protected List<CombatSkill> skills;
     protected EquipmentLoadout equipmentLoadout;
 
@@ -24,6 +28,7 @@ public abstract class Character extends Combatant {
 			int maxHP,
 			int physicalDEF,
 			int magicDEF,
+			int attack,
 
 			int currentLevel,
 			int currentXP,
@@ -37,9 +42,8 @@ public abstract class Character extends Combatant {
 			List<CombatSkill> skills
 		) 
 	{
-		super(name, maxHP, physicalDEF, magicDEF);
 
-
+		super(name, maxHP, physicalDEF, magicDEF, attack);
 		this.currentLevel = currentLevel;
 		this.currentXP = currentXP;
 		this.currentMana = currentMana;
@@ -56,10 +60,9 @@ public abstract class Character extends Combatant {
 	/* Methods */
 	
 	// Private //
-	private void setMana(int mana)
-	{
-		this.currentMana = Math.clamp(mana, 0, this.calculateMaxMana());
-	}
+	
+	// Keep currentMana within 0 and maxMana
+	private void setMana(int mana) { this.currentMana = Math.clamp(mana, 0, this.calculateMaxMana()); }
 
 	// Getters //
     public EquipmentLoadout getEquipmentLoadout() {
@@ -75,47 +78,33 @@ public abstract class Character extends Combatant {
         return 15 + this.endurance;
     }
 
+	public int getTotalAttack()
+	{
+		/* Return total Attack of character */
+		int totalAttack = this.attack;
+		
+		// Add weapon's base attack if a weapon is equipped
+		if (this.equippedWeapon != null)
+			totalAttack += this.equippedWeapon.getBaseAttack();
+
+		return totalAttack;
+	}
+
 	// Setters //
 
 	// Custom //
-	public int calculateMaxHP()
-	{
-		// Gain 5 Max HP per level beyond the first
-		return this.baseMaxHP + (5 * (this.currentLevel - 1));
-	}
 	
-	public int calculateMaxMana()
-	{
-		// Base Mana is 30
-		// Gain 2 Max Mana per point of Intelligence
-		return 30 + (2 * this.intelligence);
-	}
+	// Gain 5 Max HP per level beyond the first
+	public int calculateMaxHP() { return this.baseMaxHP + (5 * (this.currentLevel - 1)); }
 	
-	// (WIP 10.29.2026)
-	/*
-	public double calculateCritChance()
-	{
-		return 0.0;
-	}
-	*/
-	
-	// (WIP 10.29.2026)
-	/*
-	public double calculateEquipLoad()
-	{
-		return 0.0;
-	}
-	*/
-	
-	public void spendMana(int amount)
-	{
-		this.setMana(this.currentMana - amount);
-	}
-	
-	public void restoreMana(int amount)
-	{
-		this.setMana(this.currentMana + amount);
-	}
+	// Base Mana is 30
+	// Gain 2 Max Mana per point of Intelligence
+	public int calculateMaxMana() { return 30 + (2 * this.intelligence); }
+
+	public void spendMana(int amount) { this.setMana(this.currentMana - amount); }
+	public void restoreMana(int amount) { this.setMana(this.currentMana + amount); }
+	public void equipWeapon(Weapon weapon) { this.equippedWeapon = weapon; }
+	public void unequipWeapon() { this.equippedWeapon = null; }
 	
 	public void levelUp()
 	{
@@ -128,27 +117,6 @@ public abstract class Character extends Combatant {
 		this.setCurrentHP(this.getMaxHP());
 		this.setMana(this.calculateMaxMana());
 	}
-	
-	// (WIP 10.29.2026)
-	/*
-	public boolean equip(EquipmentItem item)
-	{
-		return false;
-	}
-	*/
-	
-	// (WIP 10.29.2026)
-	/*
-	public boolean unequip(EquipmentSlot slo)
-	{
-		return false;
-	}
-	*/
-	
-	public String getStatus()
-	{
-		return "";
-	}
-	
+
 	// Overrides //
 }

@@ -1,4 +1,7 @@
-package Model.Combat;
+package Model.AbstractClasses;
+
+import Model.Exploration.Room;
+import Model.Util.*;
 
 public abstract class Combatant 
 {
@@ -8,26 +11,31 @@ public abstract class Combatant
 	protected int maxHP;
 	protected int physicalDEF;
 	protected int magicDEF;
+	protected int attack;
+	protected Room currentRoom;
+	protected FiniteStateMachine stateMachine;
 
 	/* Constructors */
 	public Combatant(
-			String name, 
-			int maxHP, 
-			int physicalDEF, 
-			int magicDEF
-		) 
+		String name, 
+		int maxHP, 
+		int physicalDEF, 
+		int magicDEF,
+		int attack
+	)
 	{
 		this.name = name;
 		this.maxHP = maxHP;
 		this.currentHP = maxHP;
 		this.physicalDEF = physicalDEF;
 		this.magicDEF = magicDEF;
+		this.attack = attack;
+		this.currentRoom = null;
 	}
 
 	/* Methods */
 	
 	// Private //
-	
 	// Ensure currentHP is within 0 and maxHP
 	protected void setCurrentHP(int currentHP) { this.currentHP = Math.clamp(currentHP, 0, this.maxHP); }
 	
@@ -38,11 +46,29 @@ public abstract class Combatant
 	public String getName() { return name; }
 	public int getCurrentHP() { return currentHP; }
 	public int getMaxHP() { return maxHP; }
+	public int getPhysicalDEF() { return physicalDEF; }
+	public int getMagicDEF() { return magicDEF; }
+	public int getAttack() { return attack; }
 	public boolean isAlive() { return (currentHP > 0); }
 
 	// Setters //
-
+	public void setCurrentRoom(Room room) { this.currentRoom = room; }
+	
 	// Custom //
+	
+	// Heal the combatant by a certain amount
+	public void heal(int healing) { setCurrentHP(this.getCurrentHP() + healing); }
+	
+	public void removeFromCurrentRoom() { this.currentRoom = null; }
+	
+	public void initStateMachine(String[] allStates)
+	{
+		// Create state machine if it's not already created
+		// Should be called only once
+		if (this.stateMachine == null)
+			this.stateMachine = new FiniteStateMachine(allStates);
+	}
+	
 	public void takeDamage(int damage, String dmgType)
 	{
 		// Calculate effective damage based on damage type and defense
@@ -66,13 +92,7 @@ public abstract class Combatant
 		// Reduce current HP by effective damage
 		setCurrentHP(this.getCurrentHP() - effectiveDamage);
 	};
-	
-	// Heal the combatant by a certain amount
-	public void heal(int healing) 
-	{ 
-		setCurrentHP(this.getCurrentHP() + healing);
-	}
-	
+
 	// Overrides //
 }
 
