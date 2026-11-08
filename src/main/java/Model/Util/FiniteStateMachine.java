@@ -2,7 +2,8 @@ package Model.Util;
 
 import java.util.*;
 
-public class FiniteStateMachine {
+public class FiniteStateMachine 
+{
 	/* Data Fields */
 	private String currentState;
 	private String previousState;
@@ -27,8 +28,8 @@ public class FiniteStateMachine {
 	// Setters //
 	public void setCurrentState(String newState)
 	{
-		// Change state only if the new state is in the list of all states and is not the same as the previous state
-		if (this.allStates.contains(newState) && this.previousState != newState)
+		// Change state only if the new state is in the list of all states and is not the same as the current state
+		if (this.allStates.contains(newState) && this.currentState != newState)
 		{
 			this.previousState = this.currentState;
 			this.currentState = newState;

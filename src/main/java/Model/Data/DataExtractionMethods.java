@@ -2,17 +2,36 @@ package Model.Data;
 
 import java.util.*;
 
-import Model.Item;
-import Model.Map;
-import Model.Puzzle;
-import Model.Room;
+import Model.AbstractClasses.Combatant;
+import Model.AbstractClasses.Item;
 import Model.Combat.Monster;
+import Model.Exploration.Map;
+import Model.Exploration.Puzzle;
+import Model.Exploration.Room;
+import Model.Items.Consumable;
+import Model.Items.Weapon;
 
-public class DataExtractionMethods {
+public class DataExtractionMethods 
+{
 
 	/* Data Fields */
 	private static String delimiterA = "_";
 	private static String delimiterB = ",";
+	
+	//------------------------------------//
+	
+	/* Helper Methods */
+	
+	public static String[] trimStringArray(String[] arr)
+	{
+		/* Used to trim all strings in a string array */
+		for (int i = 0; i < arr.length; i++)
+			arr[i] = arr[i].trim();
+		
+		return arr;
+	}
+	
+	//------------------------------------//
 	
 	/* Extract data from a file and parse it into Room objects */
 	public static void extractMapData(Scanner fileScanner, Map worldMap)
@@ -26,7 +45,7 @@ public class DataExtractionMethods {
 			String currentLine = fileScanner.nextLine().trim();
 
 			// Use delimiter to split string into readable attributes
-			String[] attributes = currentLine.split(delimiterA);
+			String[] attributes = trimStringArray(currentLine.split(delimiterA));
 			
 			// Declare required attributes
 			int roomId;
@@ -71,7 +90,8 @@ public class DataExtractionMethods {
 			// Read exits //
 			try
 			{
-				String[] roomExits = attributes[3].split(delimiterB);
+				// Read exits as a single string and split it into an array of strings
+				String[] roomExits = trimStringArray(attributes[attributes.length - 1].split(delimiterB));
 				
 				// Store each exit as its own entry in the HashMap
 				int exitRoomId;
@@ -138,10 +158,11 @@ public class DataExtractionMethods {
 			String currentLine = fileScanner.nextLine().trim();
 
 			// Use delimiter to split string into readable attributes
-			String[] attributes = currentLine.split(delimiterA);
-			
+			String[] attributes = trimStringArray(currentLine.split(delimiterA));
+
 			// Declare required attributes
 			int itemId;
+			String itemType = "...";
 			String itemName = "Item";
 			String itemDesc = "...";
 
@@ -159,10 +180,20 @@ public class DataExtractionMethods {
 				continue;
 			}
 			
+			// Read itemType
+			try
+			{
+				itemType = attributes[1];
+			}
+			catch (ArrayIndexOutOfBoundsException e)
+			{
+				continue;
+			}
+			
 			// Read itemName
 			try
 			{
-				itemName = attributes[1];
+				itemName = attributes[2];
 			}
 			catch (ArrayIndexOutOfBoundsException e)
 			{
@@ -172,7 +203,7 @@ public class DataExtractionMethods {
 			// Read itemDesc
 			try
 			{
-				itemDesc = attributes[2];
+				itemDesc = attributes[3];
 			}
 			catch (ArrayIndexOutOfBoundsException e)
 			{
@@ -183,7 +214,8 @@ public class DataExtractionMethods {
 			// Depending on the number of room IDs listed in the file, a new Item object will be created for each room ID
 			try
 			{
-				String[] targetRoomIds = attributes[attributes.length - 1].split(delimiterB);
+				// Read room IDs as a single string and split it into an array of strings
+				String[] targetRoomIds = trimStringArray(attributes[attributes.length - 1].split(delimiterB));
 				
 				// Create a new Item object for each room ID listed
 				int roomId;
@@ -204,7 +236,50 @@ public class DataExtractionMethods {
 					}
 					
 					/* Create Item object */
-					Item item = new Item(itemId, itemName, itemDesc);
+					
+					// Check item type and create the appropriate subclass object
+					Item item;
+					switch (itemType.toLowerCase())
+					{
+						case "weapon":
+							int baseAttack = 0;
+							try
+							{
+								baseAttack = Integer.parseInt(attributes[4]);
+							}
+							catch (NumberFormatException e)
+							{
+								// Leave default value
+							}
+							catch (ArrayIndexOutOfBoundsException e)
+							{
+								// Leave default value
+							}
+							
+							item = new Weapon(itemId, itemName, itemDesc, baseAttack);
+							break;
+							
+						case "consumable":
+							int healingAmount = 0;
+							try
+							{
+								healingAmount = Integer.parseInt(attributes[4]);
+							}
+							catch (NumberFormatException e)
+							{
+								// Leave default value
+							}
+							catch (ArrayIndexOutOfBoundsException e)
+							{
+								// Leave default value
+							}
+							
+							item = new Consumable(itemId, itemName, itemDesc, healingAmount);
+							break;
+							
+						default:
+							continue; // Skip this item if the type is unrecognized
+					}
 					
 					// Add item to the room with the matching room ID, if it exists
 					if (rooms.containsKey(roomId))
@@ -230,7 +305,7 @@ public class DataExtractionMethods {
 			String currentLine = fileScanner.nextLine().trim();
 
 			// Use delimiter to split string into readable attributes
-			String[] attributes = currentLine.split(delimiterA);
+			String[] attributes = trimStringArray(currentLine.split(delimiterA));
 			
 			// Declare required attributes
 			int puzzleId;
@@ -333,11 +408,7 @@ public class DataExtractionMethods {
 			String currentLine = fileScanner.nextLine().trim();
 
 			// Use delimiter to split string into readable attributes
-			String[] attributes = currentLine.split(delimiterA);
-			
-			// Trim all string attributes to remove whitespace
-			for (int i = 0; i < attributes.length; i++)
-				attributes[i] = attributes[i].trim();
+			String[] attributes = trimStringArray(currentLine.split(delimiterA));
 			
 			// Declare required attributes
 			int monsterId;
@@ -346,6 +417,7 @@ public class DataExtractionMethods {
 			int maxHP = 10;
 			int physicalDEF = 0;
 			int magicDEF = 0;
+			int attack = 1;
 			int xpReward = 1;
 			int goldReward = 1;
 			boolean isBoss = false;
@@ -426,10 +498,24 @@ public class DataExtractionMethods {
 				// Leave blank
 			}
 			
+			// Read attack
+			try
+			{
+				attack = Integer.parseInt(attributes[6]);
+			}
+			catch (NumberFormatException e)
+			{
+				// Leave blank
+			}
+			catch (ArrayIndexOutOfBoundsException e)
+			{
+				// Leave blank
+			}
+			
 			// Read xpReward
 			try
 			{
-				xpReward = Integer.parseInt(attributes[6]);
+				xpReward = Integer.parseInt(attributes[7]);
 			}
 			catch (NumberFormatException e)
 			{
@@ -443,7 +529,7 @@ public class DataExtractionMethods {
 			// Read goldReward
 			try
 			{
-				goldReward = Integer.parseInt(attributes[7]);
+				goldReward = Integer.parseInt(attributes[8]);
 			}
 			catch (NumberFormatException e)
 			{
@@ -457,7 +543,7 @@ public class DataExtractionMethods {
 			// Read isBoss
 			try
 			{
-				isBoss = Boolean.parseBoolean(attributes[8]);
+				isBoss = Boolean.parseBoolean(attributes[9]);
 			}
 			catch (ArrayIndexOutOfBoundsException e)
 			{
@@ -468,7 +554,8 @@ public class DataExtractionMethods {
 			// Depending on the number of room IDs listed in the file, a new Monster object will be created for each room ID
 			try
 			{
-				String[] targetRoomIds = attributes[attributes.length - 1].split(delimiterB);
+				// Read room IDs as a single string and split it into an array of strings
+				String[] targetRoomIds = trimStringArray(attributes[attributes.length - 1].split(delimiterB));
 				
 				// Create a new Item object for each room ID listed
 				int roomId;
@@ -495,17 +582,18 @@ public class DataExtractionMethods {
 						
 					/* Create Monster object */
 					Monster monster = new Monster(
-							monsterName, 
-							maxHP, 
-							physicalDEF, 
-							magicDEF,
-							
-							monsterId,
-							monsterDesc,
-							xpReward,
-							goldReward,
-							isBoss
-						);
+						monsterName, 
+						maxHP, 
+						physicalDEF, 
+						magicDEF,
+						attack,
+						
+						monsterId,
+						monsterDesc,
+						xpReward,
+						goldReward,
+						isBoss
+					);
 					
 					// Add monster to the room with the matching room ID, if it exists
 					rooms.get(roomId).addMonster(monsterName.toLowerCase(), monster);
@@ -518,9 +606,32 @@ public class DataExtractionMethods {
 		}
 	}
 	
-	public static void extractFiniteStatesData(Scanner fileScanner)
+	/* Extract data from a file and parse it into a finite state machine for a Combatant object */
+	public static void extractFiniteStatesData(Scanner fileScanner, Combatant combatant)
 	{
+		// Read states data //
+		if (fileScanner.hasNextLine())
+		{
+			// TEST CODE
+			//System.out.println("Extracting states data for " + combatant.getName());
+			
+			/* Read current line to get states data */
+			String currentLine = fileScanner.nextLine().trim();
+	
+			// Use delimiter to split string into readable states
+			String[] states = trimStringArray(currentLine.split(delimiterA));
+			
+			// Trim all string attributes to remove whitespace
+			for (int i = 0; i < states.length; i++)
+				states[i] = states[i].trim();
+			
+			// Initialize the combatant's state machine with the extracted states
+			combatant.initStateMachine(states);
+		}
 		
+		else
+			// No states data found, exit method
+			return;
 	}
 }
 

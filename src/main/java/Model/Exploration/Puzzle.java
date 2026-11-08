@@ -1,5 +1,7 @@
-package Model;
-public class Puzzle {
+package Model.Exploration;
+
+public class Puzzle 
+{
 	/* Data Fields */
 	private int puzzleId;
 	private String puzzleName;
@@ -38,46 +40,16 @@ public class Puzzle {
 	}
 
 	// Getters //
-	public int getPuzzleId()
-	{
-		return this.puzzleId;
-	}
-	
-	public String getPuzzleName()
-	{
-		return this.puzzleName;
-	}
-	
-	public String getPuzzleDescription()
-	{
-		return this.puzzleDesc;
-	}
-	
-	public String getPuzzleSolution()
-	{
-		return this.puzzleSolution;
-	}
-	
-	public int getMaxAttempts()
-	{
-		return this.maxAttempts;
-	}
-	
-	public int getRemainingAttempts()
-	{
-		return this.remainingAttempts;
-	}
-	
-	public boolean getIsSolved()
-	{
-		return this.isSolved;
-	}
+	public int getPuzzleId() { return this.puzzleId; }
+	public String getPuzzleName() { return this.puzzleName; }
+	public String getPuzzleDescription() { return this.puzzleDesc; }
+	public String getPuzzleSolution() { return this.puzzleSolution; }
+	public int getMaxAttempts() { return this.maxAttempts; }
+	public int getRemainingAttempts() { return this.remainingAttempts; }
+	public boolean getIsSolved() { return this.isSolved; }
 
 	// Setters //
-	public void setIsSolved()
-	{
-		this.isSolved = true;
-	}
+	public void setIsSolved() { this.isSolved = true; }
 
 	// Custom //
 	public boolean checkSolution(String userInput)
@@ -117,11 +89,10 @@ public class Puzzle {
 	@Override
 	public String toString()
 	{
-		return "[" + this.puzzleName + " — " 
+		return "[" + this.puzzleName + "] | "
 				+ this.remainingAttempts + "/" 
-				+ this.maxAttempts + " attempts remaining]\n" 
-				+ "- Puzzle prompt: " + this.puzzleDesc + "\n" 
-				+ "- Your answer: ";
+				+ this.maxAttempts + " attempt(s) remaining\n" 
+				+ "Puzzle prompt: " + this.puzzleDesc;
 	}
 }
 

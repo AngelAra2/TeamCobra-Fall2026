@@ -1,6 +1,7 @@
-package Model;
+package Model.Exploration;
 import java.util.*;
 
+import Model.AbstractClasses.Item;
 import Model.Combat.Monster;
 
 public class Room 
@@ -36,40 +37,14 @@ public class Room
 	/* Methods */
 	
 	// Getters //
-	public int getRoomId()
-	{
-		return this.roomId;
-	}
-	
-	public String getRoomName()
-	{
-		return this.roomName;
-	}
-	
-	public String getRoomDescription()
-	{
-		return this.roomDesc;
-	}
-	
-	public boolean getWasVisited()
-	{
-		return this.wasVisited;
-	}
-	
-	public HashMap<String, Integer> getExits()
-	{
-		return this.exits;
-	}
-	
-	public HashMap<String, ArrayList<Item>> getItems()
-	{
-		return this.items;
-	}
-	
-	public HashMap<String, ArrayList<Monster>> getMonsters()
-	{
-		return this.monsters;
-	}
+	public int getRoomId() { return this.roomId; }
+	public String getRoomName() { return this.roomName; }	
+	public String getRoomDescription() { return this.roomDesc; }
+	public boolean getWasVisited() { return this.wasVisited; }
+	public HashMap<String, Integer> getExits() { return this.exits; }
+	public HashMap<String, ArrayList<Item>> getItems() { return this.items; }
+	public HashMap<String, ArrayList<Monster>> getMonsters() { return this.monsters; }	
+	public Puzzle getPuzzle() { return this.puzzle; }
 	
 	public Item getItemByName(String itemName)
 	{
@@ -87,9 +62,20 @@ public class Room
 		return null;
 	}
 	
-	public Puzzle getPuzzle()
+	public Monster getMonsterByName(String monsterName)
 	{
-		return this.puzzle;
+		/* Returns monster of corresponding name */
+		
+		// Checks if the room contains at least one monster of the corresponding
+		// name. If it exists, returns it
+		if (this.monsters.containsKey(monsterName))
+		{
+			ArrayList<Monster> monsterList = this.monsters.get(monsterName);
+			if (monsterList.size() > 0)
+				return monsterList.get(0);
+		}
+		
+		return null;
 	}
 	
 	// Setters //
@@ -200,7 +186,7 @@ public class Room
 		monsterName = monsterName.toLowerCase();
 		
 		// Check if the monster's name is recorded
-		if (this.items.containsKey(monsterName))
+		if (this.monsters.containsKey(monsterName))
 		{
 			ArrayList<Monster> monsterList = this.monsters.get(monsterName);
 			monsterList.remove(monster);

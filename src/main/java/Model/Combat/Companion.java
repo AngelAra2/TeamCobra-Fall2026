@@ -1,10 +1,13 @@
 package Model.Combat;
 
+//import java.util.ArrayList;
 import java.util.List;
 
-import Model.Room;
+import Model.AbstractClasses.Character;
+import Model.Exploration.Room;
 
-public class Companion extends Character {
+public class Companion extends Character 
+{
 	/* Data Fields */
 	private int id;
 	private String partyStatus;
@@ -19,6 +22,7 @@ public class Companion extends Character {
 			int maxHP,
 			int physicalDEF,
 			int magicDEF,
+			int attack,
 			
 			int currentLevel,
 			int currentXP,
@@ -37,23 +41,25 @@ public class Companion extends Character {
 			boolean isRecruited,
 			Room homeRoom
 		) 
-	{
+	{	
 		super(
-				name, 
-				maxHP, 
-				physicalDEF, 
-				magicDEF, 
-				currentLevel, 
-				currentXP, 
-				currentMana, 
-				baseMaxHP, 
-				strength, 
-				intelligence, 
-				dexterity, 
-				arcane, 
-				endurance, 
-				skills
-			);
+			name, 
+			maxHP, 
+			physicalDEF, 
+			magicDEF, 
+			attack,
+			
+			currentLevel, 
+			currentXP, 
+			currentMana, 
+			baseMaxHP, 
+			strength, 
+			intelligence, 
+			dexterity, 
+			arcane, 
+			endurance, 
+			skills
+		);
 		
 		this.id = id;
 		this.partyStatus = partyStatus;

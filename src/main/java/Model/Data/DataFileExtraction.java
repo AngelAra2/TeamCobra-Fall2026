@@ -3,9 +3,11 @@ import java.io.*;
 import java.util.*;
 import java.util.function.*;
 
-import Model.Map;
+import Model.AbstractClasses.Combatant;
+import Model.Exploration.Map;
 
-public class DataFileExtraction {
+public class DataFileExtraction 
+{
 
 	/* Data Fields */
 	// Construct base directory path for data files
@@ -29,11 +31,34 @@ public class DataFileExtraction {
 			// Clean up
 			fileScanner.close();
 		}
-		catch(FileNotFoundException e)
+		catch (FileNotFoundException e)
 		{
 			e.printStackTrace();
 		}
 		finally {} // Left blank on purpose
 	}
 
+	/* Extracts states data from file and populates states machine in combatant */
+	public static void extractStatesDataToCombatant(BiConsumer<Scanner, Combatant> dataParsingMethod, String filePath, Combatant combatant)
+	{
+		/* Get specific data file */
+		File dataFile = new File(resourcesDir, filePath);
+		
+		// Try opening this file and extracting data from it 
+		// using the provided data parsing method
+		try
+		{
+			Scanner fileScanner = new Scanner(dataFile);
+			dataParsingMethod.accept(fileScanner, combatant);
+			
+			// Clean up
+			fileScanner.close();
+		}
+		catch (FileNotFoundException e)
+		{
+			e.printStackTrace();
+		}
+		finally {} // Left blank on purpose
+	}
 }
+

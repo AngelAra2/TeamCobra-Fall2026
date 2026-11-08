@@ -1,4 +1,4 @@
-package Model;
+package Model.Exploration;
 import java.util.*;
 
 import Model.Data.DataFileExtraction;
@@ -34,10 +34,7 @@ public class Map
 	/* Methods */
 	
 	// Getters //
-	public HashMap<Integer, Room> getRooms()
-	{
-		return this.rooms;
-	}
+	public HashMap<Integer, Room> getRooms() { return this.rooms; }
 	
 	public Room getRoomById(int roomId)
 	{
