@@ -1,5 +1,4 @@
 package Model.Combat;
-import Model.Player;
 
 import java.util.ArrayList;
 import java.util.List;

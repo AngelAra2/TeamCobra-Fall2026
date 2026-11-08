@@ -1,5 +1,8 @@
-package Model;
+package Model.Exploration;
 import java.util.*;
+
+import Model.AbstractClasses.Item;
+import Model.Combat.Monster;
 
 public class Room 
 {
@@ -10,6 +13,7 @@ public class Room
 	private boolean wasVisited;
 	private HashMap<String, Integer> exits;
 	private HashMap<String, ArrayList<Item>> items;
+	private HashMap<String, ArrayList<Monster>> monsters;
 	private Puzzle puzzle;
 	
 	/* Constructors */
@@ -26,40 +30,21 @@ public class Room
 		this.wasVisited = false;
 		this.exits = exits;
 		this.items = new HashMap<>();
+		this.monsters = new HashMap<>();
+		this.puzzle = null;
 	}
 	
 	/* Methods */
 	
 	// Getters //
-	public int getRoomId()
-	{
-		return this.roomId;
-	}
-	
-	public String getRoomName()
-	{
-		return this.roomName;
-	}
-	
-	public String getRoomDescription()
-	{
-		return this.roomDesc;
-	}
-	
-	public boolean getWasVisited()
-	{
-		return this.wasVisited;
-	}
-	
-	public HashMap<String, Integer> getExits()
-	{
-		return this.exits;
-	}
-	
-	public HashMap<String, ArrayList<Item>> getItems()
-	{
-		return this.items;
-	}
+	public int getRoomId() { return this.roomId; }
+	public String getRoomName() { return this.roomName; }	
+	public String getRoomDescription() { return this.roomDesc; }
+	public boolean getWasVisited() { return this.wasVisited; }
+	public HashMap<String, Integer> getExits() { return this.exits; }
+	public HashMap<String, ArrayList<Item>> getItems() { return this.items; }
+	public HashMap<String, ArrayList<Monster>> getMonsters() { return this.monsters; }	
+	public Puzzle getPuzzle() { return this.puzzle; }
 	
 	public Item getItemByName(String itemName)
 	{
@@ -77,9 +62,20 @@ public class Room
 		return null;
 	}
 	
-	public Puzzle getPuzzle()
+	public Monster getMonsterByName(String monsterName)
 	{
-		return this.puzzle;
+		/* Returns monster of corresponding name */
+		
+		// Checks if the room contains at least one monster of the corresponding
+		// name. If it exists, returns it
+		if (this.monsters.containsKey(monsterName))
+		{
+			ArrayList<Monster> monsterList = this.monsters.get(monsterName);
+			if (monsterList.size() > 0)
+				return monsterList.get(0);
+		}
+		
+		return null;
 	}
 	
 	// Setters //
@@ -120,6 +116,9 @@ public class Room
 			ArrayList<Item> itemList = this.items.get(itemName);
 			itemList.add(item);
 			
+			// Set the item's current room to this room
+			item.setCurrentRoom(this);
+			
 			return;
 		}
 		
@@ -129,6 +128,9 @@ public class Room
 			ArrayList<Item> itemList = new ArrayList<>();
 			itemList.add(item);
 			this.items.put(itemName, itemList);
+			
+			// Set the item's current room to this room
+			item.setCurrentRoom(this);
 		}
 	}
 	
@@ -136,19 +138,71 @@ public class Room
 	{
 		itemName = itemName.toLowerCase();
 		
-		// Check if the item ID is recorded
+		// Check if the item's name is recorded
 		if (this.items.containsKey(itemName))
 		{
 			ArrayList<Item> itemList = this.items.get(itemName);
 			itemList.remove(item);
 			
-			// Remove the item ID from the HashMap if there are no more items of that ID
+			// Set the item's current room to null
+			item.removeFromCurrentRoom();
+			
+			// Remove the item's name from the HashMap if there are no more items of that name
 			if (itemList.size() <= 0)
 				this.items.remove(itemName);
 		}
 	}
 	
+	public void addMonster(String monsterName, Monster monster)
+	{
+		monsterName = monsterName.toLowerCase();
+
+		// Add monster to the room if its ArrayList exists in the HashMap
+		if (this.items.containsKey(monsterName))
+		{
+			ArrayList<Monster> monsterList = this.monsters.get(monsterName);
+			monsterList.add(monster);
+			
+			// Set the monster's current room to this room
+			monster.setCurrentRoom(this);
+			
+			return;
+		}
+		
+		// If the ArrayList for the monster name doesn't exist, create it and add the monster to it
+		else
+		{
+			ArrayList<Monster> monsterList = new ArrayList<>();
+			monsterList.add(monster);
+			this.monsters.put(monsterName, monsterList);
+			
+			// Set the monster's current room to this room
+			monster.setCurrentRoom(this);
+		}
+	}
+	
+	public void removeMonster(String monsterName, Monster monster)
+	{
+		monsterName = monsterName.toLowerCase();
+		
+		// Check if the monster's name is recorded
+		if (this.monsters.containsKey(monsterName))
+		{
+			ArrayList<Monster> monsterList = this.monsters.get(monsterName);
+			monsterList.remove(monster);
+			
+			// Set the monsters's current room to null
+			monster.removeFromCurrentRoom();
+			
+			// Remove the monster's name from the HashMap if there are no more monsters of that name
+			if (monsterList.size() <= 0)
+				this.monsters.remove(monsterName);
+		}
+	}
+	
 	// Overrides //
+	
+	/*
 	@Override
 	public String toString()
 	{
@@ -184,5 +238,6 @@ public class Room
 
 		return a + b + c + d + e;
 	}
+	*/
 }
 

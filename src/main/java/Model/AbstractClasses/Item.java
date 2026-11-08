@@ -1,5 +1,8 @@
-package Model;
-public class Item 
+package Model.AbstractClasses;
+
+import Model.Exploration.Room;
+
+public abstract class Item 
 {
 	/* Data Fields */
 	private int itemId;
@@ -21,36 +24,17 @@ public class Item
 	}
 	
 	/* Methods */
-	
-	// Private //
-	
+
 	// Getters //
-	public int getItemId()
-	{
-		return this.itemId;
-	}
-	
-	public String getItemName()
-	{
-		return this.itemName;
-	}
-	
-	public String getItemDescription()
-	{
-		return this.itemDesc;
-	}
+	public int getItemId() { return this.itemId; }
+	public String getItemName() { return this.itemName; }
+	public String getItemDescription() { return this.itemDesc; }
 
 	// Setters //
-	public void setCurrentRoom(Room room)
-	{
-		this.currentRoom = room;
-	}
+	public void setCurrentRoom(Room room) { this.currentRoom = room; }
 
 	// Custom //
-	public void removeFromCurrentRoom()
-	{
-		this.currentRoom = null;
-	}
+	public void removeFromCurrentRoom() { this.currentRoom = null; }
 	
 	// Overrides //
 	@Override

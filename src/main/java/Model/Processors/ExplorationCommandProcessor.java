@@ -1,31 +1,16 @@
-package Model;
-import java.util.Scanner;
+package Model.Processors;
 
-public class CommandProcessor 
+import Model.AbstractClasses.CommandProcessor;
+
+public class ExplorationCommandProcessor extends CommandProcessor
 {
-	/* Data Fields */
-	private String currentCmd;
-	private String cmdType;
-	private String processedCmd;
-	private Scanner inputSC;
-
 	/* Constructors */
-	public CommandProcessor()
-	{
-		this.currentCmd = "";
-		this.inputSC = new Scanner(System.in);
-	}
+	public ExplorationCommandProcessor() { super(); }
 	
 	/* Methods */
-	
-	// Private //
-	private void reset()
-	{
-		this.cmdType = "";
-		this.processedCmd = "";
-	}
-	
-	private void processCmd()
+
+	// Custom //	
+	public void processCmd()
 	{
 		/*
 		 * [Process Current Command]
@@ -41,7 +26,15 @@ public class CommandProcessor
 		 * b. "pickup" -> picks up an item from the current room and adds it to the player's inventory
 		 * c. "inspect" -> inspects an item in the player's inventory and prints its details to console
 		 * d. "drop" -> drops an item in the player's inventory and places it in the current room
-		 * e. "inventory" -> prints all item names in the player's inventory to console
+		 * e. "equip" -> equips a weapon in the player's inventory, increasing the player's Attack stat
+		 * f. "unequip" -> unequips the player's currently equipped weapon
+		 * g. "heal" -> uses a consumable item in the player's inventory to heal the player
+		 * h. "inventory" -> prints all item names in the player's inventory to console
+		 * 
+		 * -- Monster Interaction --
+		 * a. "examine [monster name]" -> prints the monster's details to the console
+		 * b. "attack [monster name]" -> attacks a monster in the current room and initiates combat
+		 * c. "ignore [monster name]" -> ignores a monster in the current room and continues exploration. The monster will be removed from the current room
 		 * 
 		 * -- Misc. --
 		 * a. "room" or "location" -> print current room name and description to console
@@ -49,7 +42,7 @@ public class CommandProcessor
 		 * c. "q" or "quit" -> stop running the game and clean up objects
 		 * 
 		 * -- Order of Priority --
-		 * Movement > Item Interaction > Misc.
+		 * Movement > Item Interaction > Monster Interaction > Misc.
 		 */
 		
 		String cmd = this.currentCmd.toLowerCase();
@@ -79,7 +72,7 @@ public class CommandProcessor
 				break;
 		}
 		
-		// Return
+		// Return because a valid movement command was detected
 		if (this.cmdType.equals("move"))
 			return;
 		
@@ -101,12 +94,24 @@ public class CommandProcessor
 			{
 				cmd = "drop";
 			}
+			else if (cmd.startsWith("equip"))
+			{
+				cmd = "equip";
+			}
+			else if (cmd.startsWith("unequip"))
+			{
+				cmd = "unequip";
+			}
+			else if (cmd.startsWith("heal"))
+			{
+				cmd = "heal";
+			}
 			
 			switch (cmd)
 			{
 				// For these commands, the player will take care of the logic for them, 
 				// but the CommandProcessor will process them as "targetItem" commands
-				case "pickup", "inspect", "drop":
+				case "pickup", "inspect", "drop", "equip", "unequip", "heal":
 					this.processedCmd = "targetItem";
 					break;
 				//-----------------------------//
@@ -124,8 +129,45 @@ public class CommandProcessor
 			}
 		}
 		
-		// Return
+		// Return because a valid item interaction command was detected
 		if (this.cmdType.equals("item"))
+			return;
+		
+		// Detect and process monster interaction commands //
+		if (!this.cmdType.equals("monster"))
+		{
+			this.cmdType = "monster";
+			
+			// Check if the command is one of the monster interaction commands
+			if (cmd.startsWith("examine"))
+			{
+				cmd = "examine";
+			}
+			else if (cmd.startsWith("attack"))
+			{
+				cmd = "attack";
+			}
+			else if (cmd.startsWith("ignore"))
+			{
+				cmd = "ignore";
+			}
+			
+			switch (cmd)
+			{
+				// For these commands, the player will take care of the logic for them, 
+				// but the CommandProcessor will process them as "targetMonster" commands
+				case "examine", "attack", "ignore":
+					this.processedCmd = "targetMonster";
+					break;
+				//-----------------------------//
+				default:
+					this.reset();
+					break;
+			}
+		}
+		
+		// Return because a valid monster interaction command was detected
+		if (this.cmdType.equals("monster"))
 			return;
 		
 		// Detect and process miscellaneous commands //
@@ -155,36 +197,6 @@ public class CommandProcessor
 		// If this command cannot be processed, it's an invalid command
 		if (this.cmdType == "")
 			this.cmdType = "invalid";
-	}
-	
-	// Getters //
-	public String getCommandType()
-	{
-		return this.cmdType;
-	}
-	
-	public String getProcessedCommand()
-	{
-		return this.processedCmd;
-	}
-	
-	// Setters //
-	public void setCurrentCommand(String newCmd)
-	{
-		this.currentCmd = newCmd;
-		this.processCmd();
-	}
-	
-	// Custom //
-	public String getUserInput()
-	{
-		// Yields current thread until the user types something in and presses [Enter]/[Return]
-		return inputSC.nextLine().trim();
-	}
-	
-	public void destroy()
-	{
-		this.inputSC.close();
 	}
 }
 
