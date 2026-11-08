@@ -7,10 +7,10 @@ import Model.Data.DataExtractionMethods;
 public class Map
 {
 	/* Data Fields */
-	private static String roomsFilePath = "gameObjects/Rooms";
-	private static String itemsFilePath = "gameObjects/Items";
-	private static String puzzlesFilePath = "gameObjects/Puzzles";
-	private static String monstersFilePath = "gameObjects/Monsters";
+	private static String roomsFilePath = "/gameObjects/Rooms";
+	private static String itemsFilePath = "/gameObjects/Items";
+	private static String puzzlesFilePath = "/gameObjects/Puzzles";
+	private static String monstersFilePath = "/gameObjects/Monsters";
 	
 	private HashMap<Integer, Room> rooms;
 

@@ -1,5 +1,6 @@
 package Model.Data;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.function.*;
 
@@ -9,32 +10,31 @@ import Model.Exploration.Map;
 public class DataFileExtraction 
 {
 
-	/* Data Fields */
-	// Construct base directory path for data files
-	private static File projectDir = new File(System.getProperty("user.dir"));
-		private static File srcDir = new File(projectDir, "src");
-			private static File resourcesDir = new File(srcDir, "resources");
-	
 	/* Extracts data from a file and stores it in the provided world map */
 	public static void extractDataToMap(BiConsumer<Scanner, Map> dataParsingMethod, String filePath, Map worldMap)
 	{
 		/* Get specific data file */
-		File dataFile = new File(resourcesDir, filePath);
-		
-		// Try opening this file and extracting data from it 
-		// using the provided data parsing method
-		try
+		try (InputStream stream = Resources.getResourceAsStream(filePath))
 		{
-			Scanner fileScanner = new Scanner(dataFile);
-			dataParsingMethod.accept(fileScanner, worldMap);
+			// Try opening this file and extracting data from it 
+			// using the provided data parsing method
+			try
+			{
+				Scanner fileScanner = new Scanner(stream, StandardCharsets.UTF_8);
+				dataParsingMethod.accept(fileScanner, worldMap);
+				
+				// Clean up
+				fileScanner.close();
+			}			
 			
-			// Clean up
-			fileScanner.close();
+			finally {} // Left blank on purpose
 		}
-		catch (FileNotFoundException e)
+		
+		catch (IOException e)
 		{
 			e.printStackTrace();
 		}
+		
 		finally {} // Left blank on purpose
 	}
 
@@ -42,22 +42,27 @@ public class DataFileExtraction
 	public static void extractStatesDataToCombatant(BiConsumer<Scanner, Combatant> dataParsingMethod, String filePath, Combatant combatant)
 	{
 		/* Get specific data file */
-		File dataFile = new File(resourcesDir, filePath);
-		
-		// Try opening this file and extracting data from it 
-		// using the provided data parsing method
-		try
+		try (InputStream stream = Resources.getResourceAsStream(filePath))
 		{
-			Scanner fileScanner = new Scanner(dataFile);
-			dataParsingMethod.accept(fileScanner, combatant);
+			// Try opening this file and extracting data from it 
+			// using the provided data parsing method
+			try
+			{
+				Scanner fileScanner = new Scanner(stream, StandardCharsets.UTF_8);
+				dataParsingMethod.accept(fileScanner, combatant);
+				
+				// Clean up
+				fileScanner.close();
+			}
 			
-			// Clean up
-			fileScanner.close();
+			finally {} // Left blank on purpose
 		}
-		catch (FileNotFoundException e)
+		
+		catch (IOException e)
 		{
 			e.printStackTrace();
 		}
+		
 		finally {} // Left blank on purpose
 	}
 }

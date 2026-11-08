@@ -15,7 +15,7 @@ import View.*;
 public class Player extends Character
 {
 	/* Data Fields */
-	private static String statesFilePath = "finiteStates/PlayerStates";
+	private static String statesFilePath = "/finiteStates/PlayerStates";
 	
 	private Room currentRoom;
 	private HashMap<String, ArrayList<Item>> inventory;
