@@ -1,8 +1,10 @@
 package Model.Items;
 
+import Model.AbstractClasses.Item;
+
 public class UtilityItem extends Item {
 
-    public UtilityItem(String itemId, String itemName,
+    public UtilityItem(int itemId, String itemName,
                        String itemDesc, double weight, int value) {
         super(itemId, itemName, itemDesc, weight, value);
     }

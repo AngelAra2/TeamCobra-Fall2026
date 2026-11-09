@@ -1,5 +1,4 @@
 package Model.Items;
-
 import Model.AbstractClasses.Item;
 
 public class Consumable extends Item
@@ -13,13 +12,8 @@ public class Consumable extends Item
 		String itemName,
 		String itemDesc,
 		int healingAmount
-	)
-	{
-		super(
-			itemId,
-			itemName,
-			itemDesc
-		);
+	) {
+		super(itemId, itemName, itemDesc, 0, 0);
 		
 		this.healingAmount = healingAmount;
 	}

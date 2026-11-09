@@ -38,4 +38,9 @@ public class EquipmentItem {
     public int getMagicDefense() {
         return magicDefense;
     }
+
+    public int getWeight() {
+        // Placeholder for weight calculation logic
+        return 0;
+    }
 }
