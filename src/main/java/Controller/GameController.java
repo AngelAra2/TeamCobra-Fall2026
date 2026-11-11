@@ -511,7 +511,7 @@ public class GameController
 	//makes sure user enters a starting class name, and returns starting class object
 	private static StartingClass getValidStartingClass(ArrayList<StartingClass> classes){
 		while(true){
-			String input = basicCmdProcessor.getUserInput().trim();
+			String input = basicCmdProcessor.getUserInput();
 
 			for(StartingClass startingClass : classes){
 				if (startingClass.getName().equalsIgnoreCase(input)){
@@ -526,7 +526,7 @@ public class GameController
 	//method gets user's input, and validates it to ensure user enter's either yes or no.
 	private static boolean getYesNoInput(){
 		while(true){
-			String input = basicCmdProcessor.getUserInput().trim();
+			String input = basicCmdProcessor.getUserInput();
 
 			if (input.equalsIgnoreCase("yes"))
 			{
