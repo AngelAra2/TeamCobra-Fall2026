@@ -5,6 +5,8 @@ import java.util.List;
 import Model.Interfaces.NPCable;
 public class Merchant implements NPCable {
 
+
+    //WIP 11/11/2026
     @Override
     public String talk() {
         return "";
@@ -16,7 +18,7 @@ public class Merchant implements NPCable {
     private final String name;
     private final List<String> dialogues;
 
-    // The diagram has this as composition, so the merchant creates and owns
+    // The merchant creates and owns
     // its own stock. The stock has no reason to exist without the merchant.
     private final Inventory inventory;
 

@@ -5,8 +5,9 @@ import java.util.List;
 
 import Model.AbstractClasses.Character;
 import Model.Exploration.Room;
+import Model.Interfaces.NPCable;
 
-public class Companion extends Character 
+public class Companion extends Character implements NPCable
 {
 	/* Data Fields */
 	private int id;
@@ -86,14 +87,7 @@ public class Companion extends Character
 
 	// Custom //
 	public void recruit() { this.isRecruited = true; }
-	
-	// (WIP 10.29.2026)
-	/*
-	public String talk()
-	{
-		return "";
-	}
-	*/
+
 	
 	// (WIP 10.29.2026)
 	/*
@@ -104,5 +98,9 @@ public class Companion extends Character
 	*/
 	
 	// Overrides //
-
+    // WIP 11/11/2026
+    @Override
+    public String talk() {
+        return "";
+    }
 }
