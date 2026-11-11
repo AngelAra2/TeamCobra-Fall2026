@@ -32,7 +32,7 @@ public class Merchant implements NPCable {
         }
 
         String line = dialogue.get(dialogueIndex);
-        dialogueIndex = (dialogueIndex + 1) % dialogue.size(); // Literally all this does is a neat way to cycle through dialogue without using a loop.
+        dialogueIndex = (dialogueIndex + 1) % dialogue.size(); // Tracks which dialogue line to return next, cycling back to the first line at the end.
         return line;
     }
 
