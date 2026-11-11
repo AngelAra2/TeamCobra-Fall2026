@@ -1,6 +1,9 @@
 package View;
 
-public class View 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+
+public class View
 {
 	/* Data Fields */
 	
@@ -127,6 +130,37 @@ public class View
 		println("");
 		println("\"attack\" --> attack the monster");
 		println("\"heal [item name]\" --> use a consumable item from your inventory to heal yourself");
+	}
+
+	/*
+	11.10.26
+	Angel
+	 */
+	public static void printStartingClassStats(String background,
+											   int hp, int baseSTR, int baseDEX,
+											   int baseINT, int baseARC, int baseEND, ArrayList<String> combatAbilities,
+											   ArrayList<String> defaultEquipment){
+
+		View.println("Background: " + background);
+		View.println("Base Max HP: " + hp);
+		View.println("Base STR: " + baseSTR);
+		View.println("Base DEX: " + baseDEX);
+		View.println("Base INT: " + baseINT);
+		View.println("Base ARC: " + baseARC);
+		View.println("Base END: " + baseEND);
+
+		separate(1);
+		View.println("Combat Abilities: ");
+		for (String ability : combatAbilities){
+			View.println("- " + ability);
+		}
+
+		separate(1);
+		View.println("Equipment:");
+		for (String equipment : defaultEquipment){
+			View.println("- " + equipment);
+		}
+
 	}
 }
 

@@ -1,7 +1,11 @@
 package Controller;
 
+import java.lang.reflect.Array;
 import java.util.*;
 
+import Model.Combat.StartingClass;
+import Model.Data.DataExtractionMethods;
+import Model.Data.DataFileExtraction;
 import Model.Processors.*;
 import Model.Util.Wait;
 
@@ -12,6 +16,8 @@ import Model.Exploration.Map;
 import Model.Exploration.Puzzle;
 import Model.Exploration.Room;
 import View.View;
+
+import javax.xml.crypto.Data;
 
 public class GameController 
 {
@@ -32,6 +38,7 @@ public class GameController
 	private static ExplorationCommandProcessor explorationCmdProcessor;
 	private static CombatCommandProcessor combatCmdProcessor;
 
+	private static String startingClassFilePath = "/gameObjects/StartingClasses";
 	//------------------------------------//
 	
 	/* Helper Methods */
@@ -499,6 +506,59 @@ public class GameController
 		processedCmd = "";
 	}
 
+	private static StartingClass pickStartingClass(){
+		ArrayList<StartingClass> classes = new ArrayList<>();
+
+		DataFileExtraction.extractClassDataToController(DataExtractionMethods::extractStartingClassData, startingClassFilePath, classes);
+
+		//for testing
+		if (classes.isEmpty()){
+			throw new IllegalStateException("No starting class loaded.");
+		}
+
+		while (true){
+
+			View.printColored("Choose your starting class:","blue", true);
+
+			for(StartingClass tempClass : classes){
+				View.println(tempClass.getName());
+			}
+
+			String choice = basicCmdProcessor.getUserInput().trim();
+
+			View.separate(5);
+			for(StartingClass tempClass : classes){
+				if(tempClass.getName().equalsIgnoreCase(choice)){
+
+					View.printColored("Class: " + tempClass.getName(),"purple", true);
+					View.separate(1);
+					View.printStartingClassStats(tempClass.getBackground(),
+							tempClass.getBaseMaxHP(),
+							tempClass.getBaseSTR(),
+							tempClass.getBaseDEX(),
+							tempClass.getBaseINT(),
+							tempClass.getBaseARC(),
+							tempClass.getBaseEND(),
+							tempClass.getCombatAbility(),
+							tempClass.getDefaultEquipment());
+
+
+					View.separate(2);
+					View.println("Do you want to select this class? Yes or No");
+
+					String confirmation = basicCmdProcessor.getUserInput().trim();
+
+					if(confirmation.equalsIgnoreCase("yes")){
+						return tempClass;
+					}
+
+					break;
+				}
+			}
+
+		}
+
+	}
 	private static void preGameSetup()
 	{
 		/* Pre-game setup */
@@ -513,7 +573,14 @@ public class GameController
 
 		// World Map //
 		worldMap = new Map();
-		
+
+
+		View.println("What is your name?");
+
+		String playerName = basicCmdProcessor.getUserInput();
+		StartingClass startingClass = pickStartingClass();
+
+
 		// Player //
 		// Start the player in the first room of the map
 		player = new Player(worldMap.getRoomById(1));

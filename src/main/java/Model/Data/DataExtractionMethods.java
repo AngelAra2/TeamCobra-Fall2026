@@ -2,9 +2,11 @@ package Model.Data;
 
 import java.util.*;
 
+import Controller.GameController;
 import Model.AbstractClasses.Combatant;
 import Model.AbstractClasses.Item;
 import Model.Combat.Monster;
+import Model.Combat.StartingClass;
 import Model.Exploration.Map;
 import Model.Exploration.Puzzle;
 import Model.Exploration.Room;
@@ -605,7 +607,7 @@ public class DataExtractionMethods
 			}
 		}
 	}
-	
+
 	/* Extract data from a file and parse it into a finite state machine for a Combatant object */
 	public static void extractFiniteStatesData(Scanner fileScanner, Combatant combatant)
 	{
@@ -632,6 +634,168 @@ public class DataExtractionMethods
 		else
 			// No states data found, exit method
 			return;
+	}
+
+	/*
+	Angel 11.9.26
+	Extracting starting classes from text file
+	 */
+	public static void extractStartingClassData(Scanner fileScanner, ArrayList<StartingClass> classes){
+
+
+		while(fileScanner.hasNextLine()){
+			String line = fileScanner.nextLine();
+
+			String parsedLine[] = line.split(delimiterA);
+
+			int id = 0;
+			String className = "";
+			String background = "";
+			int baseMaxHP = 0;
+			int baseSTR = 0;
+			int baseDEX = 0;
+			int baseINT = 0;
+			int baseARC = 0;
+			int baseEND = 0;
+			ArrayList<String> combatAbilities = new ArrayList<>();
+			ArrayList<String> defaultEquipment = new ArrayList<>();
+
+			try{
+				id = Integer.parseInt(parsedLine[0]);
+			}
+			catch(NumberFormatException e){
+				continue;
+			}
+			catch(ArrayIndexOutOfBoundsException e)
+			{
+				// Leave blank
+			}
+			try {
+				className = parsedLine[1];
+			}
+			catch (ArrayIndexOutOfBoundsException e)
+			{
+					// Leave blank
+			}
+
+			try{
+				background = parsedLine[2];
+			}
+			catch (ArrayIndexOutOfBoundsException e)
+			{
+				// Leave blank
+			}
+
+			try{
+				baseMaxHP = Integer.parseInt(parsedLine[3]);
+			} catch (NumberFormatException e) {
+                continue;
+            }
+			catch (ArrayIndexOutOfBoundsException e)
+			{
+				// Leave blank
+			}
+
+			try{
+				baseSTR = Integer.parseInt(parsedLine[4]);
+			}
+			catch (NumberFormatException e)
+			{
+                continue;
+            }
+			catch (ArrayIndexOutOfBoundsException e)
+			{
+				// Leave blank
+			}
+			try{
+				baseDEX = Integer.parseInt(parsedLine[5]);
+			}
+			catch (NumberFormatException e)
+			{
+				continue;
+			}
+			catch (ArrayIndexOutOfBoundsException e)
+			{
+				// Leave blank
+			}
+
+			try{
+				baseINT = Integer.parseInt(parsedLine[6]);
+			}
+			catch (NumberFormatException e)
+			{
+				continue;
+			}
+			catch (ArrayIndexOutOfBoundsException e)
+			{
+				// Leave blank
+			}
+
+			try{
+				baseARC = Integer.parseInt(parsedLine[7]);
+			}
+			catch (NumberFormatException e)
+			{
+				continue;
+			}
+			catch (ArrayIndexOutOfBoundsException e)
+			{
+				// Leave blank
+			}
+
+			try{
+				baseEND = Integer.parseInt(parsedLine[8]);
+			}
+			catch (NumberFormatException e)
+			{
+				continue;
+			}
+			catch (ArrayIndexOutOfBoundsException e)
+			{
+				// Leave blank
+			}
+
+			try{
+				String[] combatAbilitiesList = trimStringArray(parsedLine[9].split(delimiterB));
+
+				for(String abilities : combatAbilitiesList){
+					combatAbilities.add(abilities);
+				}
+			}
+			catch (ArrayIndexOutOfBoundsException e)
+			{
+				// Leave blank
+			}
+
+			try{
+				String[] targetItemIds = trimStringArray(parsedLine[10].split(delimiterB));
+
+				for(int i = 0; i <targetItemIds.length; i++){
+					defaultEquipment.add(targetItemIds[i]);
+				}
+				StartingClass tempClass = new StartingClass(
+							id,
+							className,
+							background,
+							baseMaxHP,
+							baseSTR,
+							baseDEX,
+							baseINT,
+							baseARC,
+							baseEND,
+							combatAbilities,
+						    defaultEquipment
+				);
+
+				classes.add(tempClass);
+
+			}
+			catch (ArrayIndexOutOfBoundsException e)
+			{
+				// Leave blank
+			}
+		}
+
 	}
 }
 
