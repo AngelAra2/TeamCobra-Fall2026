@@ -173,21 +173,20 @@ public class View
 											   ArrayList<String> defaultEquipment){
 
 		View.println("Background: " + wrapText(background, 65));
-		View.println("Base Max HP: " + hp);
+		View.println("\nBase Max HP: " + hp);
 		View.println("Base STR: " + baseSTR);
 		View.println("Base DEX: " + baseDEX);
 		View.println("Base INT: " + baseINT);
 		View.println("Base ARC: " + baseARC);
 		View.println("Base END: " + baseEND);
 
-		separate(1);
-		View.println("Combat Abilities: ");
+
+		View.println("\nCombat Abilities: ");
 		for (String ability : combatAbilities){
 			View.println("- " + ability);
 		}
 
-		separate(1);
-		View.println("Equipment:");
+		View.println("\nEquipment:");
 		for (String equipment : defaultEquipment){
 			View.println("- " + equipment);
 		}

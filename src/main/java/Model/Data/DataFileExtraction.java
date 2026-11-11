@@ -4,7 +4,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.function.*;
 
-import Controller.GameController;
 import Model.AbstractClasses.Combatant;
 import Model.Combat.StartingClass;
 import Model.Exploration.Map;

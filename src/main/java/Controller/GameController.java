@@ -1,6 +1,5 @@
 package Controller;
 
-import java.lang.reflect.Array;
 import java.util.*;
 
 import Model.Combat.StartingClass;
@@ -17,7 +16,6 @@ import Model.Exploration.Puzzle;
 import Model.Exploration.Room;
 import View.View;
 
-import javax.xml.crypto.Data;
 
 public class GameController 
 {
@@ -505,6 +503,11 @@ public class GameController
 		cmdType = "";
 		processedCmd = "";
 	}
+
+
+	//------------------------------------//
+
+
 	//makes sure user enters a starting class name, and returns starting class object
 	private static StartingClass getValidStartingClass(ArrayList<StartingClass> classes){
 		while(true){
@@ -554,14 +557,13 @@ public class GameController
 			View.printColored("Choose your starting class:","blue", true);
 
 			for(StartingClass tempClass : classes){
-				View.println(tempClass.getName());
+				View.println("- " + tempClass.getName());
 			}
 			//accepts user's input, returns startingClass they selected
 			StartingClass startingClass = getValidStartingClass(classes);
 			View.separate(5);
 
 			View.printColored("Class: " + startingClass.getName(),"purple", true);
-			View.separate(1);
 
 			//displays class stats
 			View.printStartingClassStats(startingClass.getBackground(),
@@ -574,8 +576,8 @@ public class GameController
 					startingClass.getCombatAbility(),
 					startingClass.getDefaultEquipment());
 
-			View.separate(2);
-			View.println("Do you want to select this class? Yes or No");
+
+			View.println("\nDo you want to select this class? Yes or No");
 
 			//validates user's input, if user entered yes, return startingClass, otherwise, restart loop
 			if(getYesNoInput()){
@@ -584,6 +586,11 @@ public class GameController
 		}
 
 	}
+
+
+	//------------------------------------//
+
+
 	private static void preGameSetup()
 	{
 		/* Pre-game setup */

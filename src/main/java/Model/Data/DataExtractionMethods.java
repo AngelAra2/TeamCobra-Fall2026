@@ -2,7 +2,6 @@ package Model.Data;
 
 import java.util.*;
 
-import Controller.GameController;
 import Model.AbstractClasses.Combatant;
 import Model.AbstractClasses.Item;
 import Model.Combat.Monster;
