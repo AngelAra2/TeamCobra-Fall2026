@@ -510,9 +510,13 @@ public class GameController
 
 	//makes sure user enters a starting class name, and returns starting class object
 	private static StartingClass getValidStartingClass(ArrayList<StartingClass> classes){
+
+		//gets user input, if class exists, return the starting class, if it doesn't exist
+		//keep prompting user to enter a valid starting class.
 		while(true){
 			String input = basicCmdProcessor.getUserInput();
 
+			//looks for a starting class that matches user's input, if found, return starting class
 			for(StartingClass startingClass : classes){
 				if (startingClass.getName().equalsIgnoreCase(input)){
 					return startingClass;
@@ -525,6 +529,8 @@ public class GameController
 	}
 	//method gets user's input, and validates it to ensure user enter's either yes or no.
 	private static boolean getYesNoInput(){
+
+		//validates user's input, user cannot exit loop unless they enter yes or no.
 		while(true){
 			String input = basicCmdProcessor.getUserInput();
 
@@ -552,10 +558,14 @@ public class GameController
 			throw new IllegalStateException("No starting class loaded.");
 		}
 
+		//displays available classes, and asks user to choose a class, after choosing a class, we display the
+		//character stats, and ask user if they want to move forward with this class, entering yes returns the starting class
+		//entering no restarts the loop so the user can select another starting class.
 		while (true){
 
 			View.printColored("Choose your starting class:","blue", true);
 
+			//display class names
 			for(StartingClass tempClass : classes){
 				View.println("- " + tempClass.getName());
 			}
@@ -610,7 +620,7 @@ public class GameController
 		View.println("What is your name?");
 		String playerName = basicCmdProcessor.getUserInput();
 
-		//Populate Starting classes, and prompt player to choose class
+		//Populate Starting classes from text file, and prompt player to choose class
 		StartingClass startingClass = pickStartingClass();
 
 

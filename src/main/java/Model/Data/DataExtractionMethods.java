@@ -643,10 +643,12 @@ public class DataExtractionMethods
 
 
 		while(fileScanner.hasNextLine()){
-			String line = fileScanner.nextLine();
 
+			String line = fileScanner.nextLine();
+			//splits line string using " _ " as the delimiter.
 			String parsedLine[] = line.split(delimiterA);
 
+			// Declare required attributes
 			int id = 0;
 			String className = "";
 			String background = "";
@@ -659,6 +661,7 @@ public class DataExtractionMethods
 			ArrayList<String> combatAbilities = new ArrayList<>();
 			ArrayList<String> defaultEquipment = new ArrayList<>();
 
+			//assigns starting class ID
 			try{
 				id = Integer.parseInt(parsedLine[0]);
 			}
@@ -669,6 +672,7 @@ public class DataExtractionMethods
 			{
 				// Leave blank
 			}
+			//assigns starting class name
 			try {
 				className = parsedLine[1];
 			}
@@ -677,6 +681,7 @@ public class DataExtractionMethods
 					// Leave blank
 			}
 
+			//assigns starting class background description
 			try{
 				background = parsedLine[2];
 			}
@@ -685,6 +690,7 @@ public class DataExtractionMethods
 				// Leave blank
 			}
 
+			//assigns starting class base max HP
 			try{
 				baseMaxHP = Integer.parseInt(parsedLine[3]);
 			} catch (NumberFormatException e) {
@@ -695,6 +701,7 @@ public class DataExtractionMethods
 				// Leave blank
 			}
 
+			//assigns starting class base STR
 			try{
 				baseSTR = Integer.parseInt(parsedLine[4]);
 			}
@@ -706,6 +713,7 @@ public class DataExtractionMethods
 			{
 				// Leave blank
 			}
+			//assigns starting class base DEX
 			try{
 				baseDEX = Integer.parseInt(parsedLine[5]);
 			}
@@ -718,6 +726,7 @@ public class DataExtractionMethods
 				// Leave blank
 			}
 
+			//assigns starting class base INT
 			try{
 				baseINT = Integer.parseInt(parsedLine[6]);
 			}
@@ -730,6 +739,7 @@ public class DataExtractionMethods
 				// Leave blank
 			}
 
+			//assigns starting class base ARC
 			try{
 				baseARC = Integer.parseInt(parsedLine[7]);
 			}
@@ -754,9 +764,13 @@ public class DataExtractionMethods
 				// Leave blank
 			}
 
+			//assigns starting class combat abilities
+			//starting class could have more than one ability
 			try{
+				//split combat abilities using " , " as the delimiter
 				String[] combatAbilitiesList = trimStringArray(parsedLine[9].split(delimiterB));
 
+				//adds combat ability to list
 				for(String abilities : combatAbilitiesList){
 					combatAbilities.add(abilities);
 				}
@@ -766,12 +780,17 @@ public class DataExtractionMethods
 				// Leave blank
 			}
 
+			//assigns starting class equipment
+			//starting class will have more than one equipment
 			try{
+				//split combat abilities using " , " as the delimiter
 				String[] targetItemIds = trimStringArray(parsedLine[10].split(delimiterB));
 
+				//adds equipment name to list
 				for(int i = 0; i <targetItemIds.length; i++){
 					defaultEquipment.add(targetItemIds[i]);
 				}
+				//create a StartingClass object, and add it into list of StartingClasses
 				StartingClass tempClass = new StartingClass(
 							id,
 							className,
