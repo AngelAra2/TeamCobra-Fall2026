@@ -1,136 +1,87 @@
 package Model.Exploration;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+
+import Model.AbstractClasses.Item;
+import Model.Combat.Player;
 import Model.Interfaces.NPCable;
 public class Merchant implements NPCable {
 
 
+
+
+    private String id;
+    private String name;
+    private List<String> dialogue;
+    private HashMap<String, ArrayList<Item>> stock;
+    private int dialogueIndex;
+
+    public Merchant(String id, String name, List<String> dialogue, HashMap<String, ArrayList<Item>> stock) {
+        this.id = id;
+        this.name = name;
+        this.dialogue = new ArrayList<>(dialogue);
+        this.stock = new HashMap<>();
+        this.dialogueIndex = 0;
+    }
+
     //WIP 11/11/2026
     @Override
     public String talk() {
-        return "";
-    }
-
-    // NOTE TO DYLAN: PROPERLY IMPLEMENT WHEN INVENTORY GETS ADDED
-/*
-    private final String id;
-    private final String name;
-    private final List<String> dialogues;
-
-    // The merchant creates and owns
-    // its own stock. The stock has no reason to exist without the merchant.
-    private final Inventory inventory;
-
-    // Tracks which dialogue line comes next. Without it, talking to the
-    // merchant twice would always give back the exact same line.
-    private int dialogueIndex;
-
-    // After a failed deal, store the reason here. The Controller or View
-    // reads it and prints it, so the Model never prints anything itself.
-    private String lastMessage;
-
-    public Merchant(String id, String name, List<String> dialogues) {
-        this.id = id;
-        this.name = name;
-        this.dialogues = new ArrayList<>(dialogues);
-        this.inventory = new Inventory();
-        this.dialogueIndex = 0;
-        this.lastMessage = "";
-    }
-
-    // The game data loader calls this to fill the fixed stock from the
-    // merchant table (for example Lockpick x3, Health Potion x5, just to say something)
-    public void addStock(Item item, int quantity) {
-        inventory.addItem(item, quantity);
-    }
-
-    @Override
-    public String talk() {
-        // Just in case a merchant is out of dialogue, either by exhausting it or it just isn't added.
-        if (dialogues.isEmpty()) {
+        if (dialogue.isEmpty()) {
             return name + " has nothing to say.";
         }
 
-        String line = dialogues.get(dialogueIndex);
-
-        // Wrap back to the start once it runs out of lines.
-        dialogueIndex = (dialogueIndex + 1) % dialogues.size();
-
+        String line = dialogue.get(dialogueIndex);
+        dialogueIndex = (dialogueIndex + 1) % dialogue.size(); // Literally all this does is a neat way to cycle through dialogue without using a loop.
         return line;
     }
 
-    // Checks whether this merchant can sell the item to this player right now.
-    public boolean offer(Item item, Player player) {
+    //Adds an item to the merchant's stock, grouped under the item's lowercased name. It actively rejects null.
+    public void addStock(Item item) {
+        Objects.requireNonNull(item);
+        String itemName = item.getItemName().toLowerCase();
 
-        // Not stocked, or the last copy was already bought.
-        if (item == null || !inventory.contains(item) || inventory.getQuantity(item) < 1) {
-            lastMessage = "Invalid transaction. The item is not available.";
+        ArrayList<Item> items = stock.get(itemName);
+        if (items == null) {
+            items = new ArrayList<>();
+            stock.put(itemName, items);
+        }
+
+        items.add(item);
+    }
+
+    // Returns true if that exact item instance is in the merchant's stock, otherwise returns false.
+    public boolean offer(Item item) {
+        if (item == null) {
             return false;
         }
 
-        if (player.getGold() < item.getValue()) {
-            lastMessage = "You don't have enough money, sell some items to make it back.";
+        ArrayList<Item> items = stock.get(item.getItemName().toLowerCase());
+        return items != null && items.contains(item);
+    }
+
+    // Checks that the player exists and the item is available, removes the item from the merchant's stock, and adds it to the player's inventory. It returns whether or not the sale succeeded.
+    public boolean sellItem(Item item, Player player) {
+        if (player == null || !offer(item)) {
             return false;
         }
 
-        // The carry weight limit depends on the player's level, which is why
-        // canAdd needs the level passed in.
-        if (!player.getInventory().canAdd(item, player.getLevel())) {
-            lastMessage = "You don't have enough space in your inventory, drop or sell items to make room.";
-            return false;
+        String itemName = item.getItemName().toLowerCase();
+        ArrayList<Item> items = stock.get(itemName);
+        items.remove(item);
+
+        if (items.isEmpty()) {
+            stock.remove(itemName);
         }
 
+        player.addItemToInventory(item);
         return true;
     }
 
-    // The merchant sells one copy of the item to the player.
-    // offer() already set the failure message if it said no.
-    public void sellItem(Item item, Player player) {
-        if (!offer(item, player)) {
-            return;
-        }
-
-        player.spendGold(item.getValue());
-        inventory.removeItem(item, 1);
-        player.getInventory().addItem(item, 1);
-
-        lastMessage = "";
+    // Returns a copy of the stock map and its lists, so callers can inspect the stock without directly changing the merchant's collections.
+    public HashMap<String, ArrayList<Item>> getStock() {
+        HashMap<String, ArrayList<Item>> copy = new HashMap<>();
+        stock.forEach((name, items) -> copy.put(name, new ArrayList<>(items)));
+        return copy;
     }
-
-    // The player sells one copy to the merchant. Merchants apparently have
-    // infinite gold, so there is no funds check on this side. The item goes
-    // into the merchant's stock so the player can buy it back later.
-    public boolean buyFromPlayer(Item item, Player player) {
-        if (item == null || !player.getInventory().contains(item)) {
-            lastMessage = "Invalid transaction. The item is not available.";
-            return false;
-        }
-
-        player.getInventory().removeItem(item, 1);
-        player.gainGold(item.getValue());
-        inventory.addItem(item, 1);
-
-        lastMessage = "";
-        return true;
-    }
-
-    // What the merchant says when the player types Cancel.
-    public String cancelTrade() {
-        return "That's a pity.";
-    }
-
-    public String getLastMessage() {
-        return lastMessage;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
- */
 }
