@@ -22,7 +22,38 @@ public class View
 	public static void println(String line) { System.out.println(line); }
 	public static void printObject(Object obj) { System.out.print(obj); }
 	public static void printlnObject(Object obj) { System.out.println(obj); }
-	
+
+	//11.10.26
+	//Angel
+	//Used to wrap text in terminal for long strings without splitting words.
+	public static String wrapText(String line, int maxWidth){
+		//used to rebuild line with added '\n'
+		StringBuilder result = new StringBuilder();
+		int length = 0; //tracks total characters on line being built
+
+		//splits word after each space
+		for(String word : line.split("\\s+")){
+			//checks whether adding the next word would make the line too long
+			if(length > 0 && length + word.length() + 1 > maxWidth){
+				result.append("\n");
+				length = 0;
+			}
+
+			//checks if length is greater than one, if so, add a space
+			if (length > 0){
+				result.append(" ");
+				length++;
+			}
+
+
+			result.append(word);
+			//update length
+			length += word.length();
+
+		}
+
+		return result.toString();
+	}
 	public static void printColored(String line, String color, boolean printOnNewLine) 
 	{
 		/* Prints a line to the console in a specified color */
@@ -141,7 +172,7 @@ public class View
 											   int baseINT, int baseARC, int baseEND, ArrayList<String> combatAbilities,
 											   ArrayList<String> defaultEquipment){
 
-		View.println("Background: " + background);
+		View.println("Background: " + wrapText(background, 65));
 		View.println("Base Max HP: " + hp);
 		View.println("Base STR: " + baseSTR);
 		View.println("Base DEX: " + baseDEX);

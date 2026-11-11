@@ -505,10 +505,43 @@ public class GameController
 		cmdType = "";
 		processedCmd = "";
 	}
+	//makes sure user enters a starting class name, and returns starting class object
+	private static StartingClass getValidStartingClass(ArrayList<StartingClass> classes){
+		while(true){
+			String input = basicCmdProcessor.getUserInput().trim();
+
+			for(StartingClass startingClass : classes){
+				if (startingClass.getName().equalsIgnoreCase(input)){
+					return startingClass;
+				}
+			}
+
+			View.println("Invalid class. Please enter a valid class name.");
+		}
+
+	}
+	//method gets user's input, and validates it to ensure user enter's either yes or no.
+	private static boolean getYesNoInput(){
+		while(true){
+			String input = basicCmdProcessor.getUserInput().trim();
+
+			if (input.equalsIgnoreCase("yes"))
+			{
+				return true;
+			}
+			if(input.equalsIgnoreCase("no"))
+			{
+				return false;
+			}
+
+			View.println("Invalid input. Please enter Yes or No");
+		}
+	}
 
 	private static StartingClass pickStartingClass(){
 		ArrayList<StartingClass> classes = new ArrayList<>();
 
+		//loads Starting Class data from text file to classes ArrayList
 		DataFileExtraction.extractClassDataToController(DataExtractionMethods::extractStartingClassData, startingClassFilePath, classes);
 
 		//for testing
@@ -523,39 +556,31 @@ public class GameController
 			for(StartingClass tempClass : classes){
 				View.println(tempClass.getName());
 			}
-
-			String choice = basicCmdProcessor.getUserInput().trim();
-
+			//accepts user's input, returns startingClass they selected
+			StartingClass startingClass = getValidStartingClass(classes);
 			View.separate(5);
-			for(StartingClass tempClass : classes){
-				if(tempClass.getName().equalsIgnoreCase(choice)){
 
-					View.printColored("Class: " + tempClass.getName(),"purple", true);
-					View.separate(1);
-					View.printStartingClassStats(tempClass.getBackground(),
-							tempClass.getBaseMaxHP(),
-							tempClass.getBaseSTR(),
-							tempClass.getBaseDEX(),
-							tempClass.getBaseINT(),
-							tempClass.getBaseARC(),
-							tempClass.getBaseEND(),
-							tempClass.getCombatAbility(),
-							tempClass.getDefaultEquipment());
+			View.printColored("Class: " + startingClass.getName(),"purple", true);
+			View.separate(1);
 
+			//displays class stats
+			View.printStartingClassStats(startingClass.getBackground(),
+					startingClass.getBaseMaxHP(),
+					startingClass.getBaseSTR(),
+					startingClass.getBaseDEX(),
+					startingClass.getBaseINT(),
+					startingClass.getBaseARC(),
+					startingClass.getBaseEND(),
+					startingClass.getCombatAbility(),
+					startingClass.getDefaultEquipment());
 
-					View.separate(2);
-					View.println("Do you want to select this class? Yes or No");
+			View.separate(2);
+			View.println("Do you want to select this class? Yes or No");
 
-					String confirmation = basicCmdProcessor.getUserInput().trim();
-
-					if(confirmation.equalsIgnoreCase("yes")){
-						return tempClass;
-					}
-
-					break;
-				}
+			//validates user's input, if user entered yes, return startingClass, otherwise, restart loop
+			if(getYesNoInput()){
+				return startingClass;
 			}
-
 		}
 
 	}
@@ -576,14 +601,15 @@ public class GameController
 
 
 		View.println("What is your name?");
-
 		String playerName = basicCmdProcessor.getUserInput();
+
+		//Populate Starting classes, and prompt player to choose class
 		StartingClass startingClass = pickStartingClass();
 
 
 		// Player //
-		// Start the player in the first room of the map
-		player = new Player(worldMap.getRoomById(1));
+		// Start the player in the first room of the map and assign player name, and starting class
+		player = new Player(playerName,startingClass,worldMap.getRoomById(1));
 
 		// Print welcome message
 		View.separate(25);
