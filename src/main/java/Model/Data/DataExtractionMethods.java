@@ -473,7 +473,7 @@ public class DataExtractionMethods {
             if (line.isEmpty())
                 continue;
 
-            String[] fields = trimStringArray(line.split("_", -1));
+            String[] fields = trimStringArray(line.split(delimiterA, -1));
             if (fields.length != 5 || fields[0].isEmpty() || fields[1].isEmpty())
                 continue;
 
@@ -488,7 +488,7 @@ public class DataExtractionMethods {
 
                 HashMap<String, ArrayList<Item>> stock = new HashMap<>();
                 if (!fields[3].isEmpty()) {
-                    for (String id : fields[3].split(",")) {
+                    for (String id : fields[3].split(delimiterB)) {
                         Item template = findItemById(worldMap, Integer.parseInt(id.trim()));
                         if (template == null)
                             continue;
@@ -569,7 +569,7 @@ public class DataExtractionMethods {
             if (line.isEmpty())
                 continue;
 
-            String[] attributes = trimStringArray(line.split("_", -1));
+            String[] attributes = trimStringArray(line.split(delimiterA, -1));
             if (attributes.length != 19)
                 continue;
 

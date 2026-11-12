@@ -3,6 +3,9 @@ import java.util.*;
 
 import Model.Data.DataFileExtraction;
 import Model.Data.DataExtractionMethods;
+import Model.AbstractClasses.Item;
+import Model.Items.Consumable;
+import Model.Items.Weapon;
 
 public class Map
 {
