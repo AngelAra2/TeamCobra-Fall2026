@@ -50,7 +50,39 @@ public class Player extends Character
 		// Create Finite State Machine for Player
 		DataFileExtraction.extractStatesDataToCombatant(DataExtractionMethods::extractFiniteStatesData, statesFilePath, this);
 	}
-	
+
+	/*
+	11.10.26
+	Angel
+	Adding new constructor to accept player name and starting class.
+	 */
+
+	public Player(String name, StartingClass startingClass, Room startingRoom){
+		super(
+				name, //name
+				startingClass.getBaseMaxHP(), //max HP
+				0, //physicalDEF
+				0, //magicDEF
+				5, //attack
+				1, //currentLevel
+
+				0, //currentXP
+				100, //currentMana
+				startingClass.getBaseMaxHP(), //baseMaxHP
+				startingClass.getBaseSTR(), //strength
+				startingClass.getBaseINT(), //intelligence
+				startingClass.getBaseDEX(), //dexterity
+				startingClass.getBaseARC(),  //arcane
+				startingClass.getBaseEND(), //endurance
+				new ArrayList<>() //combatSkills
+		);
+		this.currentRoom = startingRoom;
+		this.inventory = new HashMap<>();
+		this.examinedMonster = null;
+
+		//Create Finite State Machine for Player
+		DataFileExtraction.extractStatesDataToCombatant(DataExtractionMethods::extractFiniteStatesData, statesFilePath, this);
+	}
 	/* Methods */
 	
 	// Private //
