@@ -3,11 +3,12 @@ package Model.AbstractClasses;
 import java.util.List;
 
 import Model.Combat.CombatSkill;
-import Model.Items.Weapon;
+import Model.Items.*;
 
 public abstract class Character extends Combatant 
 {
 	/* Data Fields */
+
 	protected int currentLevel;
 	protected int currentXP;
 	protected int currentMana;
@@ -19,6 +20,7 @@ public abstract class Character extends Combatant
 	protected int endurance;
 	protected Weapon equippedWeapon;
 	protected List<CombatSkill> skills;
+    protected EquipmentLoadout equipmentLoadout;
 
 	/* Constructors */
 	public Character(
@@ -27,7 +29,7 @@ public abstract class Character extends Combatant
 			int physicalDEF,
 			int magicDEF,
 			int attack,
-			
+
 			int currentLevel,
 			int currentXP,
 			int currentMana,
@@ -40,8 +42,8 @@ public abstract class Character extends Combatant
 			List<CombatSkill> skills
 		) 
 	{
+
 		super(name, maxHP, physicalDEF, magicDEF, attack);
-		
 		this.currentLevel = currentLevel;
 		this.currentXP = currentXP;
 		this.currentMana = currentMana;
@@ -52,6 +54,7 @@ public abstract class Character extends Combatant
 		this.arcane = arcane;
 		this.endurance = endurance;
 		this.skills = skills;
+        this.equipmentLoadout = new EquipmentLoadout();
 	}
 	
 	/* Methods */
@@ -62,6 +65,19 @@ public abstract class Character extends Combatant
 	private void setMana(int mana) { this.currentMana = Math.clamp(mana, 0, this.calculateMaxMana()); }
 
 	// Getters //
+    public EquipmentLoadout getEquipmentLoadout() {
+        return this.equipmentLoadout;
+    }
+
+    public int getEndurance() {
+        return this.endurance;
+    }
+
+    // Calculate maximum equipment load
+    public double calculateEquipLoad() {
+        return 15 + this.endurance;
+    }
+
 	public int getTotalAttack()
 	{
 		/* Return total Attack of character */

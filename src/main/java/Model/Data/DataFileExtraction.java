@@ -5,6 +5,7 @@ import java.util.*;
 import java.util.function.*;
 
 import Model.AbstractClasses.Combatant;
+import Model.Combat.StartingClass;
 import Model.Exploration.Map;
 
 public class DataFileExtraction 
@@ -63,6 +64,34 @@ public class DataFileExtraction
 			e.printStackTrace();
 		}
 		
+		finally {} // Left blank on purpose
+	}
+
+	/* Extracts data from a file and stores it in the provided world map */
+	public static void extractClassDataToController(BiConsumer<Scanner, ArrayList<StartingClass>> dataParsingMethod, String filePath, ArrayList<StartingClass> startingClasses)
+	{
+		/* Get specific data file */
+		try (InputStream stream = Resources.getResourceAsStream(filePath))
+		{
+			// Try opening this file and extracting data from it
+			// using the provided data parsing method
+			try
+			{
+				Scanner fileScanner = new Scanner(stream, StandardCharsets.UTF_8);
+				dataParsingMethod.accept(fileScanner, startingClasses);
+
+				// Clean up
+				fileScanner.close();
+			}
+
+			finally {} // Left blank on purpose
+		}
+
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
+
 		finally {} // Left blank on purpose
 	}
 }
