@@ -273,9 +273,8 @@ public class DataExtractionMethods
 							{
 								// Leave default value
 							}
-							
-							item = new Consumable(itemId, itemName, itemDesc, healingAmount);
-							break;
+
+                            item = new Consumable(itemId, itemName, itemDesc, 0, 0, "HEAL", healingAmount, 0);
 							
 						default:
 							continue; // Skip this item if the type is unrecognized
