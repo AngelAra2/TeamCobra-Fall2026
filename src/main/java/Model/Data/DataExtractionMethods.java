@@ -552,56 +552,59 @@ public class DataExtractionMethods {
     }
 
 
-    // This reads each Companion record and adds it to the room listed in the file.
+    // Splits a comma-separated field into trimmed, non-empty values.
+    private static ArrayList<String> parseCompanionValues(String value) {
+        ArrayList<String> values = new ArrayList<>();
+        for (String part : value.split(delimiterB)) {
+            String trimmed = part.trim();
+            if (!trimmed.isEmpty())
+                values.add(trimmed);
+        }
+        return values;
+    }
+
+    // Reads each Companion record and adds it to the room listed in the file.
     public static void extractCompanionData(Scanner fileScanner, Map worldMap) {
         while (fileScanner.hasNextLine()) {
             String line = fileScanner.nextLine().trim();
             if (line.isEmpty())
                 continue;
 
-            // Each Companion record must contain 19 fields.
+            // Field Legend
+            // Fields: 0 ID, 1 name, 2 backstory, 3 base max HP, 4 STR, 5 DEX,
+            // 6 INT, 7 ARC, 8 END, 9 perk, 10 default abilities,
+            // 11 default equipment, 12 room ID.
             String[] attributes = trimStringArray(line.split(delimiterA, -1));
-            if (attributes.length != 19)
+            if (attributes.length != 13)
                 continue;
 
             try {
                 int companionId = Integer.parseInt(attributes[0]);
-                int maxHP = Integer.parseInt(attributes[2]);
-                int physicalDEF = Integer.parseInt(attributes[3]);
-                int magicDEF = Integer.parseInt(attributes[4]);
-                int attack = Integer.parseInt(attributes[5]);
-                int level = Integer.parseInt(attributes[6]);
-                int xp = Integer.parseInt(attributes[7]);
-                int mana = Integer.parseInt(attributes[8]);
-                int baseMaxHP = Integer.parseInt(attributes[9]);
-                int strength = Integer.parseInt(attributes[10]);
-                int intelligence = Integer.parseInt(attributes[11]);
-                int dexterity = Integer.parseInt(attributes[12]);
-                int arcane = Integer.parseInt(attributes[13]);
-                int endurance = Integer.parseInt(attributes[14]);
-                int roomId = Integer.parseInt(attributes[18]);
+                int baseMaxHP = Integer.parseInt(attributes[3]);
+                int strength = Integer.parseInt(attributes[4]);
+                int dexterity = Integer.parseInt(attributes[5]);
+                int intelligence = Integer.parseInt(attributes[6]);
+                int arcane = Integer.parseInt(attributes[7]);
+                int endurance = Integer.parseInt(attributes[8]);
+                int roomId = Integer.parseInt(attributes[12]);
 
-                // Skip records whose recruitable field is not a valid boolean.
-                if (!attributes[17].equalsIgnoreCase("true")
-                        && !attributes[17].equalsIgnoreCase("false"))
-                    continue;
-
-                // Skip the Companion if its room does not exist.
                 Room room = worldMap.getRoomById(roomId);
                 if (room == null)
                     continue;
 
-                // Create the Companion from the parsed fields and add it to the room.
                 Companion companion = new Companion(
                         attributes[1],
-                        maxHP, physicalDEF, magicDEF, attack,
-                        level, xp, mana, baseMaxHP,
-                        strength, intelligence, dexterity, arcane, endurance,
-                        new ArrayList<>(),
+                        attributes[2],
+                        baseMaxHP,
+                        strength,
+                        dexterity,
+                        intelligence,
+                        arcane,
+                        endurance,
+                        attributes[9],
+                        parseCompanionValues(attributes[10]),
+                        parseCompanionValues(attributes[11]),
                         companionId,
-                        attributes[15],
-                        attributes[16],
-                        Boolean.parseBoolean(attributes[17]),
                         room
                 );
 
@@ -611,7 +614,6 @@ public class DataExtractionMethods {
             }
         }
     }
-
         public static void extractStartingClassData(Scanner fileScanner, ArrayList<StartingClass> classes){
 
 
