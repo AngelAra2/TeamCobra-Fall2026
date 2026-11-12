@@ -468,31 +468,48 @@ public class DataExtractionMethods {
     }
     // This reads each Merchant record and adds the Merchant to the room listed in the file.
     public static void extractMerchantData(Scanner fileScanner, Map worldMap) {
+        // Each non-empty line in the file represents one Merchant.
         while (fileScanner.hasNextLine()) {
             String line = fileScanner.nextLine().trim();
             if (line.isEmpty())
                 continue;
 
+            // A Merchant record contains an ID, a name, dialogue, stock item IDs, and a room ID.
             String[] fields = trimStringArray(line.split(delimiterA, -1));
+
+            // Skip records that do not have all five fields or are missing the Merchant's ID or name.
             if (fields.length != 5 || fields[0].isEmpty() || fields[1].isEmpty())
                 continue;
 
             try {
+                // Find the room where this Merchant belongs, and skip the record if that room is
                 Room room = worldMap.getRoomById(Integer.parseInt(fields[4]));
                 if (room == null)
                     continue;
 
+                // Store each dialogue line separately, while allowing a Merchant to have no dialogue.
+                // This checks the List of dialogue lines to see if it is empty,
+                // and if so, creates an empty List.
+                // Otherwise, it splits the dialogue string into a List of lines.
+
+                // Ternary operators are really neat and condense code like this down by a lot, otherwise it would
+                // have been really complicated.
                 List<String> dialogue = fields[2].isEmpty()
                         ? new ArrayList<>()
                         : Arrays.asList(fields[2].split("\\|", -1));
 
+                // Build the Merchant's stock by finding each listed item and making a separate copy of it for the
+                // Merchant's stock. This allows the Merchant to have its own unique copies of items,
+                // rather than sharing the same instances with other Merchants or Rooms.
                 HashMap<String, ArrayList<Item>> stock = new HashMap<>();
                 if (!fields[3].isEmpty()) {
                     for (String id : fields[3].split(delimiterB)) {
                         Item template = findItemById(worldMap, Integer.parseInt(id.trim()));
+                        // Skip stock IDs that do not match an item loaded into the world.
                         if (template == null)
                             continue;
 
+                        // Add supported item copies under their lowercase names so stock can be looked up by name.
                         Item item = copyItem(template);
                         if (item != null) {
                             stock.computeIfAbsent(item.getItemName().toLowerCase(),
@@ -500,9 +517,10 @@ public class DataExtractionMethods {
                         }
                     }
                 }
-
+                // Create the Merchant from the parsed fields and add it to the room.
                 room.addMerchant(new Merchant(fields[0], fields[1], dialogue, stock));
             } catch (NumberFormatException e) {
+                // Skip the record if its room ID or one of its stock item IDs is not a valid number.
                 continue;
             }
         }
