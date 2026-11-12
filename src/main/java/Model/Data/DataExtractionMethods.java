@@ -13,6 +13,7 @@ import Model.Exploration.Room;
 import Model.Items.Consumable;
 import Model.Items.Weapon;
 import Model.Combat.StartingClass;
+import Model.Util.ItemUtil;
 
 public class DataExtractionMethods {
 
@@ -482,7 +483,7 @@ public class DataExtractionMethods {
                 continue;
 
             try {
-                // Find the room where this Merchant belongs, and skip the record if that room is
+                // Find the room where this Merchant belongs, and skip the record if that room is missing.
                 Room room = worldMap.getRoomById(Integer.parseInt(fields[4]));
                 if (room == null)
                     continue;
@@ -504,13 +505,13 @@ public class DataExtractionMethods {
                 HashMap<String, ArrayList<Item>> stock = new HashMap<>();
                 if (!fields[3].isEmpty()) {
                     for (String id : fields[3].split(delimiterB)) {
-                        Item template = findItemById(worldMap, Integer.parseInt(id.trim()));
+                        Item template = ItemUtil.findItemById(worldMap, Integer.parseInt(id.trim()));
                         // Skip stock IDs that do not match an item loaded into the world.
                         if (template == null)
                             continue;
 
                         // Add supported item copies under their lowercase names so stock can be looked up by name.
-                        Item item = copyItem(template);
+                        Item item = ItemUtil.copyItem(template);
                         if (item != null) {
                             stock.computeIfAbsent(item.getItemName().toLowerCase(),
                                     name -> new ArrayList<>()).add(item);
@@ -524,35 +525,6 @@ public class DataExtractionMethods {
                 continue;
             }
         }
-    }
-
-    // This searches the rooms for an item with the requested ID.
-    private static Item findItemById(Map worldMap, int itemId) {
-        for (Room room : worldMap.getRooms().values()) {
-            for (ArrayList<Item> items : room.getItems().values()) {
-                for (Item item : items) {
-                    if (item.getItemId() == itemId)
-                        return item;
-                }
-            }
-        }
-
-        return null;
-    }
-
-    // This makes a separate copy of each item type supported in Merchant stock.
-    private static Item copyItem(Item item) {
-        if (item instanceof Weapon weapon) {
-            return new Weapon(item.getItemId(), item.getItemName(),
-                    item.getItemDescription(), weapon.getBaseAttack());
-        }
-
-        if (item instanceof Consumable consumable) {
-            return new Consumable(item.getItemId(), item.getItemName(),
-                    item.getItemDescription(), consumable.getHealingAmount());
-        }
-
-        return null;
     }
 
     /* Extract data from a file and parse it into a finite state machine for a Combatant object */
@@ -580,13 +552,14 @@ public class DataExtractionMethods {
     }
 
 
-    // This reads each Companion record and adds the Companion to the room listed in the file.
+    // This reads each Companion record and adds it to the room listed in the file.
     public static void extractCompanionData(Scanner fileScanner, Map worldMap) {
         while (fileScanner.hasNextLine()) {
             String line = fileScanner.nextLine().trim();
             if (line.isEmpty())
                 continue;
 
+            // Each Companion record must contain 19 fields.
             String[] attributes = trimStringArray(line.split(delimiterA, -1));
             if (attributes.length != 19)
                 continue;
@@ -608,14 +581,17 @@ public class DataExtractionMethods {
                 int endurance = Integer.parseInt(attributes[14]);
                 int roomId = Integer.parseInt(attributes[18]);
 
+                // Skip records whose recruitable field is not a valid boolean.
                 if (!attributes[17].equalsIgnoreCase("true")
                         && !attributes[17].equalsIgnoreCase("false"))
                     continue;
 
+                // Skip the Companion if its room does not exist.
                 Room room = worldMap.getRoomById(roomId);
                 if (room == null)
                     continue;
 
+                // Create the Companion from the parsed fields and add it to the room.
                 Companion companion = new Companion(
                         attributes[1],
                         maxHP, physicalDEF, magicDEF, attack,
@@ -810,8 +786,6 @@ public class DataExtractionMethods {
                     // Leave blank
             }
         }
-
-
     }
 }
 
