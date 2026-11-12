@@ -10,6 +10,8 @@ import Model.Exploration.Puzzle;
 import Model.Exploration.Room;
 import Model.Items.Consumable;
 import Model.Items.Weapon;
+import Model.Combat.Companion;
+import Model.Exploration.Merchant;
 
 public class DataExtractionMethods 
 {
@@ -633,5 +635,152 @@ public class DataExtractionMethods
 			// No states data found, exit method
 			return;
 	}
+
+    // Extract data from Companions file and parse it into Companion objects
+    public static void extractCompanionData(Scanner fileScanner, Map worldMap)
+    {
+        while (fileScanner.hasNextLine())
+        {
+            String line = fileScanner.nextLine().trim();
+            if (line.isEmpty())
+                continue;
+
+            String[] attributes = trimStringArray(line.split("_", -1));
+            if (attributes.length != 19)
+                continue;
+
+            try
+            {
+                int companionId = Integer.parseInt(attributes[0]);
+                int maxHP = Integer.parseInt(attributes[2]);
+                int physicalDEF = Integer.parseInt(attributes[3]);
+                int magicDEF = Integer.parseInt(attributes[4]);
+                int attack = Integer.parseInt(attributes[5]);
+                int level = Integer.parseInt(attributes[6]);
+                int xp = Integer.parseInt(attributes[7]);
+                int mana = Integer.parseInt(attributes[8]);
+                int baseMaxHP = Integer.parseInt(attributes[9]);
+                int strength = Integer.parseInt(attributes[10]);
+                int intelligence = Integer.parseInt(attributes[11]);
+                int dexterity = Integer.parseInt(attributes[12]);
+                int arcane = Integer.parseInt(attributes[13]);
+                int endurance = Integer.parseInt(attributes[14]);
+                int roomId = Integer.parseInt(attributes[18]);
+
+                if (!attributes[17].equalsIgnoreCase("true")
+                        && !attributes[17].equalsIgnoreCase("false"))
+                    continue;
+
+                Room room = worldMap.getRoomById(roomId);
+                if (room == null)
+                    continue;
+
+                Companion companion = new Companion(
+                        attributes[1],
+                        maxHP, physicalDEF, magicDEF, attack,
+                        level, xp, mana, baseMaxHP,
+                        strength, intelligence, dexterity, arcane, endurance,
+                        new ArrayList<>(),
+                        companionId,
+                        attributes[15],
+                        attributes[16],
+                        Boolean.parseBoolean(attributes[17]),
+                        room
+                );
+
+                room.addCompanion(companion);
+            }
+            catch (NumberFormatException e)
+            {
+                continue;
+            }
+        }
+    }
+
+    // Reads merchant records and adds each merchant to its room.
+    public static void extractMerchantData(Scanner fileScanner, Map worldMap)
+    {
+        while (fileScanner.hasNextLine())
+        {
+            String line = fileScanner.nextLine().trim();
+
+            // Ignore blank lines in the data file.
+            if (line.isEmpty())
+                continue;
+
+            // Split into merchant ID, name, dialogue, stock IDs, and room ID.
+            // The negative limit keeps empty fields, such as an empty dialogue or stock.
+            String[] fields = trimStringArray(line.split("_", -1));
+            if (fields.length != 5 || fields[0].isEmpty() || fields[1].isEmpty())
+                continue;
+
+            try
+            {
+                // Find the room where this merchant belongs.
+                Room room = worldMap.getRoomById(Integer.parseInt(fields[4]));
+                if (room == null)
+                    continue;
+
+                // Split multiple dialogue lines on |.
+                List<String> dialogue = fields[2].isEmpty()
+                        ? new ArrayList<>()
+                        : Arrays.asList(fields[2].split("\\|", -1));
+
+                // Build the merchant's stock from the listed item IDs.
+                HashMap<String, ArrayList<Item>> stock = new HashMap<>();
+                if (!fields[3].isEmpty())
+                {
+                    for (String id : fields[3].split(","))
+                    {
+                        Item template = findItemById(worldMap, Integer.parseInt(id.trim()));
+                        if (template == null)
+                            continue;
+
+                        // Give the merchant a separate item object, not the one in the room.
+                        Item item = copyItem(template);
+                        if (item != null)
+                            stock.computeIfAbsent(item.getItemName().toLowerCase(),
+                                    name -> new ArrayList<>()).add(item);
+                    }
+                }
+
+                // Create the merchant and place it in the room.
+                room.addMerchant(new Merchant(fields[0], fields[1], dialogue, stock));
+            }
+            catch (NumberFormatException e)
+            {
+                // Skip this record if its room ID or a stock item ID is not a number.
+                continue;
+            }
+        }
+    }
+
+    // Searches all rooms for an item with the requested ID.
+    private static Item findItemById(Map worldMap, int itemId)
+    {
+        for (Room room : worldMap.getRooms().values())
+            for (ArrayList<Item> items : room.getItems().values())
+                for (Item item : items)
+                    if (item.getItemId() == itemId)
+                        return item;
+
+        // No item with that ID was found.
+        return null;
+    }
+
+    // Makes a copy of a supported item type for the merchant's stock.
+    private static Item copyItem(Item item)
+    {
+        if (item instanceof Weapon weapon)
+            return new Weapon(item.getItemId(), item.getItemName(),
+                    item.getItemDescription(), weapon.getBaseAttack());
+
+        if (item instanceof Consumable consumable)
+            return new Consumable(item.getItemId(), item.getItemName(),
+                    item.getItemDescription(), consumable.getHealingAmount());
+
+        // Return null if this item type is not supported here.
+        return null;
+    }
 }
 

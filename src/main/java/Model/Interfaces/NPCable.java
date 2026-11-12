@@ -4,4 +4,4 @@ public interface NPCable {
     String talk();
 }
 
-// NPCable will be implemented by both Companion and Merchant.
+// NPCable will be implemented by both Companions and Merchant.

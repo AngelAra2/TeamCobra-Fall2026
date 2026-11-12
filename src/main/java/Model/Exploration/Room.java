@@ -3,6 +3,8 @@ import java.util.*;
 
 import Model.AbstractClasses.Item;
 import Model.Combat.Monster;
+import Model.Combat.Companion;
+import Model.Exploration.Merchant;
 
 public class Room 
 {
@@ -15,6 +17,8 @@ public class Room
 	private HashMap<String, ArrayList<Item>> items;
 	private HashMap<String, ArrayList<Monster>> monsters;
 	private Puzzle puzzle;
+    private ArrayList<Companion> companions;
+    private ArrayList<Merchant> merchants;
 	
 	/* Constructors */
 	public Room(
@@ -32,6 +36,8 @@ public class Room
 		this.items = new HashMap<>();
 		this.monsters = new HashMap<>();
 		this.puzzle = null;
+		this.companions = new ArrayList<>();
+		this.merchants = new ArrayList<>();
 	}
 	
 	/* Methods */
@@ -45,7 +51,8 @@ public class Room
 	public HashMap<String, ArrayList<Item>> getItems() { return this.items; }
 	public HashMap<String, ArrayList<Monster>> getMonsters() { return this.monsters; }	
 	public Puzzle getPuzzle() { return this.puzzle; }
-	
+	public ArrayList<Companion> getCompanions() { return this.companions; }
+	public ArrayList<Merchant> getMerchants() { return this.merchants; }
 	public Item getItemByName(String itemName)
 	{
 		/* Returns item of corresponding name */
@@ -199,6 +206,14 @@ public class Room
 				this.monsters.remove(monsterName);
 		}
 	}
+
+    public void addCompanion(Companion companion) {
+        this.companions.add(companion);
+    }
+
+    public void addMerchant(Merchant merchant) {
+        this.merchants.add(merchant);
+    }
 	
 	// Overrides //
 	

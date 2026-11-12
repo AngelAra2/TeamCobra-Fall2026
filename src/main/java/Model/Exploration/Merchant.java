@@ -21,6 +21,12 @@ public class Merchant implements NPCable {
         this.name = name;
         this.dialogue = new ArrayList<>(dialogue);
         this.stock = new HashMap<>();
+
+        //To explain what this does, it copies each stock list into the merchant's map, so the merchant gets its own unique list
+        // without sharing the OG ones.
+        for (String itemName : stock.keySet()) {
+            this.stock.put(itemName, new ArrayList<>(stock.get(itemName)));
+        }
         this.dialogueIndex = 0;
     }
 
