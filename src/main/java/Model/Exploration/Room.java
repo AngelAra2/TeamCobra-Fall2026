@@ -14,6 +14,7 @@ public class Room
 	private HashMap<String, Integer> exits;
 	private HashMap<String, ArrayList<Item>> items;
 	private HashMap<String, ArrayList<Monster>> monsters;
+	private List<Integer> spawnableMonsterIds;
 	private Puzzle puzzle;
 	
 	/* Constructors */
@@ -31,6 +32,7 @@ public class Room
 		this.exits = exits;
 		this.items = new HashMap<>();
 		this.monsters = new HashMap<>();
+		this.spawnableMonsterIds = new ArrayList<>();
 		this.puzzle = null;
 	}
 	
@@ -43,7 +45,8 @@ public class Room
 	public boolean getWasVisited() { return this.wasVisited; }
 	public HashMap<String, Integer> getExits() { return this.exits; }
 	public HashMap<String, ArrayList<Item>> getItems() { return this.items; }
-	public HashMap<String, ArrayList<Monster>> getMonsters() { return this.monsters; }	
+	public HashMap<String, ArrayList<Monster>> getMonsters() { return this.monsters; }
+	public List<Integer> getSpawnedMonsterIds() { return this.spawnableMonsterIds; }
 	public Puzzle getPuzzle() { return this.puzzle; }
 	
 	public Item getItemByName(String itemName)
@@ -198,6 +201,13 @@ public class Room
 			if (monsterList.size() <= 0)
 				this.monsters.remove(monsterName);
 		}
+	}
+	
+	public void addSpawnedMonsterId(int monsterId)
+	{
+		/* Adds the monsterId to the list of spawned monster IDs if it doesn't already exist in the list */
+		if (!this.spawnableMonsterIds.contains(monsterId))
+			this.spawnableMonsterIds.add(monsterId);
 	}
 	
 	// Overrides //

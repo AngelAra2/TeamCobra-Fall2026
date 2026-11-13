@@ -2,6 +2,9 @@ package Controller;
 
 import java.util.*;
 
+import Model.Combat.StartingClass;
+import Model.Data.DataExtractionMethods;
+import Model.Data.DataFileExtraction;
 import Model.Processors.*;
 import Model.Util.Wait;
 
@@ -12,6 +15,7 @@ import Model.Exploration.Map;
 import Model.Exploration.Puzzle;
 import Model.Exploration.Room;
 import View.View;
+
 
 public class GameController 
 {
@@ -32,6 +36,7 @@ public class GameController
 	private static ExplorationCommandProcessor explorationCmdProcessor;
 	private static CombatCommandProcessor combatCmdProcessor;
 
+	private static String startingClassFilePath = "/gameObjects/StartingClasses";
 	//------------------------------------//
 	
 	/* Helper Methods */
@@ -499,6 +504,103 @@ public class GameController
 		processedCmd = "";
 	}
 
+
+	//------------------------------------//
+
+
+	//makes sure user enters a starting class name, and returns starting class object
+	private static StartingClass getValidStartingClass(ArrayList<StartingClass> classes){
+
+		//gets user input, if class exists, return the starting class, if it doesn't exist
+		//keep prompting user to enter a valid starting class.
+		while(true){
+			String input = basicCmdProcessor.getUserInput();
+
+			//looks for a starting class that matches user's input, if found, return starting class
+			for(StartingClass startingClass : classes){
+				if (startingClass.getName().equalsIgnoreCase(input)){
+					return startingClass;
+				}
+			}
+
+			View.println("Invalid class. Please enter a valid class name.");
+		}
+
+	}
+	//method gets user's input, and validates it to ensure user enter's either yes or no.
+	private static boolean getYesNoInput(){
+
+		//validates user's input, user cannot exit loop unless they enter yes or no.
+		while(true){
+			String input = basicCmdProcessor.getUserInput();
+
+			if (input.equalsIgnoreCase("yes"))
+			{
+				return true;
+			}
+			if(input.equalsIgnoreCase("no"))
+			{
+				return false;
+			}
+
+			View.println("Invalid input. Please enter Yes or No");
+		}
+	}
+
+	private static StartingClass pickStartingClass(){
+		ArrayList<StartingClass> classes = new ArrayList<>();
+
+		//loads Starting Class data from text file to classes ArrayList
+		DataFileExtraction.extractClassDataToController(DataExtractionMethods::extractStartingClassData, startingClassFilePath, classes);
+
+		//for testing
+		if (classes.isEmpty()){
+			throw new IllegalStateException("No starting class loaded.");
+		}
+
+		//displays available classes, and asks user to choose a class, after choosing a class, we display the
+		//character stats, and ask user if they want to move forward with this class, entering yes returns the starting class
+		//entering no restarts the loop so the user can select another starting class.
+		while (true){
+
+			View.printColored("Choose your starting class:","blue", true);
+
+			//display class names
+			for(StartingClass tempClass : classes){
+				View.println("- " + tempClass.getName());
+			}
+			//accepts user's input, returns startingClass they selected
+			StartingClass startingClass = getValidStartingClass(classes);
+			View.separate(5);
+
+			View.printColored("Class: " + startingClass.getName(),"purple", true);
+
+			//displays class stats
+			View.printStartingClassStats(startingClass.getBackground(),
+					startingClass.getBaseMaxHP(),
+					startingClass.getBaseSTR(),
+					startingClass.getBaseDEX(),
+					startingClass.getBaseINT(),
+					startingClass.getBaseARC(),
+					startingClass.getBaseEND(),
+					startingClass.getCombatAbility(),
+					startingClass.getDefaultEquipment());
+
+
+			View.println("\nDo you want to select this class? Yes or No");
+
+			//validates user's input, if user entered yes, return startingClass, otherwise, restart loop
+			if(getYesNoInput()){
+				return startingClass;
+			}
+		}
+
+	}
+
+
+	//------------------------------------//
+
+
 	private static void preGameSetup()
 	{
 		/* Pre-game setup */
@@ -513,10 +615,18 @@ public class GameController
 
 		// World Map //
 		worldMap = new Map();
-		
+
+
+		View.println("What is your name?");
+		String playerName = basicCmdProcessor.getUserInput();
+
+		//Populate Starting classes from text file, and prompt player to choose class
+		StartingClass startingClass = pickStartingClass();
+
+
 		// Player //
-		// Start the player in the first room of the map
-		player = new Player(worldMap.getRoomById(1));
+		// Start the player in the first room of the map and assign player name, and starting class
+		player = new Player(playerName,startingClass,worldMap.getRoomById(1));
 
 		// Print welcome message
 		View.separate(25);
