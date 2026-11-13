@@ -70,7 +70,7 @@ public class Party {
             return true;
         } else{
             //display error message and return false.
-            System.out.println("There is no room in the active party!" + "Remove someone from the current party using 'Remove (Companion Name)'" );
+            System.out.println("There is no room in the active party!" + "Remove someone from the current party using 'Remove (Companions Name)'" );
             return false;
         }
 

@@ -11,6 +11,7 @@ import Model.Util.Wait;
 import Model.Combat.Battlefield;
 import Model.Combat.Monster;
 import Model.Combat.Player;
+import Model.Combat.StartingClass;
 import Model.Exploration.Map;
 import Model.Exploration.Puzzle;
 import Model.Exploration.Room;
