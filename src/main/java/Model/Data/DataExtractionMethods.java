@@ -411,28 +411,40 @@ public class DataExtractionMethods
 			String[] attributes = trimStringArray(currentLine.split(DELIMITER_A));
 			
 			// Declare required attributes
+			int monsterId;
+			boolean isBoss = false;
 			String[] targetRoomIds;
 
+			// Read monsterId
+			try { monsterId = Integer.parseInt(attributes[0]); }
+			catch (NumberFormatException e) { continue; }
+			catch (ArrayIndexOutOfBoundsException e) { continue; }
+			
+			// Read isBoss
+			try { isBoss = Boolean.parseBoolean(attributes[10]); }
+			catch (NumberFormatException e) { continue; }
+			catch (ArrayIndexOutOfBoundsException e) { continue; }
+			
 			// Read targetRoomIds
 			try 
 			{
 				// Read room IDs as a single string and split it into an array of strings
-				targetRoomIds = trimStringArray(attributes[11].split(DELIMITER_B));
-				
+				targetRoomIds = trimStringArray(attributes[10].split(DELIMITER_B));
+
 				for (int i = 0; i < targetRoomIds.length; i++)
 				{
 					int roomId;
 					try 
 					{ 
 						roomId = Integer.parseInt(targetRoomIds[i]);
-						
+	
 						// Find the Room object with the matching room ID and add the monster to it
 						Room targetRoom = worldMap.getRoomById(roomId);
 						if (targetRoom != null)
-							targetRoom.addSpawnedMonsterId(Integer.parseInt(attributes[0]));
+							targetRoom.addSpawnableMonsterId(monsterId);
 					}
-					catch (NumberFormatException e) { continue; }
-					catch (ArrayIndexOutOfBoundsException e) { continue; }
+					catch (NumberFormatException e) { System.out.println("NumberFormatException"); continue; }
+					catch (ArrayIndexOutOfBoundsException e) { System.out.println("ArrayIndexOutOfBoundsException"); continue; }
 				}
 			}
 			catch (ArrayIndexOutOfBoundsException e) { continue; }
@@ -646,6 +658,21 @@ public class DataExtractionMethods
 			}
 		}
 
+	}
+	
+	public static String[] extractPlayerConstants(Scanner fileScanner)
+	{
+		String[] constantsData = null;
+		
+		// Read player constants data //
+		if (fileScanner.hasNextLine())
+		{
+			/* Read current line to get player constants data */
+			String currentLine = fileScanner.nextLine().trim();
+			constantsData = trimStringArray(currentLine.split(DELIMITER_A));
+		}
+		
+		return constantsData;
 	}
 	
 	/* Extract data from a file and return the string of data that matches the given object ID */

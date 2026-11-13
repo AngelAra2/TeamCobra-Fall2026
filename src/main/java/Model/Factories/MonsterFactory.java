@@ -4,13 +4,14 @@ import Model.AbstractClasses.Factory;
 import Model.Combat.Monster;
 import Model.Data.DataExtractionMethods;
 import Model.Data.DataFileExtraction;
-import Model.Exploration.Map;
-import Model.Exploration.Room;
 
 public class MonsterFactory extends Factory<Monster>
 {
+	/* Data Fields */
+	private static final String MONSTERS_FILE_PATH = "/gameObjects/Monsters";
+	
 	/* Constructors */
-	public MonsterFactory(String filePath, Map worldMap) { super(filePath, worldMap); }
+	public MonsterFactory() { super(MONSTERS_FILE_PATH); }
 
 	/* Methods */
 	
@@ -44,7 +45,7 @@ public class MonsterFactory extends Factory<Monster>
 		int attack = 1;
 		String damageType = "physical";
 		boolean isBoss = false;
-		String possibleDropsString = "";
+		//String possibleDropsString = "";
 		
 		// Read monsterId
 		try { monsterId = Integer.parseInt(attributes[0]); }

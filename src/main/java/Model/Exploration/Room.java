@@ -3,10 +3,13 @@ import java.util.*;
 
 import Model.AbstractClasses.Item;
 import Model.Combat.Monster;
+import Model.Factories.MonsterFactory;
 
 public class Room 
 {
 	/* Data Fields */
+	private static final int MAX_MONSTERS_PER_ROOM = 3;
+	
 	private int roomId;
 	private String roomName;
 	private String roomDesc;
@@ -16,6 +19,7 @@ public class Room
 	private HashMap<String, ArrayList<Monster>> monsters;
 	private List<Integer> spawnableMonsterIds;
 	private Puzzle puzzle;
+	private MonsterFactory monsterFactory;
 	
 	/* Constructors */
 	public Room(
@@ -34,6 +38,8 @@ public class Room
 		this.monsters = new HashMap<>();
 		this.spawnableMonsterIds = new ArrayList<>();
 		this.puzzle = null;
+		
+		this.monsterFactory = new MonsterFactory();
 	}
 	
 	/* Methods */
@@ -161,7 +167,7 @@ public class Room
 		monsterName = monsterName.toLowerCase();
 
 		// Add monster to the room if its ArrayList exists in the HashMap
-		if (this.items.containsKey(monsterName))
+		if (this.monsters.containsKey(monsterName))
 		{
 			ArrayList<Monster> monsterList = this.monsters.get(monsterName);
 			monsterList.add(monster);
@@ -203,11 +209,42 @@ public class Room
 		}
 	}
 	
-	public void addSpawnedMonsterId(int monsterId)
+	public void addSpawnableMonsterId(int monsterId)
 	{
 		/* Adds the monsterId to the list of spawned monster IDs if it doesn't already exist in the list */
 		if (!this.spawnableMonsterIds.contains(monsterId))
 			this.spawnableMonsterIds.add(monsterId);
+	}
+	
+	public void generateMonsters()
+	{
+		// Guard Clauses // 
+		// If there are no spawnable monster IDs, return
+		if (this.spawnableMonsterIds.size() <= 0)
+			return;
+		
+		// Generate a random number of monsters to spawn (between 1 and the number of spawnable monster IDs)
+		Random rng = new Random();
+		int numMonstersToSpawn = rng.nextInt(1, this.spawnableMonsterIds.size() + 1);
+		
+		// Spawn the monsters
+		for (int i = 0; i < numMonstersToSpawn; i++)
+		{
+			// Don't generate any more monsters if the room already has enough monsters
+			if (this.monsters.size() >= MAX_MONSTERS_PER_ROOM)
+				break;
+
+			// Randomly select a monster ID from the list of spawnable monster IDs
+			int randomIndex = rng.nextInt(this.spawnableMonsterIds.size());
+			int monsterId = this.spawnableMonsterIds.get(randomIndex);
+			
+			// Create a new Monster object using the MonsterFactory
+			Monster newMonster = this.monsterFactory.create(monsterId);
+			
+			// Add the new monster to the room
+			if (newMonster != null)
+				this.addMonster(newMonster.getName(), newMonster);
+		}
 	}
 	
 	// Overrides //

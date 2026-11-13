@@ -1,6 +1,9 @@
 package View;
 
+import java.util.*;
+
 import Model.AbstractClasses.Combatant;
+import Model.Combat.Monster;
 
 public class BattleView 
 {
@@ -31,5 +34,20 @@ public class BattleView
 		View.printProgressBar(hpPercentage, PROGRESS_BAR_LENGTH, hpColor, false);
 		
 		View.println("");
+	}
+	
+	public static void printMonsterNames(List<Monster> monsters) 
+	{
+		/* Prints out the names of all monsters in the list */
+		View.separate(3);
+		View.printColored("You've entered combat!", "red", true);
+		View.println("");
+		
+		View.println("Monsters in this encounter:");
+		for (Monster monster: monsters) 
+		{
+			String monsterName = monster.getName();
+			View.println("- " + monsterName);
+		}
 	}
 }

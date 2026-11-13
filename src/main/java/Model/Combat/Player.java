@@ -15,42 +15,22 @@ import View.*;
 public class Player extends Character
 {
 	/* Data Fields */
-	private static String statesFilePath = "/finiteStates/PlayerStates";
+	private static final String STATES_FILE_PATH = "/finiteStates/PlayerStates";
+	private static final String CONSTANTS_FILE_PATH = "/constants/PlayerConstants";
+	
+	// Private constants that cannot be modified
+	private float BASE_ENCOUNTER_CHANCE; // Base encounter chance for monsters
+	private float ENCOUNTER_CHANCE_INCREMENT; // Incremental increase in encounter chance after each move
+	private int ENCOUNTER_GRACE_MOVES; // Number of moves before monster encounters can occur again after a previous encounter
 	
 	private Room currentRoom;
 	private HashMap<String, ArrayList<Item>> inventory;
 	private Monster examinedMonster;
+	
+	private float currentEncounterChance; // Current encounter chance for monsters, which increases after each move
+	private int movesSinceLastEncounter; // Keeps track of the number of moves since the last monster encounter
 
 	/* Constructors */
-	public Player(Room startingRoom)
-	{
-		super(
-			"Player", // name
-			100, // maxHP
-			0, // physicalDEF
-			0, // magicDEF
-			5, // attack
-			
-			1, // currentLevel
-			0, // currentXP
-			100, // currentMana
-			100, // baseMaxHP
-			10, // strength
-			10, // intelligence
-			10, // dexterity
-			10, // arcane
-			10, // endurance
-			new ArrayList<>() // CombatSkills
-		);
-		
-		this.currentRoom = startingRoom;
-		this.inventory = new HashMap<>();
-		this.examinedMonster = null;
-		
-		// Create Finite State Machine for Player
-		DataFileExtraction.extractStatesDataToCombatant(DataExtractionMethods::extractFiniteStatesData, statesFilePath, this);
-	}
-
 	/*
 	11.10.26
 	Angel
@@ -63,7 +43,7 @@ public class Player extends Character
 				startingClass.getBaseMaxHP(), //max HP
 				0, //physicalDEF
 				0, //magicDEF
-				5, //attack
+				42, //attack
 				1, //currentLevel
 
 				0, //currentXP
@@ -81,11 +61,72 @@ public class Player extends Character
 		this.examinedMonster = null;
 
 		//Create Finite State Machine for Player
-		DataFileExtraction.extractStatesDataToCombatant(DataExtractionMethods::extractFiniteStatesData, statesFilePath, this);
+		DataFileExtraction.extractStatesDataToCombatant(DataExtractionMethods::extractFiniteStatesData, STATES_FILE_PATH, this);
+		
+		// Populate private constants from file
+		String[] constantsData = DataFileExtraction.extractConstantsData(DataExtractionMethods::extractPlayerConstants, CONSTANTS_FILE_PATH);
+		
+		try
+		{
+			this.BASE_ENCOUNTER_CHANCE = Float.parseFloat(constantsData[0]);
+			this.ENCOUNTER_CHANCE_INCREMENT = Float.parseFloat(constantsData[1]);
+			this.ENCOUNTER_GRACE_MOVES = Integer.parseInt(constantsData[2]);
+		}
+		catch (NullPointerException e)
+		{
+			e.printStackTrace();
+			this.BASE_ENCOUNTER_CHANCE = 0.33f;
+			this.ENCOUNTER_CHANCE_INCREMENT = 0.05f;
+			this.ENCOUNTER_GRACE_MOVES = 3;
+		}
+		catch (NumberFormatException e)
+		{
+			e.printStackTrace();
+			this.BASE_ENCOUNTER_CHANCE = 0.33f;
+			this.ENCOUNTER_CHANCE_INCREMENT = 0.05f;
+			this.ENCOUNTER_GRACE_MOVES = 3;
+		}
+		catch (ArrayIndexOutOfBoundsException e)
+		{
+			e.printStackTrace();
+			this.BASE_ENCOUNTER_CHANCE = 0.33f;
+			this.ENCOUNTER_CHANCE_INCREMENT = 0.05f;
+			this.ENCOUNTER_GRACE_MOVES = 3;
+		}
+		
+		this.currentEncounterChance = this.BASE_ENCOUNTER_CHANCE;
+		this.movesSinceLastEncounter = 0;
 	}
 	/* Methods */
 	
 	// Private //
+	private boolean forceMonsterEncounter()
+	{
+		// If the current room already has monsters when the player enters, trigger an encounter immediately
+		if (this.currentRoom.getMonsters().size() > 0)
+			return true;
+		
+		// Guard Clauses //
+		// If the player has not made enough moves since the last encounter, return false
+		if (this.movesSinceLastEncounter < this.ENCOUNTER_GRACE_MOVES)
+			return false;
+		
+		// Calculate the encounter chance based on the number of moves since the last encounter
+		float rng = (float) Math.random();
+
+		// If chance triggers, reset the encounter chance and moves since last encounter, then return true
+		if (rng < this.currentEncounterChance)
+		{
+			this.currentEncounterChance = this.BASE_ENCOUNTER_CHANCE;
+			this.movesSinceLastEncounter = 0;
+			return true;
+		}
+		
+		// Otherwise, increment the encounter chance, then return false
+		this.currentEncounterChance += this.ENCOUNTER_CHANCE_INCREMENT;
+		return false;
+	}
+	
 	private void _addItemToInventory(Item item)
 	{
 		String itemName = item.getItemName();
@@ -180,7 +221,7 @@ public class Player extends Character
 			
 			// Print out room details
 			View.println("Now entering: " + roomName);
-			View.println("Description: " + roomDesc);
+			View.println(roomDesc);
 			
 			// Print out message if this room has been visited before
 			if (wasVisited)
@@ -188,9 +229,48 @@ public class Player extends Character
 			
 			/* Move player to this room */
 			this._setCurrentRoom(targetRoom);
+			this.movesSinceLastEncounter++; // Increase the number of moves since the last combat encounter
 			
 			// Reset monster being examined when moving to a new room
 			this.resetExaminedMonster();
+			
+			/* Check for monster encounter */
+			boolean encounterTriggered = this.forceMonsterEncounter();
+
+			// If an encounter with monsters is triggered, have the current room generate random monsters
+			if (encounterTriggered)
+				this.currentRoom.generateMonsters();
+			
+			/* Check if the current room has monsters */
+			// If there are monsters, the player and co. will enter combat
+			if (this.currentRoom.getMonsters().size() > 0)
+			{
+				// Populate battlefield with player and monsters
+				ArrayList<Monster> monstersInRoom = new ArrayList<>();
+				for (ArrayList<Monster> monsterList: this.currentRoom.getMonsters().values()) // HashMap
+					for (Monster monster: monsterList) // ArrayList
+						monstersInRoom.add(monster);
+				
+				Battlefield.populateBattlefield(this, monstersInRoom);
+				
+				// Set the player's state to "inCombat"
+				this.setCurrentState("inCombat");
+			}
+			
+			/* Check if the player has entered a room with a puzzle that is unsolved */
+			// Make sure the player is *not* in combat before checking for puzzles
+			Puzzle getPuzzleInRoom = this.getCurrentPuzzle();
+			if ( 
+				!this.getCurrentState().equalsIgnoreCase("inCombat") && 
+				(getPuzzleInRoom != null && !getPuzzleInRoom.getIsSolved())
+			)
+			{
+				// Reset the puzzle (reset its remaining attempts)
+				getPuzzleInRoom.resetPuzzle();
+				
+				// Set player's state to "solvingPuzzle"
+				this.setCurrentState("solvingPuzzle");
+			}
 			
 			// Movement successful
 			return true;
@@ -466,51 +546,8 @@ public class Player extends Character
         /* Handle the proper interaction with the given monster name */
         // Check if player is examining a monster
         Monster targetMonster;
-        if (this.examinedMonster != null)
-		{
-        	// Attack/ignore monster
-        	if (action.equals("attack") || action.equals("ignore"))
-			{       		
-        		targetMonster = this.getExaminedMonster();
-        		
-        		// Attack monster
-        		if (action.equals("attack"))
-        		{
-        			// The player attacks the monster in the current room and initiates combat
-        			if (targetMonster != null)
-    				{
-    					// Populate battlefield with player and monsters
-    					Battlefield.populateBattlefield(this, new ArrayList<>(Arrays.asList(targetMonster)));
-    					
-    					// Change player's state to "inCombat"
-    					this.setCurrentState("inCombat");
-
-    					View.println("You've attacked " + targetMonster.getName() + "!");
-    				}
-    				else
-    					View.println("No such monster to attack in the current room");
-        		}
-        		
-        		// Ignore monster
-				else
-				{
-					// Remove the monster from the current room and reset the examined monster
-					monsterName = targetMonster.getName();
-					this.getCurrentRoom().removeMonster(monsterName, targetMonster);
-
-					View.println("You've chosen to ignore " + monsterName + ". You won't see them again...for now");
-				}
-        		
-        		// Reset the examined monster after taking action
-        		this.resetExaminedMonster();
-			}
-        }
-        
-        // Currently not examining a monster
-        else
+    		if (!monsterName.isEmpty())
         {
-        	if (!monsterName.isEmpty())
-            {
             	// Examine monster
             	if (action.equals("examine"))
             	{
@@ -524,15 +561,15 @@ public class Player extends Character
     					View.println("");
     					View.printlnObject(targetMonster);
     				}
+    				
     				else
     					View.println("No such monster to examine in the current room");
             	}
-            }
-            
-            // If monster name is empty, print error message and return
+        }
+        
+        // If monster name is empty, print error message and return
     		else
-    			View.println("Invalid: no monster name provided");
-        }  
+    			View.println("Invalid command: no monster name provided"); 
     }
      
 	public boolean attemptToSolvePuzzle(String userInput)
