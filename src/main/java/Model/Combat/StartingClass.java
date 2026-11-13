@@ -80,3 +80,5 @@ public class StartingClass {
         return defaultEquipment;
     }
 }
+
+//bleh

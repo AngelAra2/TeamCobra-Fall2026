@@ -1,79 +1,77 @@
 package Model.Combat;
 
 //import java.util.ArrayList;
+import java.util.ArrayList;
 import java.util.List;
 
 import Model.AbstractClasses.Character;
 import Model.Exploration.Room;
+import Model.Interfaces.NPCable;
 
-public class Companion extends Character 
+public class Companion extends Character implements NPCable
 {
-	/* Data Fields */
-	private int id;
-	private String partyStatus;
-	private String perkDescription;
-	private boolean isRecruited;
-	private Room homeRoom;
-	//private List<Dialogue> dialogues;
+    /* Data Fields */
+    private int id;
+    private String partyStatus;
+    private String perkDescription;
+    private boolean isRecruited;
+    private Room homeRoom;
+    private String backstory;
+    private List<String> defaultCombatAbilities; // PLACEHOLDER UNTIL THE COMBAT ABILITY CLASS IS IMPLEMENTED
+    private List<String> defaultEquipment; // PLACEHOLDER UNTIL THE EQUIPMENT CLASS IS IMPLEMENTED
+    //private List<Dialogue> dialogues;
 
-	/* Constructors */
-	public Companion(
-			String name,
-			int maxHP,
-			int physicalDEF,
-			int magicDEF,
-			int attack,
-			
-			int currentLevel,
-			int currentXP,
-			int currentMana,
-			int baseMaxHP,
-			int strength,
-			int intelligence,
-			int dexterity,
-			int arcane,
-			int endurance,
-			List<CombatSkill> skills,
+    /* Constructors */
+    public Companion(
+            String name,
+            String backstory,
+            int baseMaxHP,
+            int strength,
+            int dexterity,
+            int intelligence,
+            int arcane,
+            int endurance,
+            String perkDescription,
+            List<String> defaultCombatAbilities,
+            List<String> defaultEquipment,
+            int id,
+            Room homeRoom
+    )
+    {
+        super(
+                name,
+                baseMaxHP,
+                0,
+                0,
+                strength,
+                1,
+                0,
+                30 + (2 * intelligence),
+                baseMaxHP,
+                strength,
+                intelligence,
+                dexterity,
+                arcane,
+                endurance,
+                new ArrayList<>()
+        );
 
-			int id,
-			String partyStatus,
-			String perkDescription,
-			boolean isRecruited,
-			Room homeRoom
-		) 
-	{	
-		super(
-			name, 
-			maxHP, 
-			physicalDEF, 
-			magicDEF, 
-			attack,
-			
-			currentLevel, 
-			currentXP, 
-			currentMana, 
-			baseMaxHP, 
-			strength, 
-			intelligence, 
-			dexterity, 
-			arcane, 
-			endurance, 
-			skills
-		);
-		
-		this.id = id;
-		this.partyStatus = partyStatus;
-		this.perkDescription = perkDescription;
-		this.isRecruited = isRecruited;
-		this.homeRoom = homeRoom;
-	}
+        this.id = id;
+        this.partyStatus = null;
+        this.perkDescription = perkDescription;
+        this.isRecruited = false;
+        this.homeRoom = homeRoom;
+        this.backstory = backstory;
+        this.defaultCombatAbilities = new ArrayList<>(defaultCombatAbilities);
+        this.defaultEquipment = new ArrayList<>(defaultEquipment);
+    }
 
-	/* Methods */
-	
-	// Private //
-	
-	// Getters //
-	// (WIP 10.29.2026)
+    /* Methods */
+
+    // Private //
+
+    // Getters //
+    // (WIP 10.29.2026)
 	/*
 	public boolean isRecruitable()
 	{
@@ -81,28 +79,38 @@ public class Companion extends Character
 	}
 	*/
 
-	// Setters //
-	public void setPartyStatus(String partyStatus) { this.partyStatus = partyStatus; }
+    public int getId() { return this.id; }
+    public String getPartyStatus() { return this.partyStatus; }
+    public String getPerkDescription() { return this.perkDescription; }
+    public boolean isRecruited() { return this.isRecruited; }
+    public Room getHomeRoom() { return this.homeRoom; }
+    public String getBackstory() { return this.backstory; }
+    public List<String> getDefaultCombatAbilities() {
+        return new ArrayList<>(this.defaultCombatAbilities);
+    }
+    public List<String> getDefaultEquipment() {
+        return new ArrayList<>(this.defaultEquipment);
+    }
 
-	// Custom //
-	public void recruit() { this.isRecruited = true; }
-	
-	// (WIP 10.29.2026)
-	/*
-	public String talk()
-	{
-		return "";
-	}
-	*/
-	
-	// (WIP 10.29.2026)
+    // Setters //
+    public void setPartyStatus(String partyStatus) { this.partyStatus = partyStatus; }
+
+    // Custom //
+    public void recruit() { this.isRecruited = true; }
+
+
+    // (WIP 10.29.2026)
 	/*
 	public void applyPerk()
 	{
 		
 	}
 	*/
-	
-	// Overrides //
 
+    // Overrides //
+    // WIP 11/11/2026
+    @Override
+    public String talk() {
+        return "";
+    }
 }

@@ -3,6 +3,9 @@ import java.util.*;
 
 import Model.Data.DataFileExtraction;
 import Model.Data.DataExtractionMethods;
+import Model.AbstractClasses.Item;
+import Model.Items.Consumable;
+import Model.Items.Weapon;
 
 public class Map
 {
@@ -11,7 +14,8 @@ public class Map
 	private static String itemsFilePath = "/gameObjects/Items";
 	private static String puzzlesFilePath = "/gameObjects/Puzzles";
 	private static String monstersFilePath = "/gameObjects/Monsters";
-	
+    private static String companionsFilePath = "/gameObjects/Companions";
+	private static String merchantsFilePath = "/gameObjects/Merchants";
 	private HashMap<Integer, Room> rooms;
 
 	/* Constructors */
@@ -29,6 +33,8 @@ public class Map
 		DataFileExtraction.extractDataToMap(DataExtractionMethods::extractItemData, itemsFilePath, this); // Items
 		DataFileExtraction.extractDataToMap(DataExtractionMethods::extractPuzzleData, puzzlesFilePath, this); // Puzzles	
 		DataFileExtraction.extractDataToMap(DataExtractionMethods::extractMonsterData, monstersFilePath, this); // Monsters
+        DataFileExtraction.extractDataToMap(DataExtractionMethods::extractCompanionData, companionsFilePath, this); // Companions
+        DataFileExtraction.extractDataToMap(DataExtractionMethods::extractMerchantData, merchantsFilePath, this); // Merchants
 	}
 	
 	/* Methods */
