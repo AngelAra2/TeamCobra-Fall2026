@@ -3,19 +3,18 @@ import java.util.*;
 
 import Model.Data.DataFileExtraction;
 import Model.Data.DataExtractionMethods;
-import Model.AbstractClasses.Item;
-import Model.Items.Consumable;
-import Model.Items.Weapon;
 
 public class Map
 {
 	/* Data Fields */
-	private static String roomsFilePath = "/gameObjects/Rooms";
-	private static String itemsFilePath = "/gameObjects/Items";
-	private static String puzzlesFilePath = "/gameObjects/Puzzles";
-	private static String monstersFilePath = "/gameObjects/Monsters";
-    private static String companionsFilePath = "/gameObjects/Companions";
-	private static String merchantsFilePath = "/gameObjects/Merchants";
+
+	private static final String ROOMS_FILE_PATH = "/gameObjects/Rooms";
+	private static final String ITEMS_FILE_PATH = "/gameObjects/Items";
+	private static final String PUZZLES_FILE_PATH = "/gameObjects/Puzzles";
+	private static final String MONSTERS_FILE_PATH = "/gameObjects/Monsters";
+    private static final String COMPANIONS_FILE_PATH = "/gameObjects/Companions";
+	private static final String MERCHANTS_FILE_PATH = "/gameObjects/Merchants";
+
 	private HashMap<Integer, Room> rooms;
 
 	/* Constructors */
@@ -27,14 +26,14 @@ public class Map
 		// as a parameter to the extractDataToMap method
 		
 		/* Populate world map with Rooms */
-		DataFileExtraction.extractDataToMap(DataExtractionMethods::extractMapData, roomsFilePath, this);
+		DataFileExtraction.extractDataToMap(DataExtractionMethods::extractMapData, ROOMS_FILE_PATH, this);
 
 		/* Populate Rooms with game objects */
-		DataFileExtraction.extractDataToMap(DataExtractionMethods::extractItemData, itemsFilePath, this); // Items
-		DataFileExtraction.extractDataToMap(DataExtractionMethods::extractPuzzleData, puzzlesFilePath, this); // Puzzles	
-		DataFileExtraction.extractDataToMap(DataExtractionMethods::extractMonsterData, monstersFilePath, this); // Monsters
-        DataFileExtraction.extractDataToMap(DataExtractionMethods::extractCompanionData, companionsFilePath, this); // Companions
-        DataFileExtraction.extractDataToMap(DataExtractionMethods::extractMerchantData, merchantsFilePath, this); // Merchants
+		DataFileExtraction.extractDataToMap(DataExtractionMethods::extractItemData, ITEMS_FILE_PATH, this); // Items
+		DataFileExtraction.extractDataToMap(DataExtractionMethods::extractPuzzleData, PUZZLES_FILE_PATH, this); // Puzzles	
+		DataFileExtraction.extractDataToMap(DataExtractionMethods::extractMonsterData, MONSTERS_FILE_PATH, this); // Monsters
+        DataFileExtraction.extractDataToMap(DataExtractionMethods::extractCompanionData, COMPANIONS_FILE_PATH, this); // Companions
+        DataFileExtraction.extractDataToMap(DataExtractionMethods::extractMerchantData, MERCHANTS_FILE_PATH, this); // Merchants
 	}
 	
 	/* Methods */

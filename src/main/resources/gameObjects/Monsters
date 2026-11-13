@@ -1,3 +1,16 @@
-1 _ Thief _ Someone who loves to steal from people _ 30 _ 1 _ 1 _ 7 _ 5 _ false _ 4,5
-2 _ Grenadier _ They've got bombs! Watch out!!! _ 20 _ 0 _ 0 _ 14 _ 7 _ false _ 3,4
-3 _ Brute _ Those muscles aren't just for show... _ 65 _ 3 _ 1 _ 25 _ 15 _ true _ 5
+1_Fenrir_Fast predators that usually hunt in packs that tend to only appear around the outskirts of villages._13_10_54_3_2_4_physical_4,5,6,16,17,19_31*2,36*1
+2_Bandit_Opportunistic thieves who ambush travelers outside settlements and steal anything they believe has value._20_20_60_4_0_5_physical_3,6,10,16,17_
+3_Slime_Jelly-like creatures that engulf almost anything that they consider as food. Any objects that were not fully digested remain in their bodies._10_20_45_5_3_3_magic_1,2,4,5,10,17,19,25_
+4_Giant Centipedes_Enormous insect protected by its segmented shells and armed with venomous pincers. They often emerge from cracks and tunnels to attack intruders._17_25_60_5_3_5_physical_4,5,25_
+5_Razorback Boars_An unusually aggressive species of wild boar with thick hide and massive tusks. Its powerful charge can send even armored travelers crashing to the ground._20_25_90_7_4_7_physical_7,17_
+6_Animated Books_Ancient books are brought to life by lingering black magic. Their enchanted pages whisper spells capable of incapacitating anyone who gets too close._16_30_45_2_1_4_magical_12,13,14_
+7_Mimic_Predatory monsters that disguise themselves as treasure chests and other valuable objects. They remain perfectly still until someone attempts to claim their false treasure._19_30_86_6_3_6_physical_12,13,14,16,26,27_
+8_The Reanimated_Corpses revived by vampires and Dungeon Wardens. Fragments of their former lives remain, allowing them to use the weapons and abilities they possessed before death._23_30_100_4*9_5*7_9_physical_16,21,22,23,25_
+9_False Knights_What appears to be an abandoned suit of armor is actually filled with thousands of hostile insects controlling it from within. It remains motionless until prey approaches._26_35_120_3*10_2*6_7_magic_16,21,22,23_
+10_Wailing Ghosts_Restless spirits of people whose lives were consumed by greed. Even in death, they remain obsessed with riches and instinctively pursue the sound of treasure._10_15_56_0_0_5_magic_1,2,21,22,23,26,27_
+11_The Taskmaster_The brutal overseer of the Mines and the player's first major boss. His overwhelming physical strength introduces the player to more dangerous, mechanically complex battles._28_150_200_8_3_10_physical_04_
+12_The Archmage_A powerful spellcaster who has mastered the ancient magic preserved within the Archives. The Archmage relies on devastating spells rather than physical strength._50_200_250_7_5_12_magical_14_
+13_The Banished_A formidable warrior cast into the Depths after a failed coup. Defeating him is the only way for the player to obtain the sacred weapon._40_300_350_12_7_9_physical_24_
+14_Centurion_Elite soldiers of the New Order trained to defend its most important territories. Their superior equipment and discipline make them considerably stronger than ordinary soldiers._30_50_140_9_4_14_magic_29_
+15_Practorian Guard_Sol Invictus's personal guards and some of the most highly trained soldiers of the New Order. Two Praetorians accompany Sol during the final battle and protect him from direct attacks._35_50_200_12_6_11_physical_30,31_
+16_Sol Invictus_The leader of the New Order and the final opponent standing between the player and the end of their journey. He fights alongside two Praetorian Guards and possesses some of the strongest abilities in the game._100_150_500_15_10_15_physical_31_31*1

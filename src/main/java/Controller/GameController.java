@@ -15,6 +15,7 @@ import Model.Combat.StartingClass;
 import Model.Exploration.Map;
 import Model.Exploration.Puzzle;
 import Model.Exploration.Room;
+import View.BattleView;
 import View.View;
 
 
@@ -50,6 +51,8 @@ public class GameController
 	
 	private static void puzzleSolvingLoop()
 	{
+		Wait.yield(1f);
+		
 		View.println("");
 		View.printColored("!!! PUZZLE ENCOUNTERED !!!", "yellow", true);
 		
@@ -106,12 +109,21 @@ public class GameController
 		 * - heal [item name]
 		 */
 		
+		Wait.yield(1f);
+		
 		/* Init variables */
 		String userCmd = "";
 		String cmdType = "";
 		
 		@SuppressWarnings("unused")
 		String processedCmd = "";
+		
+		/* Print our pre-battle messages */
+		
+		// Print out messages about the encounter
+		BattleView.printMonsterNames(Battlefield.getMonsters());
+		
+		Wait.yield(1.25f);
 		
 		View.println("");
 		View.printColored("!!! BATTLE START !!!", "red", true);
@@ -299,7 +311,7 @@ public class GameController
 		View.separate(10);
 		
 		// Movement command
-		if (cmdType.equals("move"))
+		if (cmdType.equalsIgnoreCase("move"))
 		{
 			View.println("Attempting to move " + processedCmd + "...");
 			View.println("");
@@ -311,23 +323,8 @@ public class GameController
 			Room currentRoom = player.getCurrentRoom();
 			if (currentRoom != null)
 			{
+				// The player will handle all the logic of moving rooms and triggering events in the new room
 				boolean movementSuccessful = player.moveToRoom(worldMap, processedCmd);
-				
-				/* Check if the player has entered a room with a puzzle that is unsolved */
-				Puzzle getPuzzleInRoom = player.getCurrentPuzzle();
-				if (movementSuccessful 
-					&& (getPuzzleInRoom != null && !getPuzzleInRoom.getIsSolved())
-				)
-				{
-					// Reset the puzzle (reset its remaining attempts)
-					getPuzzleInRoom.resetPuzzle();
-					
-					// Set player's state to "solvingPuzzle"
-					player.setCurrentState("solvingPuzzle");
-
-					// Continue to the next iteration of the main gameplay loop
-					return true;
-				}
 				
 				// Print error message if the player cannot move in that direction
 				if (!movementSuccessful)
@@ -336,10 +333,10 @@ public class GameController
 		}
 		
 		// Monster interaction command
-		else if (cmdType.equals("monster"))
+		else if (cmdType.equalsIgnoreCase("monster"))
 		{
 			// The user would like to examine/attack/ignore a monster in the current room
-			if (processedCmd.equals("targetMonster"))
+			if (processedCmd.equalsIgnoreCase("targetMonster"))
 			{
 				View.println("...");
 				Wait.yield(1.25f);
@@ -391,7 +388,7 @@ public class GameController
 		}
 		
 		// Item interaction command
-		else if (cmdType.equals("item"))
+		else if (cmdType.equalsIgnoreCase("item"))
 		{
 			View.println("...");
 			View.println("");
@@ -424,7 +421,7 @@ public class GameController
 		}
 		
 		// Miscellaneous command
-		else if (cmdType.equals("misc"))
+		else if (cmdType.equalsIgnoreCase("misc"))
 		{
 			View.println("...");
 			View.println("");

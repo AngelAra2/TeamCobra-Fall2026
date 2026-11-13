@@ -5,3 +5,4 @@ public interface NPCable {
 }
 
 // NPCable will be implemented by both Companions and Merchant.
+
