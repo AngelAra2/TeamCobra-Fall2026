@@ -1,6 +1,6 @@
 package Model.Exploration;
 
-public class Puzzle 
+public class Puzzle
 {
 	/* Data Fields */
 	private int puzzleId;
