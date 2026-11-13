@@ -1,34 +1,42 @@
+//package Model.Items;
+//
+//import Model.AbstractClasses.Item;
+//
+//public class Weapon extends Item
+//{
+//	/* Data Fields */
+//	private int baseAttack;
+//
+//	/* Constructors */
+//	public Weapon(int itemId, String itemName, String itemDesc, int baseAttack) {
+//		super(itemId, itemName, itemDesc, 0, 0);
+//		this.baseAttack = baseAttack;
+//	}
+//
+//	// Getters //
+//	public int getBaseAttack() { return this.baseAttack; }
+//
+//}
+
+
 package Model.Items;
 
-import Model.AbstractClasses.Item;
+// Represents weapons that characters can equip.
+public class Weapon extends EquipmentItem {
 
-public class Weapon extends Item
-{
-	/* Data Fields */
-	private int baseAttack;
-    int itemId;
-    String itemName;
-    String itemDesc;
-	/* Constructors */
-	public Weapon(int itemId, String itemName, String itemDesc, int baseAttack) {
-		super(itemId, itemName, itemDesc, 0, 0);
-//		this.itemId = itemId;
-//        this.itemName = itemName;
-//        this.itemDesc = itemDesc;
-		this.baseAttack = baseAttack;
-	}
+    // Full constructor for weapons loaded from item data.
+    public Weapon(int itemId, String itemName, String itemDesc, double weight, int value, String slot, int physicalDamage,
+                  int magicDamage, int physicalDefense, int magicDefense, String strengthScaling, String dexterityScaling,
+                  String intelligenceScaling, String arcaneScaling, String specialEffect) {
 
-	/* Methods */
-	
-	// Private //
-	
-	// Getters //
-	public int getBaseAttack() { return this.baseAttack; }
+        super(itemId, itemName, itemDesc, weight, value, slot, physicalDamage, magicDamage, physicalDefense,
+                magicDefense, strengthScaling, dexterityScaling, intelligenceScaling, arcaneScaling, specialEffect);
+    }
 
-	// Setters //
-
-	// Custom //
-	
-	// Overrides //
+    // Maintains compatibility with older code that requests baseAttack.
+    public int getBaseAttack() {
+        return this.getPhysicalDamage();
+    }
 }
+
 

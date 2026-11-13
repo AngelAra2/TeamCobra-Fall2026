@@ -18,7 +18,7 @@ public abstract class Character extends Combatant
 	protected int dexterity;
 	protected int arcane;
 	protected int endurance;
-	protected Weapon equippedWeapon;
+	//protected Weapon equippedWeapon;
 	protected List<CombatSkill> skills;
     protected EquipmentLoadout equipmentLoadout;
 
@@ -78,17 +78,28 @@ public abstract class Character extends Combatant
         return 15 + this.endurance;
     }
 
-	public int getTotalAttack()
-	{
-		/* Return total Attack of character */
-		int totalAttack = this.attack;
-		
-		// Add weapon's base attack if a weapon is equipped
-		if (this.equippedWeapon != null)
-			totalAttack += this.equippedWeapon.getBaseAttack();
+//	public int getTotalAttack()
+//	{
+//		/* Return total Attack of character */
+//		int totalAttack = this.attack;
+//
+//		// Add weapon's base attack if a weapon is equipped
+//		if (this.equippedWeapon != null)
+//			totalAttack += this.equippedWeapon.getBaseAttack();
+//
+//		return totalAttack;
+//	}
+// Calculates the character's total physical attack.
+    public int getTotalAttack() {
 
-		return totalAttack;
-	}
+        int totalAttack = this.attack;
+
+    // Add physical damage from equipped weapons.
+        totalAttack = totalAttack
+            + this.equipmentLoadout.getTotalPhysicalDamage();
+
+        return totalAttack;
+    }
 
 	// Setters //
 
@@ -103,8 +114,8 @@ public abstract class Character extends Combatant
 
 	public void spendMana(int amount) { this.setMana(this.currentMana - amount); }
 	public void restoreMana(int amount) { this.setMana(this.currentMana + amount); }
-	public void equipWeapon(Weapon weapon) { this.equippedWeapon = weapon; }
-	public void unequipWeapon() { this.equippedWeapon = null; }
+//	public void equipWeapon(Weapon weapon) { this.equippedWeapon = weapon; }
+//	public void unequipWeapon() { this.equippedWeapon = null; }
 	
 	public void levelUp()
 	{
@@ -119,4 +130,24 @@ public abstract class Character extends Combatant
 	}
 
 	// Overrides //
+    // Returns the character's total physical defense, including equipment.
+    @Override
+    public int getPhysicalDEF() {
+
+        return this.physicalDEF
+                + this.equipmentLoadout.getTotalPhysicalDefense();
+    }
+
+    // Returns the character's total magic defense, including equipment.
+    @Override
+    public int getMagicDEF() {
+
+        return this.magicDEF
+                + this.equipmentLoadout.getTotalMagicDefense();
+    }
+
+    // Returns the total magic damage provided by equipped items.
+    public int getTotalMagicDamage() {
+        return this.equipmentLoadout.getTotalMagicDamage();
+    }
 }

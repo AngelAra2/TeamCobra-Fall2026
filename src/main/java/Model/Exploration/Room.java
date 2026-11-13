@@ -59,6 +59,7 @@ public class Room
 		
 		// Checks if the room contains at least one item of the corresponding
 		// name. If it exists, returns it
+        itemName = itemName.toLowerCase();
 		if (this.items.containsKey(itemName))
 		{
 			ArrayList<Item> itemList = this.items.get(itemName);
@@ -75,6 +76,7 @@ public class Room
 		
 		// Checks if the room contains at least one monster of the corresponding
 		// name. If it exists, returns it
+        monsterName = monsterName.toLowerCase();
 		if (this.monsters.containsKey(monsterName))
 		{
 			ArrayList<Monster> monsterList = this.monsters.get(monsterName);
@@ -165,7 +167,7 @@ public class Room
 		monsterName = monsterName.toLowerCase();
 
 		// Add monster to the room if its ArrayList exists in the HashMap
-		if (this.items.containsKey(monsterName))
+		if (this.monsters.containsKey(monsterName))
 		{
 			ArrayList<Monster> monsterList = this.monsters.get(monsterName);
 			monsterList.add(monster);
