@@ -1,0 +1,5 @@
+26_Lockpick_Precision steel tool used to bypass chest mechanisms. Success scales with Dexterity._0.1_5_LOCKPICK-BYPASS_BYPASS-CHEST-MECHANISM_YES_2,1
+27_Key_Rusted iron or ornate key found in dungeons. Opens specific treasure chests._0.2_0_KEY_OPEN-SPECIFIC-CHESTS_YES_NONE
+28_Wood_Crafting material used at designated rest spots to build campfires, restore HP and Mana, and enable cooking._2.0_1_CRAFTING-MATERIAL_BUILD-CAMPFIRE_YES_16,15,14,7
+29_Torch_Essential light source for exploring dark dungeons, revealing hidden puzzle clues, and lighting unlit braziers._1.5_8_LIGHT-SOURCE_ILLUMINATE-AREA-AND-LIGHT-BRAZIERS_NO_13,12,11,5,4,2,1
+30_Wooden Arrow_Basic wooden arrow used as standard ammunition for bows._0.1_2_AMMUNITION_BOW-AMMO_YES_16,15,14

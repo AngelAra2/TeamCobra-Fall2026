@@ -214,16 +214,23 @@ public class DataExtractionMethods {
                     Item item;
                     switch (itemType.toLowerCase()) {
                         case "weapon":
-                            int baseAttack = 0;
-                            try {
-                                baseAttack = Integer.parseInt(attributes[4]);
-                            } catch (NumberFormatException e) {
-                                // Leave default value
-                            } catch (ArrayIndexOutOfBoundsException e) {
-                                // Leave default value
-                            }
+                            double weight = Double.parseDouble(attributes[4]);
+                            int value = Integer.parseInt(attributes[5]);
+                            String slot = attributes[6];
+                            int physicalDamage = Integer.parseInt(attributes[7]);
+                            int magicDamage = Integer.parseInt(attributes[8]);
+                            int physicalDefense = Integer.parseInt(attributes[9]);
+                            int magicDefense = Integer.parseInt(attributes[10]);
+                            String strengthScaling = attributes[11];
+                            String dexterityScaling = attributes[12];
+                            String intelligenceScaling = attributes[13];
+                            String arcaneScaling = attributes[14];
+                            String specialEffect = attributes[15];
 
-                            item = new Weapon(itemId, itemName, itemDesc, baseAttack);
+                            item = new Weapon(itemId, itemName, itemDesc, weight, value, slot, physicalDamage,
+                            magicDamage, physicalDefense, magicDefense, strengthScaling, dexterityScaling,
+                                intelligenceScaling, arcaneScaling, specialEffect);
+                            
                             break;
 
                         case "consumable":
@@ -235,10 +242,16 @@ public class DataExtractionMethods {
                             } catch (ArrayIndexOutOfBoundsException e) {
                                 // Leave default value
                             }
+                            
+                            weight = Double.parseDouble(attributes[4]);
+                            value = Integer.parseInt(attributes[5]);
+                            String effectType = attributes[6];
+                            int effectAmount = Integer.parseInt(attributes[7]);
+                            int effectDuration = Integer.parseInt(attributes[8]);
 
-                            item = new Consumable(itemId, itemName, itemDesc, healingAmount);
+                            item = new Consumable(itemId, itemName, itemDesc,
+                                    weight, value, effectType, effectAmount, effectDuration);
                             break;
-
                         default:
                             continue; // Skip this item if the type is unrecognized
                     }

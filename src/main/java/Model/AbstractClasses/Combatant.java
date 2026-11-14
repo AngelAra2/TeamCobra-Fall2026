@@ -75,12 +75,19 @@ public abstract class Combatant
 		int effectiveDamage = damage;
 		
 		switch(dmgType.toLowerCase()) {
-			case "physical":
-				effectiveDamage -= physicalDEF;
-				break;
-			case "magic":
-				effectiveDamage -= magicDEF;
-				break;
+//			case "physical":
+//				effectiveDamage -= physicalDEF;
+//				break;
+//			case "magic":
+//				effectiveDamage -= magicDEF;
+//				break;
+            case "physical":
+                effectiveDamage -= getPhysicalDEF();
+                break;
+
+            case "magic":
+                effectiveDamage -= getMagicDEF();
+                break;
 			default:
 				// If damage type is unknown, no defense is applied
 				break;

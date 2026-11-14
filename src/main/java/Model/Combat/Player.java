@@ -9,7 +9,9 @@ import Model.Exploration.Map;
 import Model.Exploration.Puzzle;
 import Model.Exploration.Room;
 import Model.Items.Consumable;
-import Model.Items.Weapon;
+//import Model.Items.Weapon;
+import Model.Items.Inventory;
+import Model.Items.EquipmentItem;
 import View.*;
 
 public class Player extends Character
@@ -24,7 +26,8 @@ public class Player extends Character
 	private int ENCOUNTER_GRACE_MOVES; // Number of moves before monster encounters can occur again after a previous encounter
 	
 	private Room currentRoom;
-	private HashMap<String, ArrayList<Item>> inventory;
+	//private HashMap<String, ArrayList<Item>> inventory;
+    private Inventory inventory;
 	private Monster examinedMonster;
 	
 	private float currentEncounterChance; // Current encounter chance for monsters, which increases after each move
@@ -57,7 +60,8 @@ public class Player extends Character
 				new ArrayList<>() //combatSkills
 		);
 		this.currentRoom = startingRoom;
-		this.inventory = new HashMap<>();
+		//this.inventory = new HashMap<>();
+        this.inventory = new Inventory();
 		this.examinedMonster = null;
 
 		//Create Finite State Machine for Player
@@ -128,49 +132,20 @@ public class Player extends Character
 		return false;
 	}
 	
-	private void _addItemToInventory(Item item)
-	{
-		String itemName = item.getItemName();
-		itemName = itemName.toLowerCase();
-		
-		// If the inventory doesn't already contain this item ID, create a new ArrayList for it
-		if (!this.inventory.containsKey(itemName))
-			this.inventory.put(itemName, new ArrayList<Item>());
-		
-		// Add the item to the inventory
-		this.inventory.get(itemName).add(item);
-	}
-	
-	private void _removeItemFromInventory(Item item)
-	{
-		String itemName = item.getItemName();
-		itemName = itemName.toLowerCase();
-		
-		// Check if the item ID is recorded
-		if (this.inventory.containsKey(itemName))
-		{
-			ArrayList<Item> itemList = this.inventory.get(itemName);
-			itemList.remove(item);
-			
-			// Remove the item ID from the HashMap if there are no more items of that ID
-			if (itemList.size() <= 0)
-				this.inventory.remove(itemName);
-		}
-	}
-	
-	private int _getQuantityOfItemsInInventory(String itemName)
-	{
-		itemName = itemName.toLowerCase();
-		
-		// Check if the inventory contains this item name
-		if (this.inventory.containsKey(itemName))
-		{
-			ArrayList<Item> itemList = this.inventory.get(itemName);
-			return itemList.size();
-		}
+	// Adds an item to the player's inventory if there is enough capacity.
+    private boolean _addItemToInventory(Item item) {
+        return this.inventory.addItem(item, this.currentLevel);
+    }
 
-		return 0;
-	}
+    // Removes an item from the player's inventory.
+    private boolean _removeItemFromInventory(Item item) {
+        return this.inventory.removeItem(item);
+    }
+
+    // Returns how many copies of an item the player owns.
+    private int _getQuantityOfItemsInInventory(String itemName) {
+        return this.inventory.getQuantity(itemName);
+    }
 	
 	private void _setCurrentRoom(Room newRoom)
 	{
@@ -186,18 +161,21 @@ public class Player extends Character
 	public Puzzle getCurrentPuzzle() { return this.currentRoom.getPuzzle(); }
 	public Monster getExaminedMonster() { return this.examinedMonster; }
 
-	public Item getItemFromInventoryByName(String itemName)
-	{
-		// Check if the inventory contains this item name
-		if (this.inventory.containsKey(itemName))
-		{
-			ArrayList<Item> itemList = this.inventory.get(itemName);
-			if (itemList.size() > 0)
-				return itemList.get(0);
-		}
-		
-		return null;
-	}
+//	public Item getItemFromInventoryByName(String itemName)
+//	{
+//		// Check if the inventory contains this item name
+//		if (this.inventory.containsKey(itemName))
+//		{
+//			ArrayList<Item> itemList = this.inventory.get(itemName);
+//			if (itemList.size() > 0)
+//				return itemList.get(0);
+//		}
+//
+//		return null;
+//	}
+    public Item getItemFromInventoryByName(String itemName) {
+        return this.inventory.findItem(itemName);
+    }
 	
 	// Setters //
 	public void setCurrentState(String newState) { this.stateMachine.setCurrentState(newState); }
@@ -346,13 +324,14 @@ public class Player extends Character
 	{
 		/* View the player's inventory */
 		View.println("");
-
+        HashMap<String, ArrayList<Item>> allItems = this.inventory.getItems();
 		// Get all items in the player's inventory
-		if (this.inventory.size() > 0)
-		{
+		//if (this.inventory.size() > 0)
+        if (allItems.size() > 0) {
 			View.println("Inventory:");
-			for (ArrayList<Item> itemList: this.inventory.values())
-			{
+
+			//for (ArrayList<Item> itemList: this.inventory.values())
+            for (ArrayList<Item> itemList: allItems.values()) {
 				// Print out item name and quantity of each item in the room
 				Item getFirstItem = itemList.get(0);
 				String itemName = getFirstItem.getItemName();
@@ -385,23 +364,47 @@ public class Player extends Character
             Item targetItem;
 
             // Pickup item
-            if (action.equals("pickup"))
-            {
-                // The player picks up the item from the current room and adds it to their inventory
-                // The item is removed from the current room's items
+//            if (action.equals("pickup"))
+//            {
+//                // The player picks up the item from the current room and adds it to their inventory
+//                // The item is removed from the current room's items
+//                targetItem = this.currentRoom.getItemByName(itemName);
+//                if (targetItem != null)
+//                {
+//                    // Add item to inventory
+//                    this._addItemToInventory(targetItem);
+//
+//                    // Remove item from current room
+//                    this.currentRoom.removeItem(itemName, targetItem);
+//
+//                    View.println("Picked up " + targetItem.getItemName() + ". Added to Inventory");
+//                }
+//                else
+//                    View.println("No such item to pick up in the current room.");
+//            }
+            // Pickup item
+            if (action.equals("pickup")) {
+
                 targetItem = this.currentRoom.getItemByName(itemName);
-                if (targetItem != null)
-                {
-                    // Add item to inventory
-                    this._addItemToInventory(targetItem);
 
-                    // Remove item from current room
-                    this.currentRoom.removeItem(itemName, targetItem);
+                if (targetItem != null) {
 
-                    View.println("Picked up " + targetItem.getItemName() + ". Added to Inventory");
+                    // Check carrying capacity before removing the item from the room.
+                    if (this._addItemToInventory(targetItem)) {
+
+                        this.currentRoom.removeItem(itemName, targetItem);
+
+                        View.println("Picked up " + targetItem.getItemName()
+                                + ". Added to Inventory");
+                    }
+                    else {
+                        View.println("You cannot carry this item. "
+                                + "Your inventory is too heavy.");
+                    }
                 }
-                else
+                else {
                     View.println("No such item to pick up in the current room.");
+                }
             }
 
             // Inspect item
@@ -423,72 +426,152 @@ public class Player extends Character
             }
 
             // Drop item
-            else if (action.equals("drop"))
-            {
-                // The player drops the item from their inventory and adds it to the current room's items HashMap
-                // The item is removed from the inventory
+//            else if (action.equals("drop"))
+//            {
+//                // The player drops the item from their inventory and adds it to the current room's items HashMap
+//                // The item is removed from the inventory
+//                targetItem = this.getItemFromInventoryByName(itemName);
+//                if (targetItem != null)
+//                {
+//                    // Remove item from inventory
+//                    this._removeItemFromInventory(targetItem);
+//
+//                    // Add item to current room
+//                    this.currentRoom.addItem(itemName, targetItem);
+//
+//                    View.println("Dropped " + targetItem.getItemName() + ". Added to " + this.currentRoom.getRoomName());
+//
+//                    // If the dropped item was the currently equipped weapon, unequip it
+//                    if (targetItem instanceof Weapon && this.equippedWeapon == targetItem)
+//                    {
+//                    	this.handleItemInteraction("unequip " + itemName);
+//                    }
+//                }
+//                else
+//                    View.println("No such item to drop in your inventory");
+//            }
+
+            // Drop item
+            else if (action.equals("drop")) {
+
                 targetItem = this.getItemFromInventoryByName(itemName);
-                if (targetItem != null)
-                {
-                    // Remove item from inventory
-                    this._removeItemFromInventory(targetItem);
 
-                    // Add item to current room
-                    this.currentRoom.addItem(itemName, targetItem);
+                if (targetItem != null) {
 
-                    View.println("Dropped " + targetItem.getItemName() + ". Added to " + this.currentRoom.getRoomName());
-                    
-                    // If the dropped item was the currently equipped weapon, unequip it
-                    if (targetItem instanceof Weapon && this.equippedWeapon == targetItem)
-                    {
-                    	this.handleItemInteraction("unequip " + itemName);
+                    // If the item is equipped, unequip it first.
+                    if (targetItem instanceof EquipmentItem) {
+
+                        EquipmentItem equipment = (EquipmentItem) targetItem;
+
+                        if (equipment.isEquipped()) {
+                            this.equipmentLoadout.unequipItem(equipment.getSlot());
+                        }
+                    }
+
+                    // Remove the item from inventory.
+                    if (this._removeItemFromInventory(targetItem)) {
+
+                        // Add the item to the current room.
+                        this.currentRoom.addItem(itemName, targetItem);
+
+                        View.println("Dropped " + targetItem.getItemName()
+                                + ". Added to " + this.currentRoom.getRoomName());
                     }
                 }
-                else
+                else {
                     View.println("No such item to drop in your inventory");
+                }
             }
             
             // Equip item (weapon)
-            else if (action.equals("equip"))
-			{
-				// The player equips the item from their inventory
-				targetItem = this.getItemFromInventoryByName(itemName);
-				if (targetItem != null)
-				{
-					if (targetItem instanceof Weapon)
-					{
-						// Unequip the currently equipped weapon
-						if (this.equippedWeapon != null)
-						{
-							this.handleItemInteraction("unequip " + this.equippedWeapon.getItemName());
-						}
-						
-						// Equip the weapon
-						this.equipWeapon((Weapon) targetItem);
-						View.println("Equipped " + targetItem.getItemName());
-					}
-					else
-						View.println("Cannot equip " + targetItem.getItemName() + " since it isn't a weapon");
-				}
-				else
-					View.println("No such weapon to equip in your inventory");
-			}
-            
-            // Unequip item (weapon)
-			else if (action.equals("unequip"))
-			{
-				// Check if the player has a weapon equipped
-				if (this.equippedWeapon != null)
-				{
-					// Unequip the weapon
-					Weapon unequippedWeapon = this.equippedWeapon;
-					
-					this.unequipWeapon();
-					View.println("Unequipped " + unequippedWeapon.getItemName());
-				}				
-				else
-					View.println("No weapon is currently equipped");
-			}
+//            else if (action.equals("equip"))
+//			{
+//				// The player equips the item from their inventory
+//				targetItem = this.getItemFromInventoryByName(itemName);
+//				if (targetItem != null)
+//				{
+//					if (targetItem instanceof Weapon)
+//					{
+//						// Unequip the currently equipped weapon
+//						if (this.equippedWeapon != null)
+//						{
+//							this.handleItemInteraction("unequip " + this.equippedWeapon.getItemName());
+//						}
+//
+//						// Equip the weapon
+//						this.equipWeapon((Weapon) targetItem);
+//						View.println("Equipped " + targetItem.getItemName());
+//					}
+//					else
+//						View.println("Cannot equip " + targetItem.getItemName() + " since it isn't a weapon");
+//				}
+//				else
+//					View.println("No such weapon to equip in your inventory");
+//			}
+//
+//            // Unequip item (weapon)
+//			else if (action.equals("unequip"))
+//			{
+//				// Check if the player has a weapon equipped
+//				if (this.equippedWeapon != null)
+//				{
+//					// Unequip the weapon
+//					Weapon unequippedWeapon = this.equippedWeapon;
+//
+//					this.unequipWeapon();
+//					View.println("Unequipped " + unequippedWeapon.getItemName());
+//				}
+//				else
+//					View.println("No weapon is currently equipped");
+//			}
+            // Equip an item.
+            else if (action.equals("equip")) {
+                targetItem = this.getItemFromInventoryByName(itemName);
+
+                if (targetItem != null) {
+
+                    // Only EquipmentItem objects can be equipped.
+                    if (targetItem instanceof EquipmentItem) {
+                        EquipmentItem equipment = (EquipmentItem) targetItem;
+
+                        // Equip the item using the character's equipment loadout.
+                        boolean equipped = this.equipmentLoadout.equipItem(equipment, this.calculateEquipLoad());
+
+                        if (equipped) {
+                            View.println("Equipped " + equipment.getItemName());
+                        } else {
+                            View.println("Unable to equip " + equipment.getItemName()
+                                    + ". Check its equipment slot and your equipment load.");
+                        }
+                    } else {
+                        View.println("Cannot equip " + targetItem.getItemName()
+                                + " because it is not equipment.");
+                    }
+                } else {
+                    View.println("No such item to equip in your inventory.");
+                }
+            }
+
+// Unequip an item.
+            else if (action.equals("unequip")) {
+                targetItem = this.getItemFromInventoryByName(itemName);
+
+                if (targetItem != null && targetItem instanceof EquipmentItem) {
+                    EquipmentItem equipment = (EquipmentItem) targetItem;
+
+                    if (equipment.isEquipped()) {
+                        this.equipmentLoadout.unequipItem(equipment.getSlot());
+                        View.println("Unequipped " + equipment.getItemName());
+                    }
+
+                    else {
+                        View.println(equipment.getItemName() + " is not equipped.");
+                    }
+                }
+                else {
+                    View.println("No equipped item with that name was found in your inventory.");
+                }
+            }
             
             // Heal item (consumable)
 			else if (action.equals("heal"))
@@ -513,7 +596,12 @@ public class Player extends Character
 						this.heal(healingAmount);
 						
 						// Remove the consumable from the player's inventory after use
-						this._removeItemFromInventory(consumable);
+						//this._removeItemFromInventory(consumable);
+
+                        // Marks the consumable as consumed after it is successfully removed from the inventory
+                        if (this._removeItemFromInventory(consumable)) {
+                            consumable.setConsumed(true);
+                        }
 						
 						View.println("Used " + consumable.getItemName() + " to heal " + healingAmount + " HP");
 					}
@@ -596,6 +684,17 @@ public class Player extends Character
     public void resetToDefaultState() { this.setCurrentState("exploring"); }
 
     // Add item to inventory; public method that calls private method
-    public void addItemToInventory(Item item) { this._addItemToInventory(item); }
+//    public void addItemToInventory(Item item) {
+//        this._addItemToInventory(item);
+//    }
+    // Allows other classes to add an item while checking carrying capacity.
+    public boolean addItemToInventory(Item item) {
+        return this._addItemToInventory(item);
+    }
+
+    // Allows other classes to access the player's inventory.
+    public Inventory getInventory() {
+        return this.inventory;
+    }
 }
 

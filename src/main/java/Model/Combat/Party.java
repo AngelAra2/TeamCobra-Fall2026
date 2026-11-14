@@ -35,6 +35,7 @@ public class Party {
         }
 
         //updates companion's party status to recruited
+        companion.recruit();
         companion.setPartyStatus("Recruited");
 
         //if statement checks if party has max active companions, if so, add companion to inactiveCompanions list
@@ -55,6 +56,9 @@ public class Party {
     ID: FR34
     This method handles the player's request on adding a companion to their active party.
      */
+
+    /*TODO: Can add a companion who was never recruited, should be restricted to already-recruited companions.
+     TODO: Check if that companion belongs to the inactive party!*/
     public boolean addCompanionToActiveParty(Companion companion){
         //if companion already exists in active party, disp msg and return true.
         if (activeCompanions.contains(companion)){

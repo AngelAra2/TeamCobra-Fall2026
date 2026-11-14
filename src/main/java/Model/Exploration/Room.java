@@ -4,7 +4,6 @@ import java.util.*;
 import Model.AbstractClasses.Item;
 import Model.Combat.Monster;
 import Model.Combat.Companion;
-import Model.Exploration.Merchant;
 import Model.Factories.MonsterFactory;
 
 public class Room 
@@ -67,6 +66,7 @@ public class Room
 		
 		// Checks if the room contains at least one item of the corresponding
 		// name. If it exists, returns it
+        itemName = itemName.toLowerCase();
 		if (this.items.containsKey(itemName))
 		{
 			ArrayList<Item> itemList = this.items.get(itemName);
@@ -83,6 +83,7 @@ public class Room
 		
 		// Checks if the room contains at least one monster of the corresponding
 		// name. If it exists, returns it
+        monsterName = monsterName.toLowerCase();
 		if (this.monsters.containsKey(monsterName))
 		{
 			ArrayList<Monster> monsterList = this.monsters.get(monsterName);

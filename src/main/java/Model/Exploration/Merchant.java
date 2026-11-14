@@ -67,20 +67,46 @@ public class Merchant implements NPCable {
     }
 
     // Checks that the player exists and the item is available, removes the item from the merchant's stock, and adds it to the player's inventory. It returns whether or not the sale succeeded.
+//    public boolean sellItem(Item item, Player player) {
+//        if (player == null || !offer(item)) {
+//            return false;
+//        }
+//
+//        String itemName = item.getItemName().toLowerCase();
+//        ArrayList<Item> items = stock.get(itemName);
+//        items.remove(item);
+//
+//        if (items.isEmpty()) {
+//            stock.remove(itemName);
+//        }
+//
+//        player.addItemToInventory(item);
+//        return true;
+//    }
+    // Checks that the player exists and the item is available, removes the item from the merchant's stock, and adds it to
+    // the player's inventory. It returns whether or not the sale succeeded.
+    // CHECKS before transferring an item from the merchant to the player's inventory
     public boolean sellItem(Item item, Player player) {
+
         if (player == null || !offer(item)) {
             return false;
         }
 
+        // Check whether the player's inventory can accept the item.
+        if (!player.addItemToInventory(item)) {
+            return false;
+        }
+
         String itemName = item.getItemName().toLowerCase();
+
         ArrayList<Item> items = stock.get(itemName);
+
         items.remove(item);
 
         if (items.isEmpty()) {
             stock.remove(itemName);
         }
 
-        player.addItemToInventory(item);
         return true;
     }
 
