@@ -51,7 +51,6 @@ public class View
 			length += word.length();
 
 		}
-
 		return result.toString();
 	}
 	public static void printColored(String line, String color, boolean printOnNewLine) 
