@@ -23,12 +23,15 @@ public class CombatSkillFactory extends Factory<CombatSkill>
         if (objectData == null || objectData.isEmpty())
             return null;
 
+        //create CombatSkill object with extracted data.
         objectData = objectData.trim();
 
+        //split data using delimiterA
         String[] attributes = DataExtractionMethods.trimStringArray(objectData.split(DataExtractionMethods.DELIMITER_A));
 
         //ensures that all 21 fields are filled out in file.
         if (attributes.length != 21){
+            //if 1 field is missing, throw this exception
             throw new IllegalArgumentException(
                     "Invalid combat skill data for ID: " + id
             );
@@ -44,8 +47,8 @@ public class CombatSkillFactory extends Factory<CombatSkill>
 
         //assigns weapon ID, returns -1 if weapon is not required to use skill
         int requiredWeaponID = attributes[6].equalsIgnoreCase("NONE")
-                                ? -1
-                                : Integer.parseInt(attributes[6]);
+                                ? -1 //if weapon ID is none, assign ID to -1
+                                : Integer.parseInt(attributes[6]); //else, assign ID from text file
 
 
         //assigns required character name to array list
@@ -78,6 +81,7 @@ public class CombatSkillFactory extends Factory<CombatSkill>
     }
 
 
+    //this is used to retrieve combat Skill and assign to player after starting a class using String name instead of ID
     public CombatSkill createByName(String name){
         if (name == null || name.isBlank()){
             return null;

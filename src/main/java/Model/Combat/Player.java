@@ -39,7 +39,6 @@ public class Player extends Character
 	Angel
 	Adding new constructor to accept player name and starting class.
 	 */
-
 	public Player(String name, StartingClass startingClass, Room startingRoom){
 		super(
 				name, //name
