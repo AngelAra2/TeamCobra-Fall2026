@@ -3,6 +3,8 @@ package Model.Combat;
 import Model.AbstractClasses.Character;
 import Model.AbstractClasses.Combatant;
 
+import java.util.ArrayList;
+
 //11.14.26
 //Angel Aragon
 //Finished CombatSkills class
@@ -17,7 +19,7 @@ public class CombatSkill
 	private String requiredWeaponType;
 	private String requiredWeaponSlot;
 	private int requiredWeaponID;
-	private String requiredCharacter;
+	private ArrayList<String> requiredCharacters;
 	private int physicalDamage;
 	private int magicDamage;
 	private int manaCost;
@@ -35,12 +37,12 @@ public class CombatSkill
 
 	/* Constructors */
 	public CombatSkill(int id, String name, String skillType, String targetType,
-					   String requiredWeaponType, String requiredWeaponSlot, int requiredWeaponID,
-					   String requiredCharacter, int physicalDamage, int magicDamage, int manaCost,
-					   int hitCount, double damageMultiplier, String effectType,
-					   double effectValue, int effectDuration, double effectChance,
-					   boolean ignoresDefense, int ammunitionCost, int flatHolyDamage,
-					   String description)
+                       String requiredWeaponType, String requiredWeaponSlot, int requiredWeaponID,
+                       ArrayList<String> requiredCharacters, int physicalDamage, int magicDamage, int manaCost,
+                       int hitCount, double damageMultiplier, String effectType,
+                       double effectValue, int effectDuration, double effectChance,
+                       boolean ignoresDefense, int ammunitionCost, int flatHolyDamage,
+                       String description)
 	{
 		this.id = id;
 		this.name = name;
@@ -50,7 +52,7 @@ public class CombatSkill
 		this.requiredWeaponType = requiredWeaponType;
 		this.requiredWeaponSlot = requiredWeaponSlot;
 		this.requiredWeaponID = requiredWeaponID;
-		this.requiredCharacter = requiredCharacter;
+		this.requiredCharacters = requiredCharacters;
 		this.physicalDamage = physicalDamage;
 		this.magicDamage = magicDamage;
 		this.manaCost = manaCost;
@@ -72,6 +74,9 @@ public class CombatSkill
 	// Getters //
 
 	public String getName() { return name; }
+
+	public int getId() {return id;}
+
 	// Setters //
 
 	// Custom //

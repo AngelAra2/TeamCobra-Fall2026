@@ -5,6 +5,8 @@ import Model.AbstractClasses.Factory;
 import Model.Data.DataExtractionMethods;
 import Model.Data.DataFileExtraction;
 
+import java.util.ArrayList;
+
 //Angel Aragon
 public class CombatSkillFactory extends Factory<CombatSkill>
 {
@@ -46,7 +48,13 @@ public class CombatSkillFactory extends Factory<CombatSkill>
                                 : Integer.parseInt(attributes[6]);
 
 
-        String requiredCharacter = attributes[7]; //Read character required to use skill
+        //assigns required character name to array list
+        String splitCharacter[] = attributes[7].split(DataExtractionMethods.DELIMITER_B);
+        ArrayList<String> characters = new ArrayList<>();
+        for (String s : splitCharacter){
+            characters.add(s);
+        }
+
         int physicalDamage = Integer.parseInt(attributes[8]); //Read physical dmg
         int magicDamage = Integer.parseInt(attributes[9]); //Read magic damage
         int manaCost = Integer.parseInt(attributes[10]); //Read mana cost
@@ -63,7 +71,7 @@ public class CombatSkillFactory extends Factory<CombatSkill>
 
         return new CombatSkill(combatSkillId, name, skillType,
                 targetType,requiredWeaponType, requiredWeaponSlot,
-                requiredWeaponID, requiredCharacter, physicalDamage,
+                requiredWeaponID, characters, physicalDamage,
                 magicDamage, manaCost, hitCount, damageMultiplier, effectType,
                 effectValue, effectDuration, effectChance, ignoresDefense, ammunitionCost, flatHolyDamage,
                 description);

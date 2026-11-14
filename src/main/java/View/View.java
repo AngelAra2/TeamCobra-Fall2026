@@ -1,6 +1,7 @@
 package View;
 
 import Model.Combat.CombatSkill;
+import Model.Combat.Player;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -191,6 +192,41 @@ public class View
 		for (String equipment : defaultEquipment){
 			View.println("- " + equipment);
 		}
+
+	}
+
+	//Angel
+	//Method is used to display player status
+	public static void printPlayerStatus(Player player){
+		printColored("============ PLAYER STATUS ============","blue", true );
+
+		println("Name: " + player.getName());
+		print("Level: " + player.getCurrentLevel());
+
+		println("\nHP: " + player.getCurrentHP() + "/" + player.getMaxHP());
+
+		println("Mana: " + player.getCurrentMana() + "/" + player.calculateMaxMana());
+
+		println("\nPhysical Defense: " + player.getPhysicalDEF());
+		println("Magic Defense: " + player.getMagicDEF());
+
+		println("\nSTR: " + player.getStrength());
+		println("DEX: " + player.getDexterity());
+		println("INT: " + player.getIntelligence());
+		println("ARC: " + player.getArcane());
+		println("END: " + player.getEndurance());
+
+		println("\nCombat Abilities:");
+
+		if(player.getSkills().isEmpty()){
+			println("- None Available");
+		} else{
+			for (CombatSkill skill : player.getSkills()){
+				println("- " + skill.getName());
+			}
+		}
+		printColored("\n=======================================","blue",true);
+
 
 	}
 }

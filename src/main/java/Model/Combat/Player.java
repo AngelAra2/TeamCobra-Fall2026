@@ -57,7 +57,7 @@ public class Player extends Character
 				startingClass.getBaseDEX(), //dexterity
 				startingClass.getBaseARC(),  //arcane
 				startingClass.getBaseEND(), //endurance
-				new ArrayList<>() //combatSkills
+				startingClass.getCombatSkill() //combatSkills
 		);
 		this.currentRoom = startingRoom;
 		//this.inventory = new HashMap<>();

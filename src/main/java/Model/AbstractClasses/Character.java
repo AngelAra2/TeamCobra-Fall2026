@@ -73,7 +73,21 @@ public abstract class Character extends Combatant
         return this.endurance;
     }
 
-    // Calculate maximum equipment load
+	public int getCurrentLevel() { return this.currentLevel;}
+
+	public int getCurrentMana() {return this.currentMana;}
+
+	public int getStrength() {return strength;}
+
+	public int getIntelligence() {return intelligence;}
+
+	public int getDexterity() {return dexterity;}
+
+	public int getArcane() {return arcane;}
+
+	public List<CombatSkill> getSkills() {return skills;}
+
+	// Calculate maximum equipment load
     public double calculateEquipLoad() {
         return 15 + this.endurance;
     }
