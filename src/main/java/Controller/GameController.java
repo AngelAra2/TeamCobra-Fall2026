@@ -433,12 +433,17 @@ public class GameController
 				case "location":
 					player.printCurrentRoomDetails();
 					break;
-				
+
+				//displays player's status
+				case "player status":
+					View.printPlayerStatus(player);
+					break;
+
 				// The user would like to view the game's commands
 				case "help":
 					View.printCommands();
 					break;
-					
+
 				// The user would like to quit the game
 				case "quit":
 					isGameRunning = false;
