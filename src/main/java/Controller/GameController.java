@@ -581,7 +581,7 @@ public class GameController
 					startingClass.getBaseINT(),
 					startingClass.getBaseARC(),
 					startingClass.getBaseEND(),
-					startingClass.getCombatAbility(),
+					startingClass.getCombatSkill(),
 					startingClass.getDefaultEquipment());
 
 

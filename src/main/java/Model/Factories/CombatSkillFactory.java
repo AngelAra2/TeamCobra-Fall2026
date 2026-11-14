@@ -5,6 +5,7 @@ import Model.AbstractClasses.Factory;
 import Model.Data.DataExtractionMethods;
 import Model.Data.DataFileExtraction;
 
+//Angel Aragon
 public class CombatSkillFactory extends Factory<CombatSkill>
 {
     private static final String COMBATSKILLS_FILE_PATH = "/gameObjects/CombatSkills";
@@ -68,5 +69,23 @@ public class CombatSkillFactory extends Factory<CombatSkill>
                 description);
     }
 
+
+    public CombatSkill createByName(String name){
+        if (name == null || name.isBlank()){
+            return null;
+        }
+
+        //creates combat skill object based off of ID, if the name of the skill matches the name, return skill
+        for(int id = 1; id <= 13; id++){
+            CombatSkill skill = create(id);
+
+            //if skill is not null, and the skill name matches the name received, return the skill.
+            if (skill != null && skill.getName().equalsIgnoreCase(name.trim())){
+                return skill;
+            }
+        }
+
+        return null;
+    }
 
 }

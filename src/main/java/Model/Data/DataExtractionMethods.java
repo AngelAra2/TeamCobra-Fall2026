@@ -2,6 +2,7 @@ package Model.Data;
 
 import java.util.*;
 
+import Model.Combat.CombatSkill;
 import Model.Combat.Companion;
 import Model.Exploration.Merchant;
 import Model.AbstractClasses.Combatant;
@@ -10,6 +11,7 @@ import Model.Combat.StartingClass;
 import Model.Exploration.Map;
 import Model.Exploration.Puzzle;
 import Model.Exploration.Room;
+import Model.Factories.CombatSkillFactory;
 import Model.Items.Consumable;
 import Model.Items.Weapon;
 import Model.Util.ItemUtil;
@@ -570,7 +572,7 @@ public class DataExtractionMethods {
 			int baseINT = 0;
 			int baseARC = 0;
 			int baseEND = 0;
-			ArrayList<String> combatAbilities = new ArrayList<>();
+			ArrayList<CombatSkill> combatSkills = new ArrayList<>();
 			ArrayList<String> defaultEquipment = new ArrayList<>();
 
 			//assigns starting class ID
@@ -684,7 +686,12 @@ public class DataExtractionMethods {
 
 				//adds combat ability to list
 				for(String abilities : combatAbilitiesList){
-					combatAbilities.add(abilities);
+                    //creates CombatSkill factory
+                    CombatSkillFactory factory = new CombatSkillFactory();
+                    //creates skill by name received from text file
+                    CombatSkill skill = factory.createByName(abilities);
+                    //add to arrayList
+                    combatSkills.add(skill);
 				}
 			}
 			catch (ArrayIndexOutOfBoundsException e)
@@ -713,7 +720,7 @@ public class DataExtractionMethods {
 							baseINT,
 							baseARC,
 							baseEND,
-							combatAbilities,
+							combatSkills,
 						    defaultEquipment
 				);
 

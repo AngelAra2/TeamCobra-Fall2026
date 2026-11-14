@@ -1,5 +1,7 @@
 package View;
 
+import Model.Combat.CombatSkill;
+
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 
@@ -168,7 +170,7 @@ public class View
 	 */
 	public static void printStartingClassStats(String background,
 											   int hp, int baseSTR, int baseDEX,
-											   int baseINT, int baseARC, int baseEND, ArrayList<String> combatAbilities,
+											   int baseINT, int baseARC, int baseEND, ArrayList<CombatSkill> skills,
 											   ArrayList<String> defaultEquipment){
 
 		View.println("Background: " + wrapText(background, 65));
@@ -181,8 +183,8 @@ public class View
 
 
 		View.println("\nCombat Abilities: ");
-		for (String ability : combatAbilities){
-			View.println("- " + ability);
+		for (CombatSkill skill : skills){
+			View.println("- " + skill.getName());
 		}
 
 		View.println("\nEquipment:");

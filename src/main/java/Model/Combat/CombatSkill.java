@@ -71,6 +71,7 @@ public class CombatSkill
 	
 	// Getters //
 
+	public String getName() { return name; }
 	// Setters //
 
 	// Custom //
@@ -92,6 +93,6 @@ public class CombatSkill
 	{
 		return;
 	}
-	
+
 	// Overrides //
 }
