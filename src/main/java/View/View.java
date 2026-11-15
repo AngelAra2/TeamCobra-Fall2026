@@ -155,6 +155,7 @@ public class View
 		println("MISCELLANEOUS");
 		println("\"room\" or \"location\" --> view the current room's name and description");
 		println("\"player status\" --> view the player's status");
+        println("\"solve\" --> attempt to solve a puzzle in a room."); // Dylan 11.15.26
 		println("\"help\" --> view all the game's commands");
 		println("\"q\" or \"quit\" --> quit the game");
 		
