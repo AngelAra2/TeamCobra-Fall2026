@@ -21,6 +21,8 @@ public abstract class Character extends Combatant
 	//protected Weapon equippedWeapon;
 	protected List<CombatSkill> skills;
     protected EquipmentLoadout equipmentLoadout;
+	private double physicalDamageBonus = 0.0;
+	private int physicalDamageBonusTurns = 0;
 
 	/* Constructors */
 	public Character(
@@ -73,7 +75,25 @@ public abstract class Character extends Combatant
         return this.endurance;
     }
 
-    // Calculate maximum equipment load
+	public int getCurrentLevel() { return this.currentLevel;}
+
+	public int getCurrentMana() {return this.currentMana;}
+
+	public int getStrength() {return strength;}
+
+	public int getIntelligence() {return intelligence;}
+
+	public int getDexterity() {return dexterity;}
+
+	public int getArcane() {return arcane;}
+
+	public List<CombatSkill> getSkills() {return skills;}
+
+	public double getPhysicalDamageBonus() {return physicalDamageBonus;}
+
+	public int getPhysicalDamageBonusTurns() {return physicalDamageBonusTurns;}
+
+	// Calculate maximum equipment load
     public double calculateEquipLoad() {
         return 15 + this.endurance;
     }
@@ -150,4 +170,37 @@ public abstract class Character extends Combatant
     public int getTotalMagicDamage() {
         return this.equipmentLoadout.getTotalMagicDamage();
     }
+
+	//receives combat skill name, and returns combat skill from Players ArrayList of combat skills
+	public CombatSkill getSkillByName(String name){
+		for (CombatSkill skill : skills){
+			if(skill.getName().equals(name)){
+				return skill;
+			}
+		}
+
+		return null;
+	}
+
+	//applies temporary physical damage bonus to character
+	public void applyPhysicalDamageBuff(double bonus, int duration) {
+
+		//stores physical damage bonus applied to character.
+		physicalDamageBonus = bonus;
+
+		//set number of turns before buff expires.
+		physicalDamageBonusTurns = duration;
+	}
+
+	//Decreases remaining turns of an active damage buff.
+	public void decreaseBuffDuration() {
+		//reduce the remaining duration by one if buff is active
+		if (physicalDamageBonusTurns > 0) {
+			physicalDamageBonusTurns--;
+		}
+		//remove physical damage bonus.
+		if (physicalDamageBonusTurns == 0) {
+			physicalDamageBonus = 0.0;
+		}
+	}
 }

@@ -75,12 +75,7 @@ public abstract class Combatant
 		int effectiveDamage = damage;
 		
 		switch(dmgType.toLowerCase()) {
-//			case "physical":
-//				effectiveDamage -= physicalDEF;
-//				break;
-//			case "magic":
-//				effectiveDamage -= magicDEF;
-//				break;
+
             case "physical":
                 effectiveDamage -= getPhysicalDEF();
                 break;

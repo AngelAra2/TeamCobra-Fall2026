@@ -30,6 +30,7 @@ public class Map
         this.rooms = new HashMap<>();
         this.itemTemplates = new HashMap<>();
 
+
         // The below method calls use "method referencing" to pass the data extraction methods
         // as a parameter to the extractDataToMap method
 
@@ -52,6 +53,7 @@ public class Map
 	        DataFileExtraction.extractDataToMap(DataExtractionMethods::extractCompanionData, companionsFilePath, this); // Companions
 	        DataFileExtraction.extractDataToMap(DataExtractionMethods::extractMerchantData, merchantsFilePath, this); // Merchants
 	        DataFileExtraction.extractDataToMap(DataExtractionMethods::extractPuzzleRewardsData, rewardsFilePath, this); // Rewards
+
 	}
 
 	/* Methods */

@@ -17,7 +17,6 @@ public class Companion extends Character implements NPCable
     private boolean isRecruited;
     private Room homeRoom;
     private String backstory;
-    private List<String> defaultCombatAbilities; // PLACEHOLDER UNTIL THE COMBAT ABILITY CLASS IS IMPLEMENTED
     private List<String> defaultEquipment; // PLACEHOLDER UNTIL THE EQUIPMENT CLASS IS IMPLEMENTED
     //private List<Dialogue> dialogues;
 
@@ -32,7 +31,7 @@ public class Companion extends Character implements NPCable
             int arcane,
             int endurance,
             String perkDescription,
-            List<String> defaultCombatAbilities,
+            List<CombatSkill> combatSkills,
             List<String> defaultEquipment,
             int id,
             Room homeRoom
@@ -53,7 +52,7 @@ public class Companion extends Character implements NPCable
                 dexterity,
                 arcane,
                 endurance,
-                new ArrayList<>()
+                combatSkills
         );
 
         this.id = id;
@@ -62,7 +61,6 @@ public class Companion extends Character implements NPCable
         this.isRecruited = false;
         this.homeRoom = homeRoom;
         this.backstory = backstory;
-        this.defaultCombatAbilities = new ArrayList<>(defaultCombatAbilities);
         this.defaultEquipment = new ArrayList<>(defaultEquipment);
     }
 
@@ -77,9 +75,6 @@ public class Companion extends Character implements NPCable
     public boolean isRecruited() { return this.isRecruited; }
     public Room getHomeRoom() { return this.homeRoom; }
     public String getBackstory() { return this.backstory; }
-    public List<String> getDefaultCombatAbilities() {
-        return new ArrayList<>(this.defaultCombatAbilities);
-    }
     public List<String> getDefaultEquipment() {
         return new ArrayList<>(this.defaultEquipment);
     }
