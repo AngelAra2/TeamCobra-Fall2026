@@ -53,10 +53,17 @@ public class Monster extends Combatant
 	/* Methods */
 	
 	// Private //
+	private Combatant chooseRandomCompanionTarget(List<Companion> companions)
+	{
+		int randomIndex = (int) (Math.random() * companions.size());
+		return companions.get(randomIndex);
+	}
 	
 	// Getters //
 	public boolean isBossMonster() { return this.isBoss; }
 	public String getDescription() { return this.description; }
+	public int getGoldReward() { return this.goldReward; }
+	public int getXPReward() { return this.xpReward; }
 
 	// Setters //
 	public void markDefeated() { this.isDefeated = true; }
@@ -72,12 +79,37 @@ public class Monster extends Combatant
 	{
 		return null;
 	}
-	
-	public Character chooseTarget(Party party)
-	{
-		return null;
-	}
 	*/
+	
+	public Combatant chooseTarget(Party party)
+	{
+		/* The monster chooses a random target from the player's party */
+		// Guard Clause //
+		// If the party is defeated, the monster cannot choose a target
+		if (party.isPartyDefeated())
+			return null;
+		
+		float randomFloat = (float) Math.random();
+		List<Companion> activeCompanions = party.getActiveCompanions();
+		
+		// If the random float is less than 0.5, target the player
+		// If they are defeated, target a random companion instead
+		if (randomFloat < 0.5)
+		{
+			if (!party.getPlayer().isAlive())
+				return this.chooseRandomCompanionTarget(activeCompanions);
+			
+			return party.getPlayer();
+		}
+		
+		// Otherwise, target a random companion in the party
+		// If the party has no active companions or the chosen companion is defeated, target the player instead
+		else
+			if (party.getActiveCompanions().isEmpty() || !this.chooseRandomCompanionTarget(party.getActiveCompanions()).isAlive())
+				return party.getPlayer();
+			else
+				return this.chooseRandomCompanionTarget(activeCompanions);
+	}
 	
 	// Overrides //
 	@Override

@@ -3,37 +3,58 @@ import java.util.*;
 
 import Model.Data.DataFileExtraction;
 import Model.Data.DataExtractionMethods;
+import Model.AbstractClasses.Item;
+
+import Model.Items.Consumable;
+import Model.Items.Weapon;
 
 public class Map
 {
 	/* Data Fields */
-
-	private static final String ROOMS_FILE_PATH = "/gameObjects/Rooms";
-	private static final String ITEMS_FILE_PATH = "/gameObjects/Items";
-	private static final String PUZZLES_FILE_PATH = "/gameObjects/Puzzles";
-	private static final String MONSTERS_FILE_PATH = "/gameObjects/Monsters";
-    private static final String COMPANIONS_FILE_PATH = "/gameObjects/Companions";
-	private static final String MERCHANTS_FILE_PATH = "/gameObjects/Merchants";
+	private static final String roomsFilePath = "/gameObjects/Rooms";
+	private static final String puzzlesFilePath = "/gameObjects/Puzzles";
+	private static final String monstersFilePath = "/gameObjects/Monsters";
+    private static final String companionsFilePath = "/gameObjects/Companions";
+	private static final String merchantsFilePath = "/gameObjects/Merchants";
+    private static final String weaponsFilePath = "/gameObjects/WeaponItems";
+    private static final String armorFilePath = "/gameObjects/ArmorItems";
+    private static final String consumablesFilePath = "/gameObjects/ConsumeableItems";
+    private static final String utilityFilePath = "/gameObjects/UtilityItems";
+    private static final String rewardsFilePath = "/gameObjects/Rewards";
 
 	private HashMap<Integer, Room> rooms;
+    private HashMap<Integer, Item> itemTemplates;
 
 	/* Constructors */
-	public Map()
-	{
-		this.rooms = new HashMap<>();
+    public Map()
+    {
+        this.rooms = new HashMap<>();
+        this.itemTemplates = new HashMap<>();
 
-		// The below method calls use "method referencing" to pass the data extraction methods
-		// as a parameter to the extractDataToMap method
 
-		/* Populate world map with Rooms */
-		DataFileExtraction.extractDataToMap(DataExtractionMethods::extractMapData, ROOMS_FILE_PATH, this);
+        // The below method calls use "method referencing" to pass the data extraction methods
+        // as a parameter to the extractDataToMap method
 
-		/* Populate Rooms with game objects */
-		//DataFileExtraction.extractDataToMap(DataExtractionMethods::extractItemData, ITEMS_FILE_PATH, this); // Items
-		DataFileExtraction.extractDataToMap(DataExtractionMethods::extractPuzzleData, PUZZLES_FILE_PATH, this); // Puzzles
-		DataFileExtraction.extractDataToMap(DataExtractionMethods::extractMonsterData, MONSTERS_FILE_PATH, this); // Monsters
-        DataFileExtraction.extractDataToMap(DataExtractionMethods::extractCompanionData, COMPANIONS_FILE_PATH, this); // Companions
-        DataFileExtraction.extractDataToMap(DataExtractionMethods::extractMerchantData, MERCHANTS_FILE_PATH, this); // Merchants
+        /* Populate world map with Rooms */
+        DataFileExtraction.extractDataToMap(DataExtractionMethods::extractMapData, roomsFilePath, this);
+
+	    /* Populate Rooms with game objects */
+	        DataFileExtraction.extractDataToMap(
+	    DataExtractionMethods::extractWeaponData, weaponsFilePath, this);
+	
+	        DataFileExtraction.extractDataToMap(
+	    DataExtractionMethods::extractArmorData, armorFilePath, this);
+	
+	        DataFileExtraction.extractDataToMap(
+	    DataExtractionMethods::extractConsumableData, consumablesFilePath, this);
+	
+	        DataFileExtraction.extractDataToMap(DataExtractionMethods::extractUtilityData, utilityFilePath, this);
+	        DataFileExtraction.extractDataToMap(DataExtractionMethods::extractPuzzleData, puzzlesFilePath, this); // Puzzles
+	        DataFileExtraction.extractDataToMap(DataExtractionMethods::extractMonsterData, monstersFilePath, this); // Monsters
+	        DataFileExtraction.extractDataToMap(DataExtractionMethods::extractCompanionData, companionsFilePath, this); // Companions
+	        DataFileExtraction.extractDataToMap(DataExtractionMethods::extractMerchantData, merchantsFilePath, this); // Merchants
+	        DataFileExtraction.extractDataToMap(DataExtractionMethods::extractPuzzleRewardsData, rewardsFilePath, this); // Rewards
+
 	}
 
 	/* Methods */
@@ -49,5 +70,16 @@ public class Map
 
 		return null;
 	}
+    public void addItemTemplate(Item item) {
+        this.itemTemplates.put(item.getItemId(), item);
+    }
+
+    public Item getItemTemplate(int itemId) {
+        return this.itemTemplates.get(itemId);
+    }
+
+    public HashMap<Integer, Item> getItemTemplates() {
+        return this.itemTemplates;
+    }
 }
 

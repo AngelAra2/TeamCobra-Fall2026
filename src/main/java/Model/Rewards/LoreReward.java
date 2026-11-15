@@ -26,9 +26,7 @@ public class LoreReward implements Rewardable
             return;
 
         View.println("");
-
-        //most likely will need to change this
         for (String entry : this.puzzleLoreReward)
-            View.println("- " + entry);
+            View.println("- " + View.wrapText(entry, 80));
     }
 }

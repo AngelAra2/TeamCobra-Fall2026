@@ -49,6 +49,14 @@ public class CombatCommandProcessor extends CommandProcessor
 					this.cmdType = "use item";
 					this.processedCmd = "targetItem";
 				}
+				
+				// Switching monster target
+				else if (cmd.startsWith("target"))
+				{
+					this.cmdType = "target";
+					this.processedCmd = "switchMonsterTarget";
+				}
+				
 				else
 					this.reset();
 				

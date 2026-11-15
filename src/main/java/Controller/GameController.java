@@ -2,12 +2,17 @@ package Controller;
 
 import java.util.*;
 
+import Model.AbstractClasses.Character;
 import Model.Combat.*;
 import Model.Data.DataExtractionMethods;
 import Model.Data.DataFileExtraction;
 import Model.Processors.*;
 import Model.Util.Wait;
-
+import Model.AbstractClasses.Combatant;
+import Model.Combat.*;
+import Model.Combat.Battlefield;
+import Model.Combat.Monster;
+import Model.Combat.Player;
 import Model.Exploration.Map;
 import Model.Exploration.Puzzle;
 import Model.Exploration.Room;
@@ -38,65 +43,65 @@ public class GameController
 	//------------------------------------//
 	
 	/* Helper Methods */
-	private static boolean isSolvingPuzzle()
-	{
-		/* Check if the player is currently solving a puzzle in their current room */
-		Puzzle currentPuzzle = player.getCurrentPuzzle();
-		return (currentPuzzle != null && !currentPuzzle.getIsSolved() && currentPuzzle.getRemainingAttempts() > 0);
-	}
-	
-	private static void puzzleSolvingLoop()
-	{
-		Wait.yield(1f);
-		
-		View.println("");
-		View.printColored("!!! PUZZLE ENCOUNTERED !!!", "yellow", true);
-		
-		Puzzle currentPuzzle;
-		while (isSolvingPuzzle())
-		{
-			Wait.yield(1f);
-			
-			/* Check if the player is currently solving a puzzle in their current room */
-			currentPuzzle = player.getCurrentPuzzle();
+    private static void puzzleSolvingLoop()
+    {
+        // Get the puzzle in the player's current room.
+        Puzzle puzzle = player.getCurrentPuzzle();
+        if (puzzle == null)
+        {
+            View.printNoPuzzleInRoom();
+            player.resetToDefaultState();
+            return;
+        }
 
-			// Print out the puzzle prompt and the number of remaining attempts
-			View.separate(3);
+        // Each Solve command allows two incorrect guesses and up to two hints.
+        int incorrectGuesses = 0;
+        int hintsGiven = 0;
+        View.printPuzzlePrompt(puzzle);
 
-			View.printObject(currentPuzzle);
-			View.println("");
-			View.printColored("Enter an answer to the puzzle: ", "cyan", false);
-			
-			// Get user input for the puzzle
-			userCmd = basicCmdProcessor.getUserInput();
-			
-			// Have the player's input be used as an answer to the puzzle
-			boolean isCorrect = player.attemptToSolvePuzzle(userCmd);
-			
-			View.separate(3);
-			View.println("...");
-			Wait.yield(1.5f);
-			
-			View.println("");
-			
-			// Print out status messages letting the player know
-			// if they solved the puzzle or how many attempts they
-			// have left on an incorrect answer
-			if (isCorrect)
-				View.printColored("Correct! Puzzled solved", "green", true);
-			else
-			{
-				int remainingAttempts = currentPuzzle.getRemainingAttempts();
-				if (remainingAttempts > 0)
-					View.printColored("Incorrect. " + remainingAttempts + " attempt(s) remaining", "red", true);
-				else
-					View.printColored("Incorrect. No more attempts remaining", "red", true);
-			}
-		}
-		
-		// Reset player to default state (exploring)
-		player.resetToDefaultState();
-	}
+        // Keep accepting input until the puzzle is solved or both guesses are used.
+        while (incorrectGuesses < 2)
+        {
+            String answer = basicCmdProcessor.getUserInput();
+            String normalizedInput = answer.trim().toLowerCase().replaceAll("\\s+", " ");
+
+            // Hint requests do not count as guesses.
+            if (normalizedInput.equals("hint")
+                    || normalizedInput.equals("request hint")
+                    || normalizedInput.equals("ask for hint"))
+            {
+                if (hintsGiven < 2)
+                    View.printPuzzleHint(puzzle.getHint(hintsGiven++));
+                else
+                    View.printNoMorePuzzleHints();
+
+                // Prompt again without ending the current solve attempt.
+                View.printPuzzleInputPrompt();
+                continue;
+            }
+
+            // A correct answer marks the puzzle solved and ends this loop.
+            if (player.attemptToSolvePuzzle(answer))
+            {
+                View.printPuzzleSolved();
+                puzzle.giveRewards(player);
+                break;
+            }
+
+            // An incorrect answer uses one of this attempt's two guesses.
+            incorrectGuesses++;
+            if (incorrectGuesses == 1)
+            {
+                View.printIncorrectFirstGuess();
+                View.printPuzzleInputPrompt();
+            }
+            else
+                View.printIncorrectSecondGuess();
+        }
+
+        // Return the player to normal exploration after the attempt ends.
+        player.resetToDefaultState();
+    }
 	
 	private static void combatLoop()
 	{
@@ -106,7 +111,7 @@ public class GameController
 		 */
 		
 		Wait.yield(1f);
-		
+
 		/* Init variables */
 		String userCmd = "";
 		String cmdType = "";
@@ -115,7 +120,7 @@ public class GameController
 		String processedCmd = "";
 		
 		/* Print our pre-battle messages */
-		
+
 		// Print out messages about the encounter
 		BattleView.printMonsterNames(Battlefield.getMonsters());
 
@@ -125,110 +130,217 @@ public class GameController
 		View.printColored("!!! BATTLE START !!!", "red", true);
 
 		// Begin combat loop
+		outerLoop:
 		while (isGameRunning && Battlefield.canBattleContinue())
 		{
 			Wait.yield(1f);
-			View.separate(3);
 
-			// Print battle statuses at the beginning of each iteration of the combat loop
-			Battlefield.displayBattleStatuses();
+			/* Player's party's turn */
+			List<Companion> activeCompanions = player.getPlayerParty().getActiveCompanions();
+			int totalPartyMembers = 1 + activeCompanions.size(); // 1 for the player + number of active companions
 
-			/* Player's turn */
-			View.separate(3);
-			View.print("What will " + player.getName() + " do? Fight or Use Item\n");
-			View.println("Type \"help\" to view all of the game's commands");
-			View.printColored("Enter a command: ", "cyan", true);
-
-			// Get and process user input
-			userCmd = combatCmdProcessor.getUserInput();
-			combatCmdProcessor.setCurrentCommand(userCmd);
-
-			// Get results
-			cmdType = combatCmdProcessor.getCommandType();
-			processedCmd = combatCmdProcessor.getProcessedCommand();
-
-			/* Update game state based on combat command */
-			switch (cmdType)
-			{
-				// The user wants to attack
-				case "fight":
-
-					View.separate(3);
-					//prints available attacks / combat skills to player.
-					BattleView.printFightMenu(player);
-
-					String fightCmd = "";
-					String fightCmdType = "";
-
-					//validates users command
-					do{
-						//processes users input
-						fightCmd = combatCmdProcessor.getUserInput();
-						combatCmdProcessor.processFightCmd(fightCmd, player.getSkills());
-
-						fightCmdType = combatCmdProcessor.getCommandType();
-
-						//if cmd does not match any valid cmd, disp error.
-						if(combatCmdProcessor.getCommandType().equals("invalid")){
-							View.println("Invalid fight command.");
-						}
-					}
-					while(combatCmdProcessor.getCommandType().equals("invalid"));
-
-					//perform basic attack
-					if(fightCmdType.equals("basicAttack"))
-					{
-						Battlefield.performAttack(player, Battlefield.getFirstAliveMonster());
-					}
-
-					//validate and perform combatSkill
-					else if(fightCmdType.equals("combatSkill"))
-					{
-						processedCmd = combatCmdProcessor.getProcessedCommand(); //receives combat skill name
-						CombatSkill skill = player.getSkillByName(processedCmd); //receive skill
-
-						Battlefield.performSkillAttack(player, skill, Battlefield.getFirstAliveMonster()); //WIP
-					}
-
-					//return to main combat menu
-					else if (fightCmdType.equals("cancel"))
-					{
-						return;
-					}
-					//View.println("Attacking monster...");
-					Wait.yield(1f);
-
-					Battlefield.performAttack(player, Battlefield.getFirstAliveMonster());
-				
-					break;
-					
-				// The user wants to use a healing item from their inventory
-				case "use item":
-					View.separate(3);
-					View.println("Attempting to heal...");
-					Wait.yield(1f);
-					
-					// Pass in userCmd so that the player can parse it to get the item name
-					player.handleItemInteraction(userCmd);
-				
-					break;
-				
-				// The user wants to view the game's commands
-				case "help":
-					View.separate(3);
-					View.printCommands();
-					
-					// Skip the monsters' turn and continue to the next iteration of the combat loop
-					continue;
-				
-				// Invalid combat command
-				default:
-					View.println("Command not recognized. Type \"help\" to view the game's commands");
-					
-					// Skip the monsters' turn and continue to the next iteration of the combat loop
-					continue;
-			}
 			
+			// Player's turn first //
+			// Do a for loop to iterate through the player's party members, starting with the player and then each active companion
+			for (int i = 0; i < totalPartyMembers; i++)
+			{
+				// If battle cannot continue, break out of the combat loop
+				if (!Battlefield.canBattleContinue())
+					continue outerLoop;
+				
+				View.separate(3);
+				
+				//Combatant combatant;
+
+				Character combatant;
+				// If i == 0, it's the player's turn
+				if (i == 0)
+					combatant = player;
+				
+				// Otherwise, it's an active companion's turn
+				else
+					combatant = activeCompanions.get(i - 1);
+				
+				// If the combatant is alive, let them take their turn
+				if (combatant.isAlive())
+				{
+					// Print battle statuses at the beginning of each iteration of the combat loop
+					Battlefield.displayBattleStatuses();
+					
+					// Print out the combatant's turn info
+					BattleView.printCombatantTurnInfo(combatant);
+				}
+				
+				// Skip turn if not alive
+				else
+					continue;
+				
+				// Get and process user input
+				userCmd = combatCmdProcessor.getUserInput();
+				combatCmdProcessor.setCurrentCommand(userCmd);
+				
+				// Get results
+				cmdType = combatCmdProcessor.getCommandType();
+				processedCmd = combatCmdProcessor.getProcessedCommand();
+				
+				/* Update game state based on combat command */
+				switch (cmdType)
+				{
+					case "fight":
+
+						View.separate(3);
+						//prints available attacks / combat skills to player.
+						BattleView.printFightMenu(combatant);
+
+						String fightCmd = "";
+						String fightCmdType = "";
+
+						//validates users command
+						do{
+							//processes users input
+							fightCmd = combatCmdProcessor.getUserInput();
+							combatCmdProcessor.processFightCmd(fightCmd, combatant.getSkills());
+
+							fightCmdType = combatCmdProcessor.getCommandType();
+
+							//if cmd does not match any valid cmd, disp error.
+							if(combatCmdProcessor.getCommandType().equals("invalid")){
+								View.println("Invalid fight command.");
+							}
+						}
+						while(combatCmdProcessor.getCommandType().equals("invalid"));
+
+						//perform basic attack
+						if(fightCmdType.equals("basicAttack"))
+						{
+							View.separate(3);
+							View.println("Launching attack...");
+							Wait.yield(1f);
+							Battlefield.performAttack(combatant, Battlefield.getTargetMonster());
+							break;
+						}
+
+						//validate and perform combatSkill
+						else if(fightCmdType.equals("combatSkill"))
+						{
+							processedCmd = combatCmdProcessor.getProcessedCommand(); //receives combat skill name
+							CombatSkill skill = combatant.getSkillByName(processedCmd); //receive skill
+
+							Battlefield.performSkillAttack(player, skill, Battlefield.getTargetMonster()); //WIP
+						}
+
+						//return to main combat menu
+						else if (fightCmdType.equals("cancel"))
+						{
+							return;
+						}
+						//View.println("Attacking monster...");
+						Wait.yield(1f);
+
+						break;
+
+//					// The user wants to attack their currently targeted monster
+//					case "attack":
+//						View.separate(3);
+//						View.println("Launching attack...");
+//						Wait.yield(1f);
+//
+//						Battlefield.performAttack(combatant, Battlefield.getTargetMonster());
+//
+//						break;
+//
+					// The user wants to switch their target to a different monster
+					case "target":
+						View.separate(3);
+						View.println("Switching targets...");
+						Wait.yield(1f);
+						
+						// Pass in userCmd so that the player can parse it to get the target index
+						player.switchMonsterTarget(userCmd);
+						
+						break;
+
+					// The user wants to use a healing item from their inventory
+					case "use item":
+						View.separate(3);
+						View.println("Attempting to heal...");
+						Wait.yield(1f);
+
+						// Pass in userCmd so that the player can parse it to get the item name
+						player.handleItemInteraction(userCmd);
+
+						break;
+					// The user wants to use a healing item from their inventory
+//					case "heal":
+//						View.separate(3);
+//						View.println("Attempting to heal...");
+//						Wait.yield(1f);
+//						
+//						// Pass in userCmd so that the player can parse it to get the item name
+//						player.handleItemInteraction(userCmd);
+//					
+//						break;
+
+					// The user wants to view the game's commands
+					case "help":
+						View.separate(3);
+						View.printCommands();
+						
+						break;
+					
+					// Invalid combat command
+					default:
+						View.separate(3);
+						View.println("Command not recognized. Type \"help\" to view the game's commands");
+						
+						// Skip the monsters' turn and continue to the next iteration of the combat loop
+						continue;
+				}
+				
+				// Skip the monsters' turns if specific commands were used
+				switch (cmdType)
+				{
+					case "help", "target", "":
+						i--; // Decrement i to keep because it's still the same combatant's turn
+						continue;
+					default:
+						break;
+				}
+				
+				Wait.yield(1f);
+
+				// After each combatant's turn, check if any monster has been defeated. If so, remove it from the battlefield and current room
+				// and give rewards
+				ArrayList<Monster> monstersList = Battlefield.getMonsters();
+				for (int j = 0; j < monstersList.size(); j++)
+				{
+					Monster monster = monstersList.get(j);
+					
+					// Monster defeated; remove it from the battlefield and current room
+					if (!monster.isAlive())
+					{
+						View.separate(3);
+						
+						Battlefield.removeMonster(monster);
+						
+						Room currentRoom = player.getCurrentRoom();
+						if (currentRoom != null)
+							currentRoom.removeMonster(monster.getName(), monster);
+
+						BattleView.printCombatantDeath(monster);
+						
+						// Reset monster target to the first monster in the list if there are still monsters remaining
+						if (Battlefield.getMonsters().size() > 0)
+							Battlefield.switchMonsterTarget(0);
+						
+						// Reduce i by 1 to keep loop in sync
+						j--;
+						
+						Wait.yield(1f);
+					}
+				}
+			}
+
 			/* Monsters' turn */
 			ArrayList<Monster> monstersList = Battlefield.getMonsters();
 			for (int i = 0; i < monstersList.size(); i++)
@@ -244,25 +356,13 @@ public class GameController
 					
 					Wait.yield(1f);
 					
-					// Let the monster attack the player
-					Battlefield.performAttack(monster, player);
-				}
-				
-				// Monster defeated; remove it from the battlefield and current room
-				else
-				{
-					Battlefield.removeMonster(monster);
+					// Monster attacks //
+					// Randomly choose a target from the player's party for the monster to attack
+					Combatant target = Battlefield.getRandomTargetFromPlayerParty(monster);
 					
-					Room currentRoom = player.getCurrentRoom();
-					if (currentRoom != null)
-						currentRoom.removeMonster(monster.getName(), monster);
-
-					View.printColored(monster.getName() + " defeated!", "green", true);
-					
-					// Reduce i by 1 to keep loop in sync
-					i--;
+					if (target != null)
+						Battlefield.performAttack(monster, target);
 				}
-				
 			}
 		}
 		
@@ -362,12 +462,28 @@ public class GameController
 			Room currentRoom = player.getCurrentRoom();
 			if (currentRoom != null)
 			{
-				// The player will handle all the logic of moving rooms and triggering events in the new room
 				boolean movementSuccessful = player.moveToRoom(worldMap, processedCmd);
-				
+
 				// Print error message if the player cannot move in that direction
 				if (!movementSuccessful)
 					View.printColored("Can't go this way...", "red", true);
+			}
+		}
+		
+		// NPC interaction command
+		else if (cmdType.equalsIgnoreCase("npc"))
+		{
+			// The user would like to recruit or talk to a companion in the current room
+			if (processedCmd.equalsIgnoreCase("targetNPC"))
+			{
+				View.println("...");
+				Wait.yield(1.25f);
+				
+				View.println("");
+				
+				// Let the player handle the logic for this command
+				// Pass in userCmd so that the player can parse it to get the companion name
+				player.handleNPCInteraction(userCmd);
 			}
 		}
 		
@@ -478,7 +594,23 @@ public class GameController
 					View.printPlayerStatus(player);
 					break;
 
+				// The user would like to view the party's status
+				case "status":
+					player.viewPartyStatus();
+					break;
+
 				// The user would like to view the game's commands
+                case "solve":
+                    Puzzle puzzle = player.getCurrentPuzzle();
+
+                    if (puzzle == null) {
+                        View.printNoPuzzleInRoom();
+                    } else if (!puzzle.getIsSolved()) {
+                        player.setCurrentState("solvingPuzzle");
+                    }
+                    break;
+
+                // The user would like to view the game's commands
 				case "help":
 					View.printCommands();
 					break;
@@ -710,4 +842,3 @@ public class GameController
 	}
 
 }
-

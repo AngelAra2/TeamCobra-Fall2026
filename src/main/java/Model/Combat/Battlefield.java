@@ -9,32 +9,31 @@ import View.*;
 public class Battlefield 
 {
 	/* Data Fields */
-	private static Player playerCombatant;
+	//private static Player playerCombatant;
+	private static Party playerParty;
 	private static ArrayList<Monster> monsters = new ArrayList<>();
+	
+	// Keeps track of which monster in the monsters list is currently being targeted by the player's party
+	private static int playerPartyTargetIndex = 0;
 
 	/* Methods */
 	
 	// Getters //
 	public static ArrayList<Monster> getMonsters() { return Battlefield.monsters; }
-	
+
 	public static boolean canBattleContinue() 
 	{
-		return ((Battlefield.playerCombatant != null && 
-				Battlefield.playerCombatant.isAlive()) &&
-				
+		return (!Battlefield.playerParty.isPartyDefeated() &&				
 				(Battlefield.monsters != null && 
 				!Battlefield.monsters.isEmpty())
 		);
 	}
 	
-	public static Monster getFirstAliveMonster() 
-	{
-		for (Monster monster : Battlefield.monsters)
-			if (monster.isAlive())
-				return monster;
-
-		return null;
-	}
+	// Return the monster that is currently being targeted by the player's party. If there are no monsters, return null
+	public static Monster getTargetMonster() { return (Battlefield.monsters.isEmpty()) ? null : Battlefield.monsters.get(Battlefield.playerPartyTargetIndex); }
+	
+	// Return the random target the monster will attack from the player's party. If the player's party is defeated, return null
+	public static Combatant getRandomTargetFromPlayerParty(Monster monster) { return monster.chooseTarget(playerParty); }
 	
 	// Custom //
 	public static void removeMonster(Monster monster)
@@ -68,9 +67,23 @@ public class Battlefield
 		// Store receiver's current HP after taking damage
 		int receiver_HPAfter = receiver.getCurrentHP();
 		
-		// Print how much damage was dealt to the receiver
+		// Print information about the attack to the console
 		int damageDealt = receiver_HPBefore - receiver_HPAfter;
-		View.println(attacker.getName() + " dealt " + damageDealt + " damage to " + receiver.getName() + "");
+		BattleView.printDamageDealt(attacker, receiver, damageDealt, false);
+	}
+	
+	public static void switchMonsterTarget(int targetIndex) 
+	{
+		// Target index must be within the bounds of the monsters list
+		if (targetIndex < 0 || targetIndex >= Battlefield.monsters.size())
+		{
+			BattleView.printSwitchedMonsterTarget(null);
+			return;
+		}
+		
+		// Switch the target index to the new target index; print information about the new target to the console
+		Battlefield.playerPartyTargetIndex = targetIndex;
+		BattleView.printSwitchedMonsterTarget(Battlefield.monsters.get(targetIndex));
 	}
 	
 	public static void displayBattleStatuses()
@@ -83,18 +96,24 @@ public class Battlefield
 		
 		/* Print player's party status */
 		View.println("");
-		BattleView.printCombatantStatus(Battlefield.playerCombatant);
+		
+		// Player
+		BattleView.printCombatantStatus(Battlefield.playerParty.getPlayer(), false);
+		
+		// Companions
+		for (Companion companion: Battlefield.playerParty.getActiveCompanions())
+			BattleView.printCombatantStatus(companion, false);
 
 		View.println("\n------------------------------ VS. ------------------------------\n");
 		
 		/* Print monsters' statuses */
 		for (Monster monster: Battlefield.monsters)
-			BattleView.printCombatantStatus(monster);
+			BattleView.printCombatantStatus(monster, (Battlefield.monsters.indexOf(monster) == Battlefield.playerPartyTargetIndex));
 	}
 	
-	public static void populateBattlefield(Player player, ArrayList<Monster> monsters) 
+	public static void populateBattlefield(Party playerParty, ArrayList<Monster> monsters) 
 	{
-		Battlefield.playerCombatant = player;
+		Battlefield.playerParty = playerParty;
 		
 		for (Monster monster : monsters)
 			Battlefield.monsters.add(monster);
@@ -102,7 +121,7 @@ public class Battlefield
 	
 	public static void clearBattlefield() 
 	{
-		Battlefield.playerCombatant = null;	
+		Battlefield.playerParty = null;
 		Battlefield.monsters.clear();
 	}
 	//WIP

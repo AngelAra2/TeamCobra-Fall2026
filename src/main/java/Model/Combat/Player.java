@@ -29,6 +29,7 @@ public class Player extends Character
 	//private HashMap<String, ArrayList<Item>> inventory;
     private Inventory inventory;
 	private Monster examinedMonster;
+	private Party playerParty;
 	
 	private float currentEncounterChance; // Current encounter chance for monsters, which increases after each move
 	private int movesSinceLastEncounter; // Keeps track of the number of moves since the last monster encounter
@@ -45,7 +46,7 @@ public class Player extends Character
 				startingClass.getBaseMaxHP(), //max HP
 				0, //physicalDEF
 				0, //magicDEF
-				42, //attack
+				80, //attack
 				1, //currentLevel
 
 				0, //currentXP
@@ -59,10 +60,10 @@ public class Player extends Character
 				startingClass.getCombatSkill() //combatSkills
 		);
 		this.currentRoom = startingRoom;
-		//this.inventory = new HashMap<>();
         this.inventory = new Inventory();
 		this.examinedMonster = null;
 		this.startingClass = startingClass.getName();
+		this.playerParty = new Party(this);
 
 		//Create Finite State Machine for Player
 		DataFileExtraction.extractStatesDataToCombatant(DataExtractionMethods::extractFiniteStatesData, STATES_FILE_PATH, this);
@@ -161,6 +162,8 @@ public class Player extends Character
 	public Puzzle getCurrentPuzzle() { return this.currentRoom.getPuzzle(); }
 	public Monster getExaminedMonster() { return this.examinedMonster; }
 	public String getStartingClass(){return this.startingClass; }
+	public Party getPlayerParty() { return this.playerParty; }
+
 //	public Item getItemFromInventoryByName(String itemName)
 //	{
 //		// Check if the inventory contains this item name
@@ -231,27 +234,13 @@ public class Player extends Character
 					for (Monster monster: monsterList) // ArrayList
 						monstersInRoom.add(monster);
 				
-				Battlefield.populateBattlefield(this, monstersInRoom);
+				Battlefield.populateBattlefield(this.playerParty, monstersInRoom);
 				
 				// Set the player's state to "inCombat"
 				this.setCurrentState("inCombat");
 			}
 			
-			/* Check if the player has entered a room with a puzzle that is unsolved */
-			// Make sure the player is *not* in combat before checking for puzzles
-			Puzzle getPuzzleInRoom = this.getCurrentPuzzle();
-			if ( 
-				!this.getCurrentState().equalsIgnoreCase("inCombat") && 
-				(getPuzzleInRoom != null && !getPuzzleInRoom.getIsSolved())
-			)
-			{
-				// Reset the puzzle (reset its remaining attempts)
-				getPuzzleInRoom.resetPuzzle();
-				
-				// Set player's state to "solvingPuzzle"
-				this.setCurrentState("solvingPuzzle");
-			}
-			
+			// NOTE TO MERGERS. MERGE USING THIS PLEASE FOR THE LOVE OF GOD.
 			// Movement successful
 			return true;
 		}
@@ -276,49 +265,16 @@ public class Player extends Character
 	
 	public void exploreCurrentRoom()
 	{
-		/* Return the HashMap of items in the current room */
+		/* Explore the current room */
+		Room currentRoom = this.getCurrentRoom();
 		
-		// Get all items in the current room
-		HashMap<String, ArrayList<Item>> allItems = this.currentRoom.getItems();
-		if (allItems.size() > 0)
-		{
-			View.println("Items found in this room:");
-			for (ArrayList<Item> itemList: allItems.values())
-			{
-				// Print out item name and quantity of each item in the room
-				Item getFirstItem = itemList.get(0);
-				String itemName = getFirstItem.getItemName();
-				int itemQuantity = itemList.size();
-				
-				View.println("- " + itemName + " (x" + itemQuantity + ")");
-			}
-		}
-		
-		// If no items were found, print message
-		else
-			View.println("No items found in this room");
+		// Print out all available exits in the current room
+		ExplorationView.printRoomExits(currentRoom.getExits());
 		
 		View.println("");
 		
-		// Get all monsters in the current room //
-		HashMap<String, ArrayList<Monster>> allMonsters = this.currentRoom.getMonsters();
-		if (allMonsters.size() > 0)
-		{
-			View.println("Monsters found in this room:");
-			for (ArrayList<Monster> monsterList: allMonsters.values())
-			{
-				// Print out item name and quantity of each item in the room
-				Monster getFirstMonster = monsterList.get(0);
-				String monsterName = getFirstMonster.getName();
-				int monsterQuantity = monsterList.size();
-				
-				View.println("- " + monsterName + " (x" + monsterQuantity + ")");
-			}
-		}
-		
-		// If no monsters were found, print message
-		else
-			View.println("No monsters found in this room");
+		// Print out NPCs/NPC companions in the current room //
+		ExplorationView.printCompanionsInRoom(currentRoom.getCompanions());
 	}
 	
 	public void viewInventory()
@@ -612,13 +568,65 @@ public class Player extends Character
 				else
 					View.println("No such consumable to use in your inventory");
 				
-				BattleView.printCombatantStatus(this);
+				BattleView.printCombatantStatus(this, false);
 			}
         }
 
         // If item name is empty, print error message and return
         else
             View.println("Invalid command: no item name provided.");
+    }
+    
+    public void handleNPCInteraction(String cmd)
+    {
+    	/* Handles interaction commands with NPCs and NPC companions */
+    	
+    	// Normalize the command (NPC names are case-insensitive), then split it into
+        // the action and the monster name at the first run of whitespace
+        String[] cmdParts = cmd.trim().toLowerCase().split("\\s+", 2);
+
+        // Declare attributes
+        String action = cmdParts[0];
+        String npcName = (cmdParts.length > 1) ? cmdParts[1].trim() : "";
+        
+        // Handle the proper interaction with the given NPC name //
+        if (!npcName.isEmpty())
+		{
+			// Recruit NPC companion
+			if (action.equals("recruit"))
+			{
+				// The player recruits the NPC companion in the current room and adds them to their party
+				// The NPC companion is removed from the current room's companions list
+				Object targetNPC = this.currentRoom.getNPCByName(npcName);
+				if (targetNPC != null)
+				{
+					if (targetNPC instanceof Companion)
+					{
+						// Have the Party class handle the recruitment of the companion
+						Companion companion = (Companion) targetNPC;
+						//this.playerParty.recruit(companion);
+						
+						boolean recruitmentSuccessful = this.playerParty.recruit(companion);
+						
+						// Remove companion from current room if recruitment was successful
+						if (recruitmentSuccessful)
+							this.currentRoom.removeCompanion(companion);
+					}
+					
+					// Not an NPC companion, so cannot be recruited
+					else
+						View.println("Cannot recruit " + npcName + " since they are not a companion");
+				}
+				
+				// No NPC companion with that name was found in the current room
+				else
+					View.println("No such companion to recruit in the current room");
+			}
+		}
+        
+        // No NPC name provided
+		else
+			View.println("Invalid command: no NPC name provided");
     }
     
     public void handleMonsterInteraction(String cmd)
@@ -661,16 +669,30 @@ public class Player extends Character
     		else
     			View.println("Invalid command: no monster name provided"); 
     }
-     
+    
+    public void switchMonsterTarget(String cmd)
+    {
+    		/* While in combat, the player can switch their party's current target to a different monster on the battlefield */
+    	
+    		// Guard Clauses //
+    		// If the player is not in combat, they cannot switch targets
+    		if (!this.getCurrentState().equalsIgnoreCase("inCombat"))
+    			return;
+    		
+    		String[] cmdParts = cmd.trim().toLowerCase().split("\\s+", 2);
+    		
+    		// Get the target monster index from the command (subtract 1 to convert to 0-based index)
+    		int targetMonsterIndex = cmdParts.length > 1 ? Integer.parseInt(cmdParts[1].trim()) - 1 : -1;
+    		
+    		// Attempt to switch the monster target on the battlefield
+    		Battlefield.switchMonsterTarget(targetMonsterIndex);
+    }
+    
 	public boolean attemptToSolvePuzzle(String userInput)
 	{
 		/* Guard Clauses */
 		// Do not attempt to solve a puzzle if there is no puzzle in the current room
 		if (this.currentRoom.getPuzzle() == null)
-			return false;
-		
-		// Do not attempt to solve a puzzle if it has no remaining attempts
-		if (this.currentRoom.getPuzzle().getRemainingAttempts() <= 0)
 			return false;
 		
 		// Do not attempt to solve a puzzle if the player has already solved it
@@ -681,13 +703,15 @@ public class Player extends Character
 		return this.currentRoom.getPuzzle().checkSolution(userInput);
 	}
 
+	public void viewPartyStatus()
+	{
+		/* View the player's party's status */
+		//this.playerParty.printPartyStatus();
+	}
+	
 	// Reset to default state (exploring) when the player is not in combat or solving a puzzle
     public void resetToDefaultState() { this.setCurrentState("exploring"); }
 
-    // Add item to inventory; public method that calls private method
-//    public void addItemToInventory(Item item) {
-//        this._addItemToInventory(item);
-//    }
     // Allows other classes to add an item while checking carrying capacity.
     public boolean addItemToInventory(Item item) {
         return this._addItemToInventory(item);
@@ -698,15 +722,5 @@ public class Player extends Character
         return this.inventory;
     }
 
-	//receives combat skill name, and returns combat skill from Players ArrayList of combat skills
-	public CombatSkill getSkillByName(String name){
-		for (CombatSkill skill : skills){
-			if(skill.getName().equals(name)){
-				return skill;
-			}
-		}
-
-		return null;
-	}
 }
 

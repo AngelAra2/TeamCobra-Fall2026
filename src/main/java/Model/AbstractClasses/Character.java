@@ -164,4 +164,15 @@ public abstract class Character extends Combatant
     public int getTotalMagicDamage() {
         return this.equipmentLoadout.getTotalMagicDamage();
     }
+
+	//receives combat skill name, and returns combat skill from Players ArrayList of combat skills
+	public CombatSkill getSkillByName(String name){
+		for (CombatSkill skill : skills){
+			if(skill.getName().equals(name)){
+				return skill;
+			}
+		}
+
+		return null;
+	}
 }
