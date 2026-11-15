@@ -161,6 +161,7 @@ public class View
 		
 		println("");
 		println("\"attack\" --> attack the monster");
+        println("\"target [target number]\" --> switch to a different monster target in battle");
 		println("\"heal [item name]\" --> use a consumable item from your inventory to heal yourself");
 	}
 
