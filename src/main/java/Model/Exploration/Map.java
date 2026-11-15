@@ -16,6 +16,7 @@ public class Map
 	private static String monstersFilePath = "/gameObjects/Monsters";
     private static String companionsFilePath = "/gameObjects/Companions";
 	private static String merchantsFilePath = "/gameObjects/Merchants";
+    private static String puzzleRewardsFilePath = "/gameObjects/Rewards";
 	private HashMap<Integer, Room> rooms;
 
 	/* Constructors */
@@ -30,8 +31,9 @@ public class Map
 		DataFileExtraction.extractDataToMap(DataExtractionMethods::extractMapData, roomsFilePath, this);
 
 		/* Populate Rooms with game objects */
-		DataFileExtraction.extractDataToMap(DataExtractionMethods::extractItemData, itemsFilePath, this); // Items
-		DataFileExtraction.extractDataToMap(DataExtractionMethods::extractPuzzleData, puzzlesFilePath, this); // Puzzles	
+	// TODO: FIX THIS EVENTUALLY	// DataFileExtraction.extractDataToMap(DataExtractionMethods::extractItemData, itemsFilePath, this); // Items
+        DataFileExtraction.extractDataToMap(DataExtractionMethods::extractPuzzleData, puzzlesFilePath, this);
+        DataFileExtraction.extractDataToMap(DataExtractionMethods::extractPuzzleRewardsData, puzzleRewardsFilePath, this);
 		DataFileExtraction.extractDataToMap(DataExtractionMethods::extractMonsterData, monstersFilePath, this); // Monsters
         DataFileExtraction.extractDataToMap(DataExtractionMethods::extractCompanionData, companionsFilePath, this); // Companions
         DataFileExtraction.extractDataToMap(DataExtractionMethods::extractMerchantData, merchantsFilePath, this); // Merchants

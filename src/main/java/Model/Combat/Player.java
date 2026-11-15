@@ -675,10 +675,6 @@ public class Player extends Character
 		if (this.currentRoom.getPuzzle() == null)
 			return false;
 		
-		// Do not attempt to solve a puzzle if it has no remaining attempts
-		if (this.currentRoom.getPuzzle().getRemainingAttempts() <= 0)
-			return false;
-		
 		// Do not attempt to solve a puzzle if the player has already solved it
 		if (this.currentRoom.getPuzzle().getIsSolved())
 			return true;

@@ -179,7 +179,11 @@ public class ExplorationCommandProcessor extends CommandProcessor
 				case "room", "location":
 					this.processedCmd = "location";
 					break;
-				//-----------------------------//
+                //-----------------------------//
+                case "solve":
+                    this.processedCmd = "solve";
+                    break;
+                //-----------------------------//
 				case "help":
 					this.processedCmd = "help";
 					break;
