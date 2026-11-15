@@ -4,8 +4,7 @@ import java.util.*;
 import Model.Data.DataFileExtraction;
 import Model.Data.DataExtractionMethods;
 import Model.AbstractClasses.Item;
-import Model.Items.Consumable;
-import Model.Items.Weapon;
+
 
 public class Map
 {
@@ -20,6 +19,7 @@ public class Map
     private static final String consumablesFilePath = "/gameObjects/ConsumeableItems";
     private static final String utilityFilePath = "/gameObjects/UtilityItems";
     private static final String rewardsFilePath = "/gameObjects/Rewards";
+    private static final String roomItemsFilePath = "/gameObjects/RoomItems";
 
 	private HashMap<Integer, Room> rooms;
     private HashMap<Integer, Item> itemTemplates;
@@ -38,16 +38,11 @@ public class Map
         DataFileExtraction.extractDataToMap(DataExtractionMethods::extractMapData, roomsFilePath, this);
 
 	    /* Populate Rooms with game objects */
-	        DataFileExtraction.extractDataToMap(
-	    DataExtractionMethods::extractWeaponData, weaponsFilePath, this);
-
-	        DataFileExtraction.extractDataToMap(
-	    DataExtractionMethods::extractArmorData, armorFilePath, this);
-
-	        DataFileExtraction.extractDataToMap(
-	    DataExtractionMethods::extractConsumableData, consumablesFilePath, this);
-
+	        DataFileExtraction.extractDataToMap(DataExtractionMethods::extractWeaponData, weaponsFilePath, this);
+	        DataFileExtraction.extractDataToMap(DataExtractionMethods::extractArmorData, armorFilePath, this);
+	        DataFileExtraction.extractDataToMap(DataExtractionMethods::extractConsumableData, consumablesFilePath, this);
 	        DataFileExtraction.extractDataToMap(DataExtractionMethods::extractUtilityData, utilityFilePath, this);
+            DataFileExtraction.extractDataToMap(DataExtractionMethods::extractRoomItems, roomItemsFilePath, this); // Permanent room items
 	        DataFileExtraction.extractDataToMap(DataExtractionMethods::extractPuzzleData, puzzlesFilePath, this); // Puzzles
 	        DataFileExtraction.extractDataToMap(DataExtractionMethods::extractMonsterData, monstersFilePath, this); // Monsters
 	        DataFileExtraction.extractDataToMap(DataExtractionMethods::extractCompanionData, companionsFilePath, this); // Companions

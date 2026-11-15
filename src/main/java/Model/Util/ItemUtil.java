@@ -9,6 +9,7 @@ import Model.Items.Consumable;
 import Model.Items.Weapon;
 import Model.Items.Armor;
 import Model.Items.EquipmentItem;
+import Model.Items.UtilityItem;
 
 // Provides shared item lookup and copying methods.
 public class ItemUtil {
@@ -16,32 +17,35 @@ public class ItemUtil {
     private ItemUtil() {}
 
     // Finds an item by ID, or returns null if it is not in the map.
+//    public static Item findItemById(Map worldMap, int itemId) {
+//        for (Room room : worldMap.getRooms().values()) {
+//            for (ArrayList<Item> items : room.getItems().values()) {
+//                for (Item item : items) {
+//                    if (item.getItemId() == itemId)
+//                        return item;
+//                }
+//            }
+//        }
+//
+//        return null;
+//    }
     public static Item findItemById(Map worldMap, int itemId) {
-        for (Room room : worldMap.getRooms().values()) {
-            for (ArrayList<Item> items : room.getItems().values()) {
-                for (Item item : items) {
-                    if (item.getItemId() == itemId)
-                        return item;
-                }
-            }
-        }
-
-        return null;
+        return worldMap.getItemTemplate(itemId);
     }
 
     // Copies supported item types; returns null for unsupported types.
     public static Item copyItem(Item item) {
         // instanceof checks whether the item is a Weapon; if so, weapon refers to it as that type.
-//        if (item instanceof Weapon weapon) {
-//            return new Weapon(item.getItemId(), item.getItemName(),
-//                    item.getItemDescription(), weapon.getBaseAttack());
-//        }
         // Copy a weapon and preserve its equipment information.
         if (item instanceof Weapon weapon) {
             return new Weapon(item.getItemId(), item.getItemName(), item.getItemDescription(), item.getWeight(), item.getValue(),
                     weapon.getSlot(), weapon.getPhysicalDamage(), weapon.getMagicDamage(), weapon.getPhysicalDefense(),
                     weapon.getMagicDefense(), weapon.getStrengthScaling(), weapon.getDexterityScaling(),
                     weapon.getIntelligenceScaling(), weapon.getArcaneScaling(), weapon.getSpecialEffect(), weapon.getWeaponType());
+        }
+        if (item instanceof UtilityItem utility) {
+            return new UtilityItem(item.getItemId(), item.getItemName(), item.getItemDescription(), item.getWeight(),
+                    item.getValue(), utility.getUtilityType(), utility.getUtilityAction(), utility.isConsumedWhenUsed());
         }
 
 // Copy armor or a shield.

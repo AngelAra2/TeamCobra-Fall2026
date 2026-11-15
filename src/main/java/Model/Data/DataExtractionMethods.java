@@ -362,10 +362,11 @@ public static void extractWeaponData(Scanner fileScanner, Map worldMap) {
             try {
                 UtilityItem item = new UtilityItem(
                         Integer.parseInt(a[0]), a[1], a[2],
-                        Double.parseDouble(a[3]), Integer.parseInt(a[4])
-                );
-
+                        Double.parseDouble(a[3]),
+                        Integer.parseInt(a[4]), a[5], a[6],
+                        a[7].equalsIgnoreCase("YES"));
                 worldMap.addItemTemplate(item);
+
             } catch (NumberFormatException e) {
                 continue;
             } catch (ArrayIndexOutOfBoundsException e) {
@@ -374,6 +375,72 @@ public static void extractWeaponData(Scanner fileScanner, Map worldMap) {
         }
     }
 
+    /* Loads permanent and spawnable item IDs for each room. */
+    public static void extractRoomItems(Scanner fileScanner, Map worldMap) {
+        while (fileScanner.hasNextLine()) {
+            String currentLine = fileScanner.nextLine().trim();
+
+            if (currentLine.isEmpty()) {
+                continue;
+            }
+
+            String[] attributes = trimStringArray(currentLine.split(DELIMITER_A, -1));
+            if (attributes.length < 3){
+                continue;
+            }
+
+            int roomId;
+            try {
+                roomId = Integer.parseInt(attributes[0]);
+            }
+            catch (NumberFormatException e) {
+                continue;
+            }
+
+            Room room = worldMap.getRoomById(roomId);
+
+            if (room == null) {
+                continue;
+            }
+
+            // Load guaranteed items into the room.
+            if (!attributes[1].equalsIgnoreCase("NONE")) {
+                String[] permanentItemIds = trimStringArray(attributes[1].split(DELIMITER_B));
+
+                for (int i = 0; i < permanentItemIds.length; i++) {
+                    try {
+                        int itemId = Integer.parseInt(permanentItemIds[i]);
+                        Item template = worldMap.getItemTemplate(itemId);
+
+                        if (template != null) {
+                            Item roomItem = ItemUtil.copyItem(template);
+
+                            if (roomItem != null) {
+                                room.addItem(roomItem.getItemName(), roomItem);
+                            }
+                        }
+                    }
+
+                    catch (NumberFormatException e) { // Skip invalid item IDs.
+                    }
+                }
+            }
+
+            // Save IDs that can be used by the random item spawning system.
+            if (!attributes[2].equalsIgnoreCase("NONE")) {
+                String[] spawnableItemIds = trimStringArray(attributes[2].split(DELIMITER_B));
+
+                for (int i = 0; i < spawnableItemIds.length; i++) {
+                    try {
+                        int itemId = Integer.parseInt(spawnableItemIds[i]);
+                        room.addSpawnableItemId(itemId);
+                    }
+                    catch (NumberFormatException e) { // Skip invalid item IDs.
+                    }
+                }
+            }
+        }
+    }
 
     /* Extract data from a file and parse it into Puzzle objects */
     public static void extractPuzzleData(Scanner fileScanner, Map worldMap) {
