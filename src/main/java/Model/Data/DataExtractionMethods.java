@@ -344,20 +344,46 @@ public static void extractWeaponData(Scanner fileScanner, Map worldMap) {
     }
 
     // Loads utility item definitions.
+//    public static void extractUtilityData(Scanner fileScanner, Map worldMap) {
+//        while (fileScanner.hasNextLine()) {
+//            String line = fileScanner.nextLine().trim();
+//            if (line.isEmpty()) continue;
+//
+//            String[] a = trimStringArray(line.split(delimiterA, -1));
+//
+//            try {
+//                UtilityItem item = new UtilityItem(
+//                        Integer.parseInt(a[0]), a[1], a[2],
+//                        Double.parseDouble(a[3]), Integer.parseInt(a[4])
+//                );
+//
+//                worldMap.addItemTemplate(item);
+//            } catch (NumberFormatException e) {
+//                continue;
+//            } catch (ArrayIndexOutOfBoundsException e) {
+//                continue;
+//            }
+//        }
+//    }
+
     public static void extractUtilityData(Scanner fileScanner, Map worldMap) {
         while (fileScanner.hasNextLine()) {
             String line = fileScanner.nextLine().trim();
-            if (line.isEmpty()) continue;
+
+            if (line.isEmpty()) {
+                continue;
+            }
 
             String[] a = trimStringArray(line.split(delimiterA, -1));
 
             try {
                 UtilityItem item = new UtilityItem(
                         Integer.parseInt(a[0]), a[1], a[2],
-                        Double.parseDouble(a[3]), Integer.parseInt(a[4])
-                );
+                        Double.parseDouble(a[3]),
+                        Integer.parseInt(a[4]), a[5], a[6], a[7].equalsIgnoreCase("YES"));
 
                 worldMap.addItemTemplate(item);
+
             } catch (NumberFormatException e) {
                 continue;
             } catch (ArrayIndexOutOfBoundsException e) {

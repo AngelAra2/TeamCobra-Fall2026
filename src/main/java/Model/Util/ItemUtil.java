@@ -9,6 +9,7 @@ import Model.Items.Consumable;
 import Model.Items.Weapon;
 import Model.Items.Armor;
 import Model.Items.EquipmentItem;
+import Model.Items.UtilityItem;
 
 // Provides shared item lookup and copying methods.
 public class ItemUtil {
@@ -40,11 +41,15 @@ public class ItemUtil {
 //                    item.getItemDescription(), weapon.getBaseAttack());
 //        }
         // Copy a weapon and preserve its equipment information.
-        if (item instanceof Weapon weapon) {
-            return new Weapon(item.getItemId(), item.getItemName(), item.getItemDescription(), item.getWeight(), item.getValue(),
-                    weapon.getSlot(), weapon.getPhysicalDamage(), weapon.getMagicDamage(), weapon.getPhysicalDefense(),
-                    weapon.getMagicDefense(), weapon.getStrengthScaling(), weapon.getDexterityScaling(),
-                    weapon.getIntelligenceScaling(), weapon.getArcaneScaling(), weapon.getSpecialEffect());
+//        if (item instanceof Weapon weapon) {
+//            return new Weapon(item.getItemId(), item.getItemName(), item.getItemDescription(), item.getWeight(), item.getValue(),
+//                    weapon.getSlot(), weapon.getPhysicalDamage(), weapon.getMagicDamage(), weapon.getPhysicalDefense(),
+//                    weapon.getMagicDefense(), weapon.getStrengthScaling(), weapon.getDexterityScaling(),
+//                    weapon.getIntelligenceScaling(), weapon.getArcaneScaling(), weapon.getSpecialEffect());
+//        }
+        if (item instanceof UtilityItem utility) {
+            return new UtilityItem(item.getItemId(), item.getItemName(), item.getItemDescription(), item.getWeight(),
+                    item.getValue(), utility.getUtilityType(), utility.getUtilityAction(), utility.isConsumedWhenUsed());
         }
 
 // Copy armor or a shield.
