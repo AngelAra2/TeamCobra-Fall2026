@@ -875,7 +875,7 @@ public static void extractWeaponData(Scanner fileScanner, Map worldMap) {
             }
         }
     }
-        public static void extractStartingClassData(Scanner fileScanner, ArrayList<StartingClass> classes){
+        public static void extractStartingClassData(Scanner fileScanner, ArrayList<StartingClass> classes, Map worldMap){
 
 
             while(fileScanner.hasNextLine()){
@@ -895,8 +895,7 @@ public static void extractWeaponData(Scanner fileScanner, Map worldMap) {
 			int baseARC = 0;
 			int baseEND = 0;
 			ArrayList<CombatSkill> combatSkills = new ArrayList<>();
-			ArrayList<String> defaultEquipment = new ArrayList<>();
-
+			ArrayList<Item> defaultEquipment = new ArrayList<>();
                 //assigns starting class ID
                 try{
                     id = Integer.parseInt(parsedLine[0]);
@@ -1024,13 +1023,41 @@ public static void extractWeaponData(Scanner fileScanner, Map worldMap) {
 			//assigns starting class equipment
 			//starting class will have more than one equipment
 			try{
-				//split combat abilities using " , " as the delimiter
-				String[] targetItemIds = trimStringArray(parsedLine[10].split(DELIMITER_B));
+                //split equipment items using "," as delimiter
+                String[] equipmentNames = trimStringArray(parsedLine[10].split(DELIMITER_B));
 
-				//adds equipment name to list
-				for(int i = 0; i <targetItemIds.length; i++){
-					defaultEquipment.add(targetItemIds[i]);
-				}
+
+                for (String equipmentName : equipmentNames){
+                    int quantity = 1;
+                    String itemName = equipmentName.trim();
+
+                    if(itemName.contains(DELIMITER_C)){
+                        String[] parts = itemName.split("\\*",2); //separates quantity and item name
+                        quantity = Integer.parseInt(parts[0].trim()); //converts quantity of item into int
+                        itemName = parts[1].trim();
+                    }
+
+                    Item temp = null;
+
+                    for (Item item : worldMap.getItemTemplates().values()){
+                        if(item.getItemName().equalsIgnoreCase(itemName)){
+                            temp = item;
+                            break;
+                        }
+                    }
+
+
+                    for (int i = 0; i < quantity; i++){
+                        Item copy = ItemUtil.copyItem(temp);
+
+                        //prevents non found items from being added to starting class equipment.
+                        if (copy != null){
+                            defaultEquipment.add(copy);
+                        }
+                    }
+                }
+
+
 				//create a StartingClass object, and add it into list of StartingClasses
 				StartingClass tempClass = new StartingClass(
 							id,

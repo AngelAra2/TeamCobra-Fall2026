@@ -1,5 +1,7 @@
 package Model.Combat;
 
+import Model.AbstractClasses.Item;
+
 import java.util.ArrayList;
 
 public class StartingClass {
@@ -13,11 +15,11 @@ public class StartingClass {
     private int baseARC;
     private int baseEND;
     private ArrayList<CombatSkill> combatSkills;
-    private ArrayList<String> defaultEquipment;
+    private ArrayList<Item> defaultEquipment;
 
     public StartingClass(int id, String name, String background, int baseMaxHP, int baseSTR,
                          int baseDEX, int baseINT, int baseARC, int baseEND,
-                         ArrayList<CombatSkill> combatSkills, ArrayList<String> defaultEquipment){
+                         ArrayList<CombatSkill> combatSkills, ArrayList<Item> defaultEquipment){
         this.id = id;
         this.name = name;
         this.background = background;
@@ -76,7 +78,7 @@ public class StartingClass {
         return combatSkills;
     }
 
-    public ArrayList<String> getDefaultEquipment() {
+    public ArrayList<Item> getDefaultEquipment() {
         return defaultEquipment;
     }
 }

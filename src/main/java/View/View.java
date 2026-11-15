@@ -1,5 +1,6 @@
 package View;
 
+import Model.AbstractClasses.Item;
 import Model.Combat.CombatSkill;
 import Model.Combat.Player;
 import java.util.ArrayList;
@@ -177,7 +178,7 @@ public class View
 	public static void printStartingClassStats(String background,
 											   int hp, int baseSTR, int baseDEX,
 											   int baseINT, int baseARC, int baseEND, ArrayList<CombatSkill> skills,
-											   ArrayList<String> defaultEquipment){
+											   ArrayList<Item> defaultEquipment){
 
 		View.println("Background: " + wrapText(background, 65));
 		View.println("\nBase Max HP: " + hp);
@@ -194,8 +195,25 @@ public class View
 		}
 
 		View.println("\nEquipment:");
-		for (String equipment : defaultEquipment){
-			View.println("- " + equipment);
+		HashMap<String, Integer> itemCounts = new HashMap<>();
+
+		// Count each item
+		for (Item equipment : defaultEquipment) {
+			String itemName = equipment.getItemName();
+
+			itemCounts.put(itemName, itemCounts.getOrDefault(itemName, 0) + 1
+			);
+		}
+
+		// Display each item with its quantity
+		for (String itemName : itemCounts.keySet()) {
+			int quantity = itemCounts.get(itemName);
+
+			if (quantity > 1) {
+				View.println("- " + itemName + " x" + quantity);
+			} else {
+				View.println("- " + itemName);
+			}
 		}
 
 	}

@@ -771,8 +771,10 @@ public class GameController
 		ArrayList<StartingClass> classes = new ArrayList<>();
 
 		//loads Starting Class data from text file to classes ArrayList
-		DataFileExtraction.extractClassDataToController(DataExtractionMethods::extractStartingClassData, startingClassFilePath, classes);
+		//DataFileExtraction.extractClassDataToController(DataExtractionMethods::extractStartingClassData, startingClassFilePath, classes, worldMap);
 
+		DataFileExtraction.extractClassDataToController((scanner, classList) -> DataExtractionMethods.extractStartingClassData
+						(scanner, classList, worldMap), startingClassFilePath, classes);
 		//for testing
 		if (classes.isEmpty()){
 			throw new IllegalStateException("No starting class loaded.");

@@ -26,7 +26,6 @@ public class Player extends Character
 	private int ENCOUNTER_GRACE_MOVES; // Number of moves before monster encounters can occur again after a previous encounter
 	
 	private Room currentRoom;
-	//private HashMap<String, ArrayList<Item>> inventory;
     private Inventory inventory;
 	private Monster examinedMonster;
 	private Party playerParty;
@@ -65,6 +64,12 @@ public class Player extends Character
 		);
 		this.currentRoom = startingRoom;
         this.inventory = new Inventory();
+
+		//add starting class equipment to player inventory
+		for (Item item : startingClass.getDefaultEquipment()){
+			this.inventory.addItem(item, this.currentLevel);
+
+		}
 		this.examinedMonster = null;
 		this.startingClass = startingClass.getName();
 		this.playerParty = new Party(this);
