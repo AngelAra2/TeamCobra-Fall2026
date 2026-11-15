@@ -29,6 +29,8 @@ public class Merchant implements NPCable {
         }
         this.dialogueIndex = 0;
     }
+    
+    public String getName () { return name; }
 
     //WIP 11/11/2026
     @Override

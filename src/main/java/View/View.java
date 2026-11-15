@@ -1,6 +1,7 @@
 package View;
 
-import java.util.ArrayList;
+import java.util.*;
+
 import Model.Exploration.Puzzle;
 
 public class View

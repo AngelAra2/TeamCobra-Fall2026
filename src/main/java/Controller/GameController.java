@@ -8,9 +8,13 @@ import Model.Data.DataFileExtraction;
 import Model.Processors.*;
 import Model.Util.Wait;
 
+import Model.AbstractClasses.Combatant;
+import Model.Combat.*;
+
 import Model.Combat.Battlefield;
 import Model.Combat.Monster;
 import Model.Combat.Player;
+
 import Model.Exploration.Map;
 import Model.Exploration.Puzzle;
 import Model.Exploration.Room;
@@ -128,67 +132,152 @@ public class GameController
 		View.printColored("!!! BATTLE START !!!", "red", true);
 
 		// Begin combat loop
+		outerLoop:
 		while (isGameRunning && Battlefield.canBattleContinue())
 		{
 			Wait.yield(1f);
-			View.separate(3);
-			
-			// Print battle statuses at the beginning of each iteration of the combat loop
-			Battlefield.displayBattleStatuses();
-			
-			/* Player's turn */
-			View.separate(3);
-			View.println("Type \"help\" to view all of the game's commands");
-			View.printColored("Your turn. Enter a command: ", "cyan", false);
-			
-			// Get and process user input
-			userCmd = combatCmdProcessor.getUserInput();
-			combatCmdProcessor.setCurrentCommand(userCmd);
-			
-			// Get results
-			cmdType = combatCmdProcessor.getCommandType();
-			processedCmd = combatCmdProcessor.getProcessedCommand();
-			
-			/* Update game state based on combat command */
-			switch (cmdType)
-			{
-				// The user wants to attack
-				case "attack":
-					View.separate(3);
-					View.println("Attacking monster...");
-					Wait.yield(1f);
 
-					Battlefield.performAttack(player, Battlefield.getFirstAliveMonster());
-				
-					break;
-					
-				// The user wants to use a healing item from their inventory
-				case "heal":
-					View.separate(3);
-					View.println("Attempting to heal...");
-					Wait.yield(1f);
-					
-					// Pass in userCmd so that the player can parse it to get the item name
-					player.handleItemInteraction(userCmd);
-				
-					break;
-				
-				// The user wants to view the game's commands
-				case "help":
-					View.separate(3);
-					View.printCommands();
-					
-					// Skip the monsters' turn and continue to the next iteration of the combat loop
-					continue;
-				
-				// Invalid combat command
-				default:
-					View.println("Command not recognized. Type \"help\" to view the game's commands");
-					
-					// Skip the monsters' turn and continue to the next iteration of the combat loop
-					continue;
-			}
+			/* Player's party's turn */
+			List<Companion> activeCompanions = player.getPlayerParty().getActiveCompanions();
+			int totalPartyMembers = 1 + activeCompanions.size(); // 1 for the player + number of active companions
 			
+			// Player's turn first //
+			// Do a for loop to iterate through the player's party members, starting with the player and then each active companion
+			for (int i = 0; i < totalPartyMembers; i++)
+			{
+				// If battle cannot continue, break out of the combat loop
+				if (!Battlefield.canBattleContinue())
+					continue outerLoop;
+				
+				View.separate(3);
+				
+				Combatant combatant;
+				
+				// If i == 0, it's the player's turn
+				if (i == 0)
+					combatant = player;
+				
+				// Otherwise, it's an active companion's turn
+				else
+					combatant = activeCompanions.get(i - 1);
+				
+				// If the combatant is alive, let them take their turn
+				if (combatant.isAlive())
+				{
+					// Print battle statuses at the beginning of each iteration of the combat loop
+					Battlefield.displayBattleStatuses();
+					
+					// Print out the combatant's turn info
+					BattleView.printCombatantTurnInfo(combatant);
+				}
+				
+				// Skip turn if not alive
+				else
+					continue;
+				
+				// Get and process user input
+				userCmd = combatCmdProcessor.getUserInput();
+				combatCmdProcessor.setCurrentCommand(userCmd);
+				
+				// Get results
+				cmdType = combatCmdProcessor.getCommandType();
+				processedCmd = combatCmdProcessor.getProcessedCommand();
+				
+				/* Update game state based on combat command */
+				switch (cmdType)
+				{
+					// The user wants to attack their currently targeted monster
+					case "attack":
+						View.separate(3);
+						View.println("Launching attack...");
+						Wait.yield(1f);
+
+						Battlefield.performAttack(combatant, Battlefield.getTargetMonster());
+					
+						break;
+				
+					// The user wants to switch their target to a different monster
+					case "target":
+						View.separate(3);
+						View.println("Switching targets...");
+						Wait.yield(1f);
+						
+						// Pass in userCmd so that the player can parse it to get the target index
+						player.switchMonsterTarget(userCmd);
+						
+						break;
+					
+					// The user wants to use a healing item from their inventory
+//					case "heal":
+//						View.separate(3);
+//						View.println("Attempting to heal...");
+//						Wait.yield(1f);
+//						
+//						// Pass in userCmd so that the player can parse it to get the item name
+//						player.handleItemInteraction(userCmd);
+//					
+//						break;
+
+					// The user wants to view the game's commands
+					case "help":
+						View.separate(3);
+						View.printCommands();
+						
+						break;
+					
+					// Invalid combat command
+					default:
+						View.separate(3);
+						View.println("Command not recognized. Type \"help\" to view the game's commands");
+						
+						// Skip the monsters' turn and continue to the next iteration of the combat loop
+						continue;
+				}
+				
+				// Skip the monsters' turns if specific commands were used
+				switch (cmdType)
+				{
+					case "help", "target", "":
+						i--; // Decrement i to keep because it's still the same combatant's turn
+						continue;
+					default:
+						break;
+				}
+				
+				Wait.yield(1f);
+
+				// After each combatant's turn, check if any monster has been defeated. If so, remove it from the battlefield and current room
+				// and give rewards
+				ArrayList<Monster> monstersList = Battlefield.getMonsters();
+				for (int j = 0; j < monstersList.size(); j++)
+				{
+					Monster monster = monstersList.get(j);
+					
+					// Monster defeated; remove it from the battlefield and current room
+					if (!monster.isAlive())
+					{
+						View.separate(3);
+						
+						Battlefield.removeMonster(monster);
+						
+						Room currentRoom = player.getCurrentRoom();
+						if (currentRoom != null)
+							currentRoom.removeMonster(monster.getName(), monster);
+
+						BattleView.printCombatantDeath(monster);
+						
+						// Reset monster target to the first monster in the list if there are still monsters remaining
+						if (Battlefield.getMonsters().size() > 0)
+							Battlefield.switchMonsterTarget(0);
+						
+						// Reduce i by 1 to keep loop in sync
+						j--;
+						
+						Wait.yield(1f);
+					}
+				}
+			}
+
 			/* Monsters' turn */
 			ArrayList<Monster> monstersList = Battlefield.getMonsters();
 			for (int i = 0; i < monstersList.size(); i++)
@@ -204,25 +293,13 @@ public class GameController
 					
 					Wait.yield(1f);
 					
-					// Let the monster attack the player
-					Battlefield.performAttack(monster, player);
-				}
-				
-				// Monster defeated; remove it from the battlefield and current room
-				else
-				{
-					Battlefield.removeMonster(monster);
+					// Monster attacks //
+					// Randomly choose a target from the player's party for the monster to attack
+					Combatant target = Battlefield.getRandomTargetFromPlayerParty(monster);
 					
-					Room currentRoom = player.getCurrentRoom();
-					if (currentRoom != null)
-						currentRoom.removeMonster(monster.getName(), monster);
-
-					View.printColored(monster.getName() + " defeated!", "green", true);
-					
-					// Reduce i by 1 to keep loop in sync
-					i--;
+					if (target != null)
+						Battlefield.performAttack(monster, target);
 				}
-				
 			}
 		}
 		
@@ -330,6 +407,23 @@ public class GameController
 			}
 		}
 		
+		// NPC interaction command
+		else if (cmdType.equalsIgnoreCase("npc"))
+		{
+			// The user would like to recruit or talk to a companion in the current room
+			if (processedCmd.equalsIgnoreCase("targetNPC"))
+			{
+				View.println("...");
+				Wait.yield(1.25f);
+				
+				View.println("");
+				
+				// Let the player handle the logic for this command
+				// Pass in userCmd so that the player can parse it to get the companion name
+				player.handleNPCInteraction(userCmd);
+			}
+		}
+		
 		// Monster interaction command
 		else if (cmdType.equalsIgnoreCase("monster"))
 		{
@@ -432,6 +526,12 @@ public class GameController
 					player.printCurrentRoomDetails();
 					break;
 
+				// The user would like to view the party's status
+				case "status":
+					player.viewPartyStatus();
+					break;
+			
+				// The user would like to view the game's commands
                 case "solve":
                     Puzzle puzzle = player.getCurrentPuzzle();
 
@@ -441,7 +541,6 @@ public class GameController
                         player.setCurrentState("solvingPuzzle");
                     }
                     break;
-
 
                 // The user would like to view the game's commands
 				case "help":
