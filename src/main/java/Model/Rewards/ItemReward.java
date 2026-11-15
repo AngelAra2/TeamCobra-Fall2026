@@ -3,6 +3,8 @@ package Model.Rewards;
 import Model.AbstractClasses.Item;
 import Model.Combat.Player;
 import Model.Interfaces.Rewardable;
+import Model.Util.ItemUtil;
+import View.View;
 
 public class ItemReward implements Rewardable {
 
@@ -17,13 +19,19 @@ public class ItemReward implements Rewardable {
     }
     @Override
     public void give(Player player) {
-        //Nothing to give, just in case
-
-        if (this.puzzleItemReward == null)
+        if (puzzleItemReward == null || player == null)
             return;
 
+        Item reward = ItemUtil.copyItem(puzzleItemReward);
+        if (reward == null) {
+            throw new IllegalStateException("Unsupported item reward type"); // Shouldn't see this, just a failsafe.
+        }
 
-        // Add the item to the player's inventory
-
+        if (player.addItemToInventory(reward)) {
+            View.printColored("You received " + reward.getItemName() + "!", "green", true);
+        } else {
+            View.printColored("Your inventory is too heavy to carry "
+                    + reward.getItemName() + ".", "red", true);
+        }
     }
 }

@@ -23,7 +23,7 @@ import Model.Combat.StartingClass;
 import Model.Util.ItemUtil;
 import Model.Rewards.LoreReward;
 import Model.Rewards.RoomReward;
-
+import Model.Rewards.ItemReward;
 public class DataExtractionMethods {
 
     /* Data Fields */
@@ -681,6 +681,24 @@ public static void extractWeaponData(Scanner fileScanner, Map worldMap) {
                         // Attach this exit reward to the puzzle.
                         puzzle.addReward(new RoomReward(fromRoom, direction, toRoom));
                         break;
+                    case "ITEM": {
+                        // ITEM entries must contain a puzzle ID, the reward type, and an item ID.
+                        if (attributes.length != 3)
+                            throw new IllegalArgumentException(
+                                    "ITEM format: puzzleId|ITEM|itemId");
+
+                        // Parse the item ID and look up its shared template in the world map.
+                        int itemId = Integer.parseInt(attributes[2]);
+                        Item item = worldMap.getItemTemplate(itemId);
+
+                        // Reject IDs that do not refer to a loaded item.
+                        if (item == null)
+                            throw new IllegalArgumentException("Unknown item ID: " + itemId);
+
+                        // Attach the item reward to this puzzle.
+                        puzzle.addReward(new ItemReward(item));
+                        break;
+                    }
 
                     default:
                         // Reject reward types that this loader does not support.
