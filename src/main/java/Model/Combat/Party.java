@@ -32,7 +32,6 @@ public class Party {
 
         //if companion already exists in player's party, disp message, and return false.
         if (activeCompanions.contains(companion) || inactiveCompanions.contains(companion)){
-            View.println(companion.getName() + " already exists in party.");
             return false;
         }
 
@@ -42,13 +41,10 @@ public class Party {
 
         //if statement checks if party has max active companions, if so, add companion to inactiveCompanions list
         if(activeCompanions.size() == maxActiveCompanions){
-            View.println("New companion recruited!" + companion.getName() + " added to inactive party.");
             inactiveCompanions.add(companion);
             return true;
         }
 
-
-        View.println("New companion recruited! " + companion.getName() + " added to the active party!");
         activeCompanions.add(companion);
         return true;
 
@@ -64,19 +60,15 @@ public class Party {
     public boolean addCompanionToActiveParty(Companion companion){
         //if companion already exists in active party, disp msg and return true.
         if (activeCompanions.contains(companion)){
-            System.out.println(companion.getName() + " is already in the active party!");
             return true;
         }
 
         //if the size of the activeCompanion is not 2, then add companion to active party.
         if(activeCompanions.size() != maxActiveCompanions){
-            System.out.println(companion.getName() + " moved to active party!");
             activeCompanions.add(companion);
             inactiveCompanions.remove(companion);
             return true;
         } else{
-            //display error message and return false.
-            System.out.println("There is no room in the active party!" + "Remove someone from the current party using 'Remove (Companions Name)'" );
             return false;
         }
 
@@ -91,7 +83,6 @@ public class Party {
     public boolean removeCompanionFromActiveParty(Companion companion){
         //checks if companion is in active party.
         if (!activeCompanions.contains(companion)){
-            System.out.println(companion.getName() + " is not currently in the active party.");
             return true;
         }
 
@@ -100,8 +91,6 @@ public class Party {
 
         //adds companion to inactive party
         inactiveCompanions.add(companion);
-
-        System.out.println(companion.getName() + " moved to inactive party.");
 
         return true;
     }

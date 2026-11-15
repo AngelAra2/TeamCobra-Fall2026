@@ -4,6 +4,7 @@ import java.util.*;
 
 import Model.AbstractClasses.Item;
 import Model.Combat.Companion;
+import Model.Combat.Party;
 import Model.Exploration.Room;
 import Model.Exploration.Puzzle;
 import Model.Exploration.Merchant;
@@ -125,5 +126,82 @@ public class ExplorationView
         for (Merchant merchant : room.getMerchants())
             View.println("> " + merchant.getName());
     }
+
+	public static void printCompanionRecruitment(boolean success, Party playerParty, Companion companion)
+	{
+		/* Prints out a message when a companion is recruited */
+		String companionName = "[" + companion.getName() + "]";
+		List<Companion> inactiveCompanions = playerParty.getInactiveCompanions();
+
+		if (success)
+		{
+			View.printColored(companionName, "cyan", false);
+
+			// Companion was successfully recruited
+			View.print(" successfully recruited!");
+			View.println("");
+
+			// If companion was added to the Inactive Party, print a different message
+			if (inactiveCompanions.contains(companion))
+				View.println("Added to the Inactive Party");
+
+			// Added to the Active Party
+			else
+				View.println("Added to the Active Party");
+		}
+
+		else
+		{
+			View.printColored(companionName, "cyan", false);
+			View.print(" is already recruited");
+		}
+
+		View.println("");
+	}
+
+	public static void printAddedCompanionToParty(boolean success, Companion companion)
+	{
+		/* Prints out a message when a companion is added to the player's party */
+		String companionName = "[" + companion.getName() + "]";
+
+		if (success)
+		{
+			View.printColored(companionName, "cyan", false);
+			View.print(" added to the Active Party");
+		}
+
+		// Active Party full
+		else
+		{
+			View.printColored("Active Party full", "red", true);
+			View.print("Remove a Companion from the Active Party to make room for ");
+			View.printColored(companionName, "cyan", false);
+		}
+
+		View.println("");
+	}
+
+	public static void printRemovedCompanionFromParty(boolean success, Companion companion)
+	{
+		/* Prints out a message when a companion is removed from the player's party */
+		String companionName = "[" + companion.getName() + "]";
+
+		// Companion was successfully removed from the Active Party
+		if (success)
+		{
+			View.printColored(companionName, "cyan", false);
+			View.print(" removed from the Active Party");
+		}
+
+		// Companion is not in the Active Party
+		else
+		{
+			View.printColored(companionName, "cyan", false);
+			View.print(" isn't in the Active Party");
+		}
+
+		View.println("");
+	}
 }
+
 
