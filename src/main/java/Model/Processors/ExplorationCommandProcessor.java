@@ -31,6 +31,9 @@ public class ExplorationCommandProcessor extends CommandProcessor
 		 * g. "heal" -> uses a consumable item in the player's inventory to heal the player
 		 * h. "inventory" -> prints all item names in the player's inventory to console
 		 * 
+		 * -- NPC Interaction --
+		 * a. "recruit [companion name]" -> recruits a companion to the player's party if the companion is in the current room
+		 * 
 		 * -- Monster Interaction --
 		 * a. "examine [monster name]" -> prints the monster's details to the console
 		 * b. "attack [monster name]" -> attacks a monster in the current room and initiates combat
@@ -38,11 +41,12 @@ public class ExplorationCommandProcessor extends CommandProcessor
 		 * 
 		 * -- Misc. --
 		 * a. "room" or "location" -> print current room name and description to console
-		 * b. "help" -> print all commands to console
-		 * c. "q" or "quit" -> stop running the game and clean up objects
+		 * b. "status" -> print player's party's status to console, including each party member's name and their stats
+		 * c. "help" -> print all commands to console
+		 * d. "q" or "quit" -> stop running the game and clean up objects
 		 * 
 		 * -- Order of Priority --
-		 * Movement > Item Interaction > Monster Interaction > Misc.
+		 * Movement > Item Interaction > NPC Interaction > Monster Interaction > Misc.
 		 */
 		
 		String cmd = this.currentCmd.toLowerCase();
@@ -133,6 +137,34 @@ public class ExplorationCommandProcessor extends CommandProcessor
 		if (this.cmdType.equals("item"))
 			return;
 		
+		// Detect and process NPC interaction commands //
+		if (!this.cmdType.equals("npc"))
+		{
+			this.cmdType = "npc";
+			
+			// Check if the command is one of the monster interaction commands
+			if (cmd.startsWith("recruit")) { cmd = "recruit"; }
+			//else if (cmd.startsWith("attack")) { cmd = "attack"; }
+			//else if (cmd.startsWith("ignore")) { cmd = "ignore"; }
+			
+			switch (cmd)
+			{
+				// For these commands, the player will take care of the logic for them, 
+				// but the CommandProcessor will process them as "targetNPC" commands
+				case "recruit", "talk":
+					this.processedCmd = "targetNPC";
+					break;
+				//-----------------------------//
+				default:
+					this.reset();
+					break;
+			}
+		}
+		
+		// Return because a valid NPC interaction command was detected
+		if (this.cmdType.equals("npc"))
+			return;
+		
 		// Detect and process monster interaction commands //
 		if (!this.cmdType.equals("monster"))
 		{
@@ -178,6 +210,10 @@ public class ExplorationCommandProcessor extends CommandProcessor
 			{
 				case "room", "location":
 					this.processedCmd = "location";
+					break;
+				//-----------------------------//
+				case "status":
+					this.processedCmd = "status";
 					break;
 				//-----------------------------//
 				case "help":

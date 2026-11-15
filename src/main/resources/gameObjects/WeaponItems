@@ -1,0 +1,17 @@
+1_Broadsword_Basic one-handed weapon. Leaves off-hand open for a shield._3.5_50_MAIN-HAND_12_0_0_0_B_C_NONE_NONE_NONE_3,2
+2_Curved Sword_Agile one-handed sword used by early native inhabitants._3.0_45_MAIN-HAND_12_0_0_0_C_B_NONE_NONE_NONE_NONE
+3_Noble's Rapier_One-handed thrusting sword once owned by a noble family, with an ornate gold serpent on its hilt._2.5_150_MAIN-HAND_10_10_0_0_D_B_B_NONE_NONE_13,12,11
+4_Claymore_Two-handed greatsword that is slow to swing but deals heavy damage and poise damage._9.0_80_MAIN-HAND_22_0_0_0_A_D_NONE_NONE_NONE_19
+5_Dagger_Lightweight blade designed for rapid strikes and stealth combat._1.5_15_MAIN-HAND_9_0_0_0_NONE_A_NONE_NONE_NONE_5,4,2,1
+6_The Serpent's Fang_Unique ceremonial dagger forged by the ancient Jormun clan. Heals the wielder for 20 percent of physical damage inflicted._2.0_250_MAIN-HAND_10_8_0_0_NONE_A_NONE_A_LIFESTEAL-20-PERCENT_NONE
+7_Hammer_Heavy blunt weapon capable of crushing armor, breaking enemy guards, and interrupting channel spells._6.0_65_MAIN-HAND_20_0_0_0_S_NONE_NONE_NONE_NONE_19
+8_Spear_Mid-to-long reach polearm ideal for keeping hostile creatures at a distance._5.0_60_MAIN-HAND_15_0_0_0_B_B_NONE_NONE_NONE_5,4
+9_Spear of Destiny_Legendary weapon once wielded by the Gods against the Leviathan. Its weapon skill deals physical and holy damage._6.5_350_MAIN-HAND_25_0_0_0_A_B_NONE_B_GREAT-SERPENT-HUNT_NONE
+10_Axe_Cleaving weapon built for high burst strength damage._4.0_40_MAIN-HAND_18_0_0_0_A_D_NONE_NONE_NONE_6,5,4
+11_Magic Staff_Focus weapon infused with mana, allowing the user to cast spells._3.0_75_OFF-HAND_0_0_0_0_NONE_NONE_A_B_NONE_13,12,11
+12_Caduceus Staff_Ancient winged staff intertwined with dual serpents. Allows the user to use the Serpent Call spell._3.5_300_OFF-HAND_0_0_0_0_NONE_NONE_S_S_UNLOCKS-SERPENT-CALL-SPELL_12
+13_Shortbow_Light bow offering fast draw times for mobile combat._2.0_35_MAIN-HAND_9_0_0_0_D_A_NONE_NONE_NONE_24,16,15,14
+14_Longbow_Heavy bow requiring setup and dealing high single-target ranged damage._4.0_80_MAIN-HAND_16_0_0_0_B_B_NONE_NONE_NONE_19,8
+15_Sunspire Lightbow_Legendary bow forged by Vulcan and wielded by Apollo. Has a unique weapon skill._3.0_300_MAIN-HAND_24_0_0_0_C_A_NONE_B_NIGHTS-BANE_25
+16_Throwing Knives_Balanced iron blades for quick consumable ranged strikes without spending mana._1.0_10_MAIN-HAND_8_0_0_0_NONE_B_NONE_NONE_NONE_7,5,4
+17_Ancient Hero's Greatsword_Unwieldy greatsword once wielded by a legendary hero. Its unique skill damages all enemies._10.0_200_MAIN-HAND_15_12_0_0_S_B_B_NONE_UNIQUE-SKILL-ALL-ENEMIES_NONE

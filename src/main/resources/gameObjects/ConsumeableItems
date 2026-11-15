@@ -1,0 +1,9 @@
+31_Health Potion_Red elixir vial that restores 25 HP._0.5_25_HEAL-HP_25_0_NONE
+32_Greater Health Potion_Glowing ruby-red elixir that restores 50 HP._0.5_75_HEAL-HP_50_0_NONE
+33_Supreme Health Potion_Concentrated crimson draft that instantly restores 100 HP._0.5_200_HEAL-HP_100_0_NONE
+34_Mana Potion_Dark blue bubbling flask that restores 30 MP._0.5_30_RESTORE-MP_30_0_NONE
+35_Strength Potion_Golden brew that temporarily raises base attack power by 10 damage for 3 turns._0.5_40_INCREASE-ATTACK_10_3_NONE
+36_Raw Meat_Basic food item that restores 8 HP._1.0_3_HEAL-HP_8_0_NONE
+37_Cooked Steak_Prepared meat created by cooking Raw Meat at a campfire. Restores 20 HP._0.8_8_HEAL-HP_20_0_NONE
+38_Raw Fish_Freshly caught fish that restores 6 HP when eaten raw or can be cooked._0.5_2_HEAL-HP_6_0_NONE
+39_Cooked Fish_Fish roasted over a campfire that restores 18 HP._0.4_6_HEAL-HP_18_0_NONE

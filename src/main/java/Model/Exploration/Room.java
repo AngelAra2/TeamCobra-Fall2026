@@ -94,6 +94,27 @@ public class Room
 		return null;
 	}
 	
+	public Object getNPCByName(String npcName)
+	{
+		/* Returns NPC of corresponding name */
+		
+		// Checks if the room contains at least one NPC of the corresponding
+		// name. If it exists, returns it
+		npcName = npcName.toLowerCase();
+		
+		// Check companions first
+		for (Companion companion: this.companions)
+			if (companion.getName().equalsIgnoreCase(npcName))
+				return companion;
+		
+		// Check merchants next
+		for (Merchant merchant: this.merchants)
+			if (merchant.getName().equalsIgnoreCase(npcName))
+				return merchant;
+
+		return null;
+	}
+	
 	// Setters //
 	public void setWasVisited()
 	{
@@ -219,11 +240,15 @@ public class Room
     public void addCompanion(Companion companion) {
         this.companions.add(companion);
     }
+    
+    public void removeCompanion(Companion companion) {
+		this.companions.remove(companion);
+	}
 
     public void addMerchant(Merchant merchant) {
         this.merchants.add(merchant);
     }
-	
+
 	public void addSpawnableMonsterId(int monsterId)
 	{
 		/* Adds the monsterId to the list of spawned monster IDs if it doesn't already exist in the list */
@@ -250,7 +275,7 @@ public class Room
 				break;
 
 			// Randomly select a monster ID from the list of spawnable monster IDs
-			int randomIndex = rng.nextInt(this.spawnableMonsterIds.size());
+			int randomIndex = rng.nextInt(0, this.spawnableMonsterIds.size());
 			int monsterId = this.spawnableMonsterIds.get(randomIndex);
 			
 			// Create a new Monster object using the MonsterFactory

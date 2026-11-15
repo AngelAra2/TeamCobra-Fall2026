@@ -1,7 +1,8 @@
 package View;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
+import java.util.*;
+
+import Model.Combat.*;
 
 public class View
 {
@@ -160,6 +161,7 @@ public class View
 		
 		println("");
 		println("\"attack\" --> attack the monster");
+		println("\"target [target number]\" --> switch to a different monster target in battle");
 		println("\"heal [item name]\" --> use a consumable item from your inventory to heal yourself");
 	}
 
@@ -192,5 +194,28 @@ public class View
 		}
 
 	}
+
+//	public static void printPartyStatus(Party playerParty)
+//	{
+//		/* Prints out the player's party's status to the console */
+//		
+//		View.separate(3);
+//		View.printColored("Party Status", "yellow", true);
+//		View.println("");
+//		
+//		for (Companion companion: playerParty.getCompanions())
+//		{
+//			String companionName = companion.getName();
+//			int companionHP = companion.getCurrentHP();
+//			int companionMaxHP = companion.getMaxHP();
+//			String companionPerkDescription = companion.getPerkDescription();
+//			
+//			View.println(companionName + " | HP: " + companionHP + "/" + companionMaxHP);
+//			View.println("Perk: " + companionPerkDescription);
+//			View.println("");
+//		}
+//		
+//		View.separate(3);
+//	}
 }
 

@@ -71,14 +71,6 @@ public class Companion extends Character implements NPCable
     // Private //
 
     // Getters //
-    // (WIP 10.29.2026)
-	/*
-	public boolean isRecruitable()
-	{
-		return false;
-	}
-	*/
-
     public int getId() { return this.id; }
     public String getPartyStatus() { return this.partyStatus; }
     public String getPerkDescription() { return this.perkDescription; }
