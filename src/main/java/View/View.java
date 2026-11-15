@@ -1,6 +1,5 @@
 package View;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import Model.Exploration.Puzzle;
 
