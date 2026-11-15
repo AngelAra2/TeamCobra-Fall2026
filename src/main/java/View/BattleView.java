@@ -138,7 +138,7 @@ public class BattleView
 	public static void printCombatantDeath(Combatant combatant) 
 	{
 		/* Prints out a message indicating that a combatant has died */
-		String combatantName = combatant.getName();
+		String combatantName = "[" + combatant.getName() + "]";
 		String textColor = "red";
 		boolean isMonster = combatant instanceof Monster;
 		
@@ -147,8 +147,7 @@ public class BattleView
 			textColor = "cyan";
 
 		View.printColored(combatantName + " has fallen!", textColor, true);
-		View.println("");
-		
+
 		// Print gold and XP rewards if the combatant is a Monster
 		if (isMonster)
 		{
@@ -156,6 +155,7 @@ public class BattleView
 			int goldReward = monster.getGoldReward();
 			int xpReward = monster.getXPReward();
 			
+			View.println("");
 			View.printColored(goldReward + " Gold earned", "yellow", true);
 			View.printColored(xpReward + " XP earned", "yellow", true);
 		}

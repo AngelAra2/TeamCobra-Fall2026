@@ -98,17 +98,6 @@ public abstract class Character extends Combatant
         return 15 + this.endurance;
     }
 
-//	public int getTotalAttack()
-//	{
-//		/* Return total Attack of character */
-//		int totalAttack = this.attack;
-//
-//		// Add weapon's base attack if a weapon is equipped
-//		if (this.equippedWeapon != null)
-//			totalAttack += this.equippedWeapon.getBaseAttack();
-//
-//		return totalAttack;
-//	}
 // Calculates the character's total physical attack.
     public int getTotalAttack() {
 
@@ -121,6 +110,12 @@ public abstract class Character extends Combatant
         return totalAttack;
     }
 
+    public int getXPToNextLevel() {
+		/* Calculate the XP required for the next level using a simple formula */
+    	// Base XP for level 1 is 100, and it increases by 20 for each subsequent level
+		return 100 + (20 * this.currentLevel - 1);
+	}
+    
 	// Setters //
 
 	// Custom //
@@ -147,6 +142,19 @@ public abstract class Character extends Combatant
 		// Restore HP and Mana to full on level up
 		this.setCurrentHP(this.getMaxHP());
 		this.setMana(this.calculateMaxMana());
+	}
+	
+	public void addXP(int amount)
+	{
+		this.currentXP += amount;
+		
+		// Check if the character has enough XP to level up
+		while (this.currentXP >= this.getXPToNextLevel())
+		{
+			this.currentXP -= this.getXPToNextLevel();
+			this.currentLevel++;
+			this.levelUp();
+		}
 	}
 
 	// Overrides //

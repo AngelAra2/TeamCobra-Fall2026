@@ -34,6 +34,10 @@ public class Player extends Character
 	private float currentEncounterChance; // Current encounter chance for monsters, which increases after each move
 	private int movesSinceLastEncounter; // Keeps track of the number of moves since the last monster encounter
 	private String startingClass;
+	
+	// Currency
+	private int goldBalance;
+	
 	/* Constructors */
 	/*
 	11.10.26
@@ -46,7 +50,7 @@ public class Player extends Character
 				startingClass.getBaseMaxHP(), //max HP
 				0, //physicalDEF
 				0, //magicDEF
-				80, //attack
+				40, //attack
 				1, //currentLevel
 
 				0, //currentXP
@@ -65,6 +69,9 @@ public class Player extends Character
 		this.startingClass = startingClass.getName();
 		this.playerParty = new Party(this);
 
+		// Currency
+		this.goldBalance = 0;
+		
 		//Create Finite State Machine for Player
 		DataFileExtraction.extractStatesDataToCombatant(DataExtractionMethods::extractFiniteStatesData, STATES_FILE_PATH, this);
 		
@@ -81,21 +88,21 @@ public class Player extends Character
 		{
 			e.printStackTrace();
 			this.BASE_ENCOUNTER_CHANCE = 0.33f;
-			this.ENCOUNTER_CHANCE_INCREMENT = 0.05f;
+			this.ENCOUNTER_CHANCE_INCREMENT = 0.03f;
 			this.ENCOUNTER_GRACE_MOVES = 3;
 		}
 		catch (NumberFormatException e)
 		{
 			e.printStackTrace();
 			this.BASE_ENCOUNTER_CHANCE = 0.33f;
-			this.ENCOUNTER_CHANCE_INCREMENT = 0.05f;
+			this.ENCOUNTER_CHANCE_INCREMENT = 0.03f;
 			this.ENCOUNTER_GRACE_MOVES = 3;
 		}
 		catch (ArrayIndexOutOfBoundsException e)
 		{
 			e.printStackTrace();
 			this.BASE_ENCOUNTER_CHANCE = 0.33f;
-			this.ENCOUNTER_CHANCE_INCREMENT = 0.05f;
+			this.ENCOUNTER_CHANCE_INCREMENT = 0.03f;
 			this.ENCOUNTER_GRACE_MOVES = 3;
 		}
 		
@@ -155,6 +162,13 @@ public class Player extends Character
 		// Mark this room as visited if it wasn't already
 		this.currentRoom.setWasVisited();
 	}
+	
+	private void _adjustGoldBalance()
+	{
+		// Ensure that the player's gold balance is never negative
+		if (this.goldBalance < 0)
+			this.goldBalance = 0;
+	}
 
 	// Getters //
 	public String getCurrentState() { return this.stateMachine.getCurrentState(); }
@@ -163,6 +177,9 @@ public class Player extends Character
 	public Monster getExaminedMonster() { return this.examinedMonster; }
 	public String getStartingClass(){return this.startingClass; }
 	public Party getPlayerParty() { return this.playerParty; }
+	public int getGoldBalance() { return this.goldBalance; }
+	
+	public boolean hasSufficientGold(int amount) { return this.goldBalance >= amount; }
 
 //	public Item getItemFromInventoryByName(String itemName)
 //	{
@@ -179,7 +196,11 @@ public class Player extends Character
     public Item getItemFromInventoryByName(String itemName) {
         return this.inventory.findItem(itemName);
     }
-
+   
+    // Allows other classes to access the player's inventory.
+    public Inventory getInventory() {
+        return this.inventory;
+    }
 
 	// Setters //
 	public void setCurrentState(String newState) { this.stateMachine.setCurrentState(newState); }
@@ -198,17 +219,7 @@ public class Player extends Character
 		if (targetRoom != null)
 		{
 			/* Print out details about the room BEFORE entering */
-			String roomName = targetRoom.getRoomName();
-			String roomDesc = targetRoom.getRoomDescription();
-			boolean wasVisited = targetRoom.getWasVisited();
-			
-			// Print out room details
-			View.println("Now entering: " + roomName);
-			View.println(roomDesc);
-			
-			// Print out message if this room has been visited before
-			if (wasVisited)
-				View.println("You've been here before...");
+			ExplorationView.printRoomInfo(targetRoom);
 			
 			/* Move player to this room */
 			this._setCurrentRoom(targetRoom);
@@ -249,28 +260,22 @@ public class Player extends Character
 		return false;
 	}
 	
-	public void printCurrentRoomDetails()
+	public void viewRoomInfo()
 	{
 		/* Print out details about the current room */
-		String roomName = this.currentRoom.getRoomName();
-		String roomDesc = this.currentRoom.getRoomDescription();
-		boolean wasVisited = this.currentRoom.getWasVisited();
-		
-		View.println("Current Room: " + roomName);
-		View.println("Description: " + View.wrapText(roomDesc,65));
-		
-		if (wasVisited)
-			View.println("You've been here before...");
+		ExplorationView.printRoomInfo(this.getCurrentRoom());
 	}
 	
 	public void exploreCurrentRoom()
 	{
 		/* Explore the current room */
-		Room currentRoom = this.getCurrentRoom();
+		
+		// Print out all items in the current room
+		ExplorationView.printItemsInRoom(currentRoom.getItems());
+		View.println("");
 		
 		// Print out all available exits in the current room
 		ExplorationView.printRoomExits(currentRoom.getExits());
-		
 		View.println("");
 		
 		// Print out NPCs/NPC companions in the current room //
@@ -712,14 +717,35 @@ public class Player extends Character
 	// Reset to default state (exploring) when the player is not in combat or solving a puzzle
     public void resetToDefaultState() { this.setCurrentState("exploring"); }
 
+    
+    public void addGold(int amount) 
+    {
+    		/* Adds gold to the player's balance and adjusts it to ensure it is not negative */
+    	
+		this.goldBalance += amount;
+		this._adjustGoldBalance();
+	}
+
+    public void spendGold(int amount) 
+	{
+    		/* Subtracts gold to the player's balance and adjusts it to ensure it is not negative. */
+    		this.goldBalance -= amount;
+		this._adjustGoldBalance();
+	}
+
+    public void gainXP(int amount) 
+	{
+    		/* Adds XP to the player and their active companions */
+		super.addXP(amount); // XP for player
+		
+		// Add XP to all active companions in the player's party
+		for (Companion companion: this.playerParty.getActiveCompanions())
+			companion.addXP(amount);
+	}
+    
     // Allows other classes to add an item while checking carrying capacity.
     public boolean addItemToInventory(Item item) {
         return this._addItemToInventory(item);
-    }
-
-    // Allows other classes to access the player's inventory.
-    public Inventory getInventory() {
-        return this.inventory;
     }
 
 }

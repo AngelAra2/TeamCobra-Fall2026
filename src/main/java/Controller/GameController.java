@@ -138,7 +138,6 @@ public class GameController
 			/* Player's party's turn */
 			List<Companion> activeCompanions = player.getPlayerParty().getActiveCompanions();
 			int totalPartyMembers = 1 + activeCompanions.size(); // 1 for the player + number of active companions
-
 			
 			// Player's turn first //
 			// Do a for loop to iterate through the player's party members, starting with the player and then each active companion
@@ -149,8 +148,6 @@ public class GameController
 					continue outerLoop;
 				
 				View.separate(3);
-				
-				//Combatant combatant;
 
 				Character combatant;
 				// If i == 0, it's the player's turn
@@ -345,6 +342,12 @@ public class GameController
 						if (Battlefield.getMonsters().size() > 0)
 							Battlefield.switchMonsterTarget(0);
 						
+						// Reward player with gold and experience for defeating the monster
+						int goldReward = monster.getGoldReward();
+						int xpReward = monster.getXPReward();
+						player.addGold(goldReward);
+						player.addXP(xpReward);
+							
 						// Reduce i by 1 to keep loop in sync
 						j--;
 						
@@ -374,6 +377,30 @@ public class GameController
 					
 					if (target != null)
 						Battlefield.performAttack(monster, target);
+				}
+				
+				// After each monster's turn, check if anyone (including the player) is defeated
+				// Do a for loop to iterate through the player's party members, starting with the player and then each active companion
+				for (int j = 0; j < totalPartyMembers; j++)
+				{
+					Character combatant;
+					
+					// Get the player if j == 0
+					if (j == 0)
+						combatant = player;
+					
+					// Otherwise, it's an active companion's turn
+					else
+						combatant = activeCompanions.get(j - 1);
+					
+					// If the character is defeated, print out a message
+					if (!combatant.isAlive())
+					{
+						View.separate(3);
+						BattleView.printCombatantDeath(combatant);
+						
+						Wait.yield(1f);
+					}
 				}
 			}
 
@@ -605,7 +632,7 @@ public class GameController
 			{
 				// The user would like to view the current room's details
 				case "location":
-					player.printCurrentRoomDetails();
+					player.viewRoomInfo();
 					break;
 
 				//displays player's status
@@ -660,7 +687,7 @@ public class GameController
 		{
 			View.separate(10);
 			View.printColored("!!! GAME OVER !!!", "red", true);
-			View.println("You've fallen and can't get up. Your journey ends prematurely...");
+			View.println("Your party has fallen. Your journey ends prematurely...");
 
 			// Break out of the main gameplay loop
 			return true;
