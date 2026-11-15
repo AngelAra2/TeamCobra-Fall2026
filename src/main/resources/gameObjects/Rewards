@@ -1,1 +1,10 @@
+1|ITEM|19
+1|LORE|As you finish the puzzle and approach the cloaked figure sitting beneath the shade of the trees, you see a Serpent emerge from the robes, looking at you with anticipation. Before you can react, you hear a disembodied voice speaking to you: “You, who have come here seeking Truth and Discernment, all in service of your quest to become Inheritor. Heed my words, as those who came before you failed to do. Long before the Age of Light, the World was shrouded in Darkness, ruled over by the Leviathan, the Great Serpent of the Abyss. The Serpent was once the source of all Life, and so did the Serpent create humanity. When the Gods saw this new creation, they reacted with Righteous anger. They hunted the Serpent and its kin, leaving behind not a trace of its existence. They created a new Age of Light, free from the tyranny and chaos of the Primordial Age. But after their victory, the Gods disappeared, never to be seen again. The Flame they left behind continues to fuel their ambitions, but one day the Flame of the Gods will fade away, and an Age of Dark will once again swallow the World. What will you do? Will you continue to carry out the will of the Gods, or will you step aside and let nature take its course? I’m afraid I already know the answer. Such is the fate of those Branded by the Gods, after all.”
+2|ROOM|22|south|23
+3|ROOM|28|north|29
+4|ITEM|12
+4|ROOM|12|north|13
+5|ROOM|25|north|26
 6|ROOM|4|north|5
+7|ITEM|6
+7|ROOM|15|east|16
