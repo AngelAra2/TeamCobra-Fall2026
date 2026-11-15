@@ -50,7 +50,7 @@ public class Player extends Character
 				startingClass.getBaseMaxHP(), //max HP
 				0, //physicalDEF
 				0, //magicDEF
-				40, //attack
+				60, //attack
 				1, //currentLevel
 
 				0, //currentXP
@@ -326,7 +326,7 @@ public class Player extends Character
             Item targetItem;
 
             // Pickup item
-//            if (action.equals("pickup"))
+//            if (action.equalsIgnoreCase("pickup"))
 //            {
 //                // The player picks up the item from the current room and adds it to their inventory
 //                // The item is removed from the current room's items
@@ -345,7 +345,7 @@ public class Player extends Character
 //                    View.println("No such item to pick up in the current room.");
 //            }
             // Pickup item
-            if (action.equals("pickup")) {
+            if (action.equalsIgnoreCase("pickup")) {
 
                 targetItem = this.currentRoom.getItemByName(itemName);
 
@@ -370,7 +370,7 @@ public class Player extends Character
             }
 
             // Inspect item
-            else if (action.equals("inspect"))
+            else if (action.equalsIgnoreCase("inspect"))
             {
                 // The player inspects the item in their inventory and prints its details to console
                 // The item is not removed from the inventory
@@ -388,7 +388,7 @@ public class Player extends Character
             }
 
             // Drop item
-//            else if (action.equals("drop"))
+//            else if (action.equalsIgnoreCase("drop"))
 //            {
 //                // The player drops the item from their inventory and adds it to the current room's items HashMap
 //                // The item is removed from the inventory
@@ -414,7 +414,7 @@ public class Player extends Character
 //            }
 
             // Drop item
-            else if (action.equals("drop")) {
+            else if (action.equalsIgnoreCase("drop")) {
 
                 targetItem = this.getItemFromInventoryByName(itemName);
 
@@ -446,7 +446,7 @@ public class Player extends Character
             }
             
             // Equip item (weapon)
-//            else if (action.equals("equip"))
+//            else if (action.equalsIgnoreCase("equip"))
 //			{
 //				// The player equips the item from their inventory
 //				targetItem = this.getItemFromInventoryByName(itemName);
@@ -472,7 +472,7 @@ public class Player extends Character
 //			}
 //
 //            // Unequip item (weapon)
-//			else if (action.equals("unequip"))
+//			else if (action.equalsIgnoreCase("unequip"))
 //			{
 //				// Check if the player has a weapon equipped
 //				if (this.equippedWeapon != null)
@@ -487,7 +487,7 @@ public class Player extends Character
 //					View.println("No weapon is currently equipped");
 //			}
             // Equip an item.
-            else if (action.equals("equip")) {
+            else if (action.equalsIgnoreCase("equip")) {
                 targetItem = this.getItemFromInventoryByName(itemName);
 
                 if (targetItem != null) {
@@ -515,7 +515,7 @@ public class Player extends Character
             }
 
 // Unequip an item.
-            else if (action.equals("unequip")) {
+            else if (action.equalsIgnoreCase("unequip")) {
                 targetItem = this.getItemFromInventoryByName(itemName);
 
                 if (targetItem != null && targetItem instanceof EquipmentItem) {
@@ -536,7 +536,7 @@ public class Player extends Character
             }
             
             // Heal item (consumable)
-			else if (action.equals("heal"))
+			else if (action.equalsIgnoreCase("heal"))
 			{
 				// The player uses the item from their inventory to heal themselves
 				targetItem = this.getItemFromInventoryByName(itemName);
@@ -598,7 +598,7 @@ public class Player extends Character
         if (!npcName.isEmpty())
 		{
 			// Recruit NPC companion
-			if (action.equals("recruit"))
+			if (action.equalsIgnoreCase("recruit"))
 			{
 				// The player recruits the NPC companion in the current room and adds them to their party
 				// The NPC companion is removed from the current room's companions list
@@ -609,23 +609,76 @@ public class Player extends Character
 					{
 						// Have the Party class handle the recruitment of the companion
 						Companion companion = (Companion) targetNPC;
-						//this.playerParty.recruit(companion);
-						
+
 						boolean recruitmentSuccessful = this.playerParty.recruit(companion);
-						
+
 						// Remove companion from current room if recruitment was successful
 						if (recruitmentSuccessful)
 							this.currentRoom.removeCompanion(companion);
+						
+						// Print information about the companion being recruited
+						ExplorationView.printCompanionRecruitment(recruitmentSuccessful, this.playerParty, companion);
 					}
 					
 					// Not an NPC companion, so cannot be recruited
 					else
-						View.println("Cannot recruit " + npcName + " since they are not a companion");
+						View.println("Cannot recruit " + npcName + " since they're not a Companion");
 				}
 				
 				// No NPC companion with that name was found in the current room
 				else
-					View.println("No such companion to recruit in the current room");
+					View.println("No such Companion to recruit in the current room");
+			}
+			
+			// Add/remove NPC companion to/from party and mark them as active/inactive
+			else if (action.equalsIgnoreCase("add") || action.equalsIgnoreCase("remove"))
+			{
+				Object targetNPC;
+				List<Companion> companions;
+				
+				// Adding party member
+				if (action.equalsIgnoreCase("add"))
+				{
+					companions = this.playerParty.getInactiveCompanions();
+					
+					// Attempts to find the companion in the inactive companions list
+					targetNPC = companions.stream()
+							.filter(companion -> companion.getName().equalsIgnoreCase(npcName))
+							.findFirst()
+							.orElse(null);
+					
+					// Print information about the companion being added to the active party
+					if (targetNPC != null && targetNPC instanceof Companion)
+					{
+						Companion companion = (Companion) targetNPC;
+						ExplorationView.printAddedCompanionToParty(this.playerParty.addCompanionToActiveParty(companion), companion);
+					}
+					
+					else
+						View.println("No such Companion in the Inactive Party to add to the Active Party");
+				}
+				
+				// Removing party member
+				else if (action.equalsIgnoreCase("remove"))
+				{
+					companions = this.playerParty.getActiveCompanions();
+					
+					// Attempts to find the companion in the active companions list
+					targetNPC = companions.stream()
+							.filter(companion -> companion.getName().equalsIgnoreCase(npcName))
+							.findFirst()
+							.orElse(null);
+					
+					// Print information about the companion being removed from the active party
+					if (targetNPC != null && targetNPC instanceof Companion)
+					{
+						Companion companion = (Companion) targetNPC;
+						ExplorationView.printRemovedCompanionFromParty(this.playerParty.removeCompanionFromActiveParty(companion), companion);
+					}
+					
+					else
+						View.println("No such Companion in the Active Party to remove to the Inactive Party");
+				}
 			}
 		}
         
@@ -652,7 +705,7 @@ public class Player extends Character
     		if (!monsterName.isEmpty())
         {
             	// Examine monster
-            	if (action.equals("examine"))
+            	if (action.equalsIgnoreCase("examine"))
             	{
             		// The player examines the monster in the current room and prints its details to console
     				targetMonster = this.currentRoom.getMonsterByName(monsterName);
