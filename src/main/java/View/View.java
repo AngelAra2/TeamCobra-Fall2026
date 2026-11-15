@@ -2,6 +2,7 @@ package View;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import Model.Exploration.Puzzle;
 
 public class View
 {
@@ -192,5 +193,40 @@ public class View
 		}
 
 	}
-}
 
+    public static void printPuzzlePrompt(Puzzle puzzle) {
+        separate(3);
+        println("[" + puzzle.getPuzzleName() + "]");
+        println("Puzzle prompt: " + wrapText(puzzle.getPuzzleDescription(), 100));
+        println("");
+        printColored("Enter a solution: ", "cyan", false);
+    }
+
+    public static void printIncorrectFirstGuess() {
+        println("Incorrect solution, please enter a different guess.");
+    }
+
+    public static void printIncorrectSecondGuess() {
+        println("Incorrect solution, try again later.");
+    }
+
+    public static void printPuzzleSolved() {
+        printColored("Correct solution! You have solved the puzzle!", "green", true);
+    }
+
+    public static void printNoPuzzleInRoom() {
+        println("There is no puzzle in the current room to solve.");
+    }
+
+    public static void printPuzzleInputPrompt() {
+        printColored("Enter a solution: ", "cyan", false);
+    }
+
+    public static void printPuzzleHint(String hint) {
+        println("Hint: " + wrapText(hint, 100));
+    }
+
+    public static void printNoMorePuzzleHints() {
+        println("No more hints available for the current puzzle. Attempt to solve the puzzle");
+    }
+}

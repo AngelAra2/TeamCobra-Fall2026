@@ -32,8 +32,8 @@ public class RoomReward implements Rewardable
         String dir = this.direction.toLowerCase();
         this.fromRoom.getExits().put(dir, this.toRoom.getRoomId());
 
-        View.println("A new exit has opened to the " + dir + " of "
+        View.printColored("A new exit has opened to the " + dir + " of "
                 + this.fromRoom.getRoomName() + ", leading to "
-                + this.toRoom.getRoomName() + "!");
+                + this.toRoom.getRoomName() + "!", "green", true);
     }
 }

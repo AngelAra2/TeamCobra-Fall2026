@@ -11,7 +11,6 @@ import Model.Util.Wait;
 import Model.Combat.Battlefield;
 import Model.Combat.Monster;
 import Model.Combat.Player;
-import Model.Combat.StartingClass;
 import Model.Exploration.Map;
 import Model.Exploration.Puzzle;
 import Model.Exploration.Room;
@@ -42,65 +41,65 @@ public class GameController
 	//------------------------------------//
 	
 	/* Helper Methods */
-	private static boolean isSolvingPuzzle()
-	{
-		/* Check if the player is currently solving a puzzle in their current room */
-		Puzzle currentPuzzle = player.getCurrentPuzzle();
-		return (currentPuzzle != null && !currentPuzzle.getIsSolved() && currentPuzzle.getRemainingAttempts() > 0);
-	}
-	
-	private static void puzzleSolvingLoop()
-	{
-		Wait.yield(1f);
-		
-		View.println("");
-		View.printColored("!!! PUZZLE ENCOUNTERED !!!", "yellow", true);
-		
-		Puzzle currentPuzzle;
-		while (isSolvingPuzzle())
-		{
-			Wait.yield(1f);
-			
-			/* Check if the player is currently solving a puzzle in their current room */
-			currentPuzzle = player.getCurrentPuzzle();
+    private static void puzzleSolvingLoop()
+    {
+        // Get the puzzle in the player's current room.
+        Puzzle puzzle = player.getCurrentPuzzle();
+        if (puzzle == null)
+        {
+            View.printNoPuzzleInRoom();
+            player.resetToDefaultState();
+            return;
+        }
 
-			// Print out the puzzle prompt and the number of remaining attempts
-			View.separate(3);
+        // Each Solve command allows two incorrect guesses and up to two hints.
+        int incorrectGuesses = 0;
+        int hintsGiven = 0;
+        View.printPuzzlePrompt(puzzle);
 
-			View.printObject(currentPuzzle);
-			View.println("");
-			View.printColored("Enter an answer to the puzzle: ", "cyan", false);
-			
-			// Get user input for the puzzle
-			userCmd = basicCmdProcessor.getUserInput();
-			
-			// Have the player's input be used as an answer to the puzzle
-			boolean isCorrect = player.attemptToSolvePuzzle(userCmd);
-			
-			View.separate(3);
-			View.println("...");
-			Wait.yield(1.5f);
-			
-			View.println("");
-			
-			// Print out status messages letting the player know
-			// if they solved the puzzle or how many attempts they
-			// have left on an incorrect answer
-			if (isCorrect)
-				View.printColored("Correct! Puzzled solved", "green", true);
-			else
-			{
-				int remainingAttempts = currentPuzzle.getRemainingAttempts();
-				if (remainingAttempts > 0)
-					View.printColored("Incorrect. " + remainingAttempts + " attempt(s) remaining", "red", true);
-				else
-					View.printColored("Incorrect. No more attempts remaining", "red", true);
-			}
-		}
-		
-		// Reset player to default state (exploring)
-		player.resetToDefaultState();
-	}
+        // Keep accepting input until the puzzle is solved or both guesses are used.
+        while (incorrectGuesses < 2)
+        {
+            String answer = basicCmdProcessor.getUserInput();
+            String normalizedInput = answer.trim().toLowerCase().replaceAll("\\s+", " ");
+
+            // Hint requests do not count as guesses.
+            if (normalizedInput.equals("hint")
+                    || normalizedInput.equals("request hint")
+                    || normalizedInput.equals("ask for hint"))
+            {
+                if (hintsGiven < 2)
+                    View.printPuzzleHint(puzzle.getHint(hintsGiven++));
+                else
+                    View.printNoMorePuzzleHints();
+
+                // Prompt again without ending the current solve attempt.
+                View.printPuzzleInputPrompt();
+                continue;
+            }
+
+            // A correct answer marks the puzzle solved and ends this loop.
+            if (player.attemptToSolvePuzzle(answer))
+            {
+                View.printPuzzleSolved();
+                puzzle.giveRewards(player);
+                break;
+            }
+
+            // An incorrect answer uses one of this attempt's two guesses.
+            incorrectGuesses++;
+            if (incorrectGuesses == 1)
+            {
+                View.printIncorrectFirstGuess();
+                View.printPuzzleInputPrompt();
+            }
+            else
+                View.printIncorrectSecondGuess();
+        }
+
+        // Return the player to normal exploration after the attempt ends.
+        player.resetToDefaultState();
+    }
 	
 	private static void combatLoop()
 	{
@@ -110,7 +109,7 @@ public class GameController
 		 */
 		
 		Wait.yield(1f);
-		
+
 		/* Init variables */
 		String userCmd = "";
 		String cmdType = "";
@@ -119,12 +118,12 @@ public class GameController
 		String processedCmd = "";
 		
 		/* Print our pre-battle messages */
-		
+
 		// Print out messages about the encounter
 		BattleView.printMonsterNames(Battlefield.getMonsters());
-		
+
 		Wait.yield(1.25f);
-		
+
 		View.println("");
 		View.printColored("!!! BATTLE START !!!", "red", true);
 
@@ -323,9 +322,8 @@ public class GameController
 			Room currentRoom = player.getCurrentRoom();
 			if (currentRoom != null)
 			{
-				// The player will handle all the logic of moving rooms and triggering events in the new room
 				boolean movementSuccessful = player.moveToRoom(worldMap, processedCmd);
-				
+
 				// Print error message if the player cannot move in that direction
 				if (!movementSuccessful)
 					View.printColored("Can't go this way...", "red", true);
@@ -433,8 +431,19 @@ public class GameController
 				case "location":
 					player.printCurrentRoomDetails();
 					break;
-				
-				// The user would like to view the game's commands
+
+                case "solve":
+                    Puzzle puzzle = player.getCurrentPuzzle();
+
+                    if (puzzle == null) {
+                        View.printNoPuzzleInRoom();
+                    } else if (!puzzle.getIsSolved()) {
+                        player.setCurrentState("solvingPuzzle");
+                    }
+                    break;
+
+
+                // The user would like to view the game's commands
 				case "help":
 					View.printCommands();
 					break;
@@ -666,4 +675,3 @@ public class GameController
 	}
 
 }
-
