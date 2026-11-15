@@ -238,21 +238,7 @@ public class Player extends Character
 				this.setCurrentState("inCombat");
 			}
 			
-			/* Check if the player has entered a room with a puzzle that is unsolved */
-			// Make sure the player is *not* in combat before checking for puzzles
-			Puzzle getPuzzleInRoom = this.getCurrentPuzzle();
-			if ( 
-				!this.getCurrentState().equalsIgnoreCase("inCombat") && 
-				(getPuzzleInRoom != null && !getPuzzleInRoom.getIsSolved())
-			)
-			{
-				// Reset the puzzle (reset its remaining attempts)
-				getPuzzleInRoom.resetPuzzle();
-				
-				// Set player's state to "solvingPuzzle"
-				this.setCurrentState("solvingPuzzle");
-			}
-			
+			// NOTE TO MERGERS. MERGE USING THIS PLEASE FOR THE LOVE OF GOD.
 			// Movement successful
 			return true;
 		}
@@ -705,10 +691,6 @@ public class Player extends Character
 		/* Guard Clauses */
 		// Do not attempt to solve a puzzle if there is no puzzle in the current room
 		if (this.currentRoom.getPuzzle() == null)
-			return false;
-		
-		// Do not attempt to solve a puzzle if it has no remaining attempts
-		if (this.currentRoom.getPuzzle().getRemainingAttempts() <= 0)
 			return false;
 		
 		// Do not attempt to solve a puzzle if the player has already solved it
