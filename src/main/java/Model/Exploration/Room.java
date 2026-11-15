@@ -19,6 +19,7 @@ public class Room
 	private HashMap<String, ArrayList<Item>> items;
 	private HashMap<String, ArrayList<Monster>> monsters;
 	private List<Integer> spawnableMonsterIds;
+    private List<Integer> spawnableItemIds;
 	private Puzzle puzzle;
     private ArrayList<Companion> companions;
     private ArrayList<Merchant> merchants;
@@ -40,6 +41,7 @@ public class Room
 		this.items = new HashMap<>();
 		this.monsters = new HashMap<>();
 		this.spawnableMonsterIds = new ArrayList<>();
+        this.spawnableItemIds = new ArrayList<>();
 		this.puzzle = null;
 		this.companions = new ArrayList<>();
 		this.merchants = new ArrayList<>();
@@ -57,6 +59,7 @@ public class Room
 	public HashMap<String, ArrayList<Item>> getItems() { return this.items; }
 	public HashMap<String, ArrayList<Monster>> getMonsters() { return this.monsters; }
 	public List<Integer> getSpawnedMonsterIds() { return this.spawnableMonsterIds; }
+	public List<Integer> getSpawnedItemIds() { return this.spawnableItemIds; }
 	public Puzzle getPuzzle() { return this.puzzle; }
 	public ArrayList<Companion> getCompanions() { return this.companions; }
 	public ArrayList<Merchant> getMerchants() { return this.merchants; }
@@ -255,6 +258,12 @@ public class Room
 		if (!this.spawnableMonsterIds.contains(monsterId))
 			this.spawnableMonsterIds.add(monsterId);
 	}
+
+    public void addSpawnableItemId(int itemId) {
+        if (!this.spawnableItemIds.contains(itemId)) {
+            this.spawnableItemIds.add(itemId);
+        }
+    }
 	
 	public void generateMonsters()
 	{

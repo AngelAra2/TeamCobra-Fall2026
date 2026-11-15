@@ -3,7 +3,9 @@ package View;
 import java.util.*;
 
 import Model.AbstractClasses.Combatant;
+import Model.Combat.CombatSkill;
 import Model.Combat.Monster;
+import Model.AbstractClasses.Character;
 
 public class BattleView 
 {
@@ -22,6 +24,10 @@ public class BattleView
 		float hpPercentage = currentHP/maxHP;
 		boolean isBoss = false;
 		boolean criticalHP = hpPercentage <= CRIT_HP_THRESHOLD;
+		//used to print physical defense and magical defense for combatant
+		float physDef = (float) combatant.getPhysicalDEF();
+		float magDef = (float) combatant.getMagicDEF();
+
 		
 		// Check if the combatant is a Monster and if it is a boss
 		if (combatant instanceof Monster)
@@ -46,12 +52,15 @@ public class BattleView
 		
 		String hpText = "HP " + (int) currentHP + "/" + (int) maxHP;
 		String hpColor = criticalHP ? "red" : "green";
-		
+
+		String pDefText = "Phys Def: " + (int) physDef;
+		String mDefText = "Mag Def: " + (int) magDef;
 		// If critical HP, print HP text and progress bar in red; print in green otherwise
 		View.printColored(hpText, hpColor, false);
 		View.print(" ");
 		View.printProgressBar(hpPercentage, PROGRESS_BAR_LENGTH, hpColor, false);
-		
+
+		View.printColored(" | " + pDefText + " | " + mDefText, "cyan", true);
 		View.println("");
 	}
 	
@@ -111,7 +120,21 @@ public class BattleView
 			View.println("- " + monsterName);
 		}
 	}
-	
+
+	public static void printFightMenu(Character character) {
+		View.printColored("---< FIGHT MENU >--- ", "yellow", true);
+		View.printColored("\n- Basic Attack", "blue", true);
+
+		View.println(" ");
+
+		View.println("- Combat Skills:\n");
+		//displays available skills for player
+		for (CombatSkill skills : character.getSkills()) {
+			View.printColored("- " + skills.getName(), "blue", true);
+		}
+
+		View.println("\nChoose basic attack or skill, or cancel to return.");
+	}
 	public static void printCombatantDeath(Combatant combatant) 
 	{
 		/* Prints out a message indicating that a combatant has died */
@@ -144,10 +167,11 @@ public class BattleView
 		String characterName = "[" + combatant.getName() + "]";
 		
 		View.separate(3);
-		
+
 		View.println("Type \"help\" to view all of the game's commands");
 		View.printColored("It's ", "cyan", false);
 		View.print(characterName + "'s ");
-		View.printColored("turn to act. Enter a command: ",  "cyan", false);
+		View.printColored("turn to act. Fight or Use Item ",  "cyan", false);
+		View.printColored("\nTo target a specific enemy, use \"target [slot #]\".","cyan", true);
 	}
 }

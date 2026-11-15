@@ -33,14 +33,13 @@ public class Player extends Character
 	
 	private float currentEncounterChance; // Current encounter chance for monsters, which increases after each move
 	private int movesSinceLastEncounter; // Keeps track of the number of moves since the last monster encounter
-
+	private String startingClass;
 	/* Constructors */
 	/*
 	11.10.26
 	Angel
 	Adding new constructor to accept player name and starting class.
 	 */
-
 	public Player(String name, StartingClass startingClass, Room startingRoom){
 		super(
 				name, //name
@@ -51,18 +50,19 @@ public class Player extends Character
 				1, //currentLevel
 
 				0, //currentXP
-				100, //currentMana
+				30 + (2 * startingClass.getBaseINT()), //currentMana
 				startingClass.getBaseMaxHP(), //baseMaxHP
 				startingClass.getBaseSTR(), //strength
 				startingClass.getBaseINT(), //intelligence
 				startingClass.getBaseDEX(), //dexterity
 				startingClass.getBaseARC(),  //arcane
 				startingClass.getBaseEND(), //endurance
-				new ArrayList<>() //combatSkills
+				startingClass.getCombatSkill() //combatSkills
 		);
 		this.currentRoom = startingRoom;
         this.inventory = new Inventory();
 		this.examinedMonster = null;
+		this.startingClass = startingClass.getName();
 		this.playerParty = new Party(this);
 
 		//Create Finite State Machine for Player
@@ -161,6 +161,7 @@ public class Player extends Character
 	public Room getCurrentRoom() { return this.currentRoom; }
 	public Puzzle getCurrentPuzzle() { return this.currentRoom.getPuzzle(); }
 	public Monster getExaminedMonster() { return this.examinedMonster; }
+	public String getStartingClass(){return this.startingClass; }
 	public Party getPlayerParty() { return this.playerParty; }
 
 //	public Item getItemFromInventoryByName(String itemName)
@@ -178,7 +179,8 @@ public class Player extends Character
     public Item getItemFromInventoryByName(String itemName) {
         return this.inventory.findItem(itemName);
     }
-	
+
+
 	// Setters //
 	public void setCurrentState(String newState) { this.stateMachine.setCurrentState(newState); }
 	public void setExaminedMonster(Monster monster) { this.examinedMonster = monster; }
@@ -255,7 +257,7 @@ public class Player extends Character
 		boolean wasVisited = this.currentRoom.getWasVisited();
 		
 		View.println("Current Room: " + roomName);
-		View.println("Description: " + roomDesc);
+		View.println("Description: " + View.wrapText(roomDesc,65));
 		
 		if (wasVisited)
 			View.println("You've been here before...");
@@ -719,5 +721,6 @@ public class Player extends Character
     public Inventory getInventory() {
         return this.inventory;
     }
+
 }
 

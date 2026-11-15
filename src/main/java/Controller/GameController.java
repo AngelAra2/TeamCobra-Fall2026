@@ -2,19 +2,17 @@ package Controller;
 
 import java.util.*;
 
-import Model.Combat.StartingClass;
+import Model.AbstractClasses.Character;
+import Model.Combat.*;
 import Model.Data.DataExtractionMethods;
 import Model.Data.DataFileExtraction;
 import Model.Processors.*;
 import Model.Util.Wait;
-
 import Model.AbstractClasses.Combatant;
 import Model.Combat.*;
-
 import Model.Combat.Battlefield;
 import Model.Combat.Monster;
 import Model.Combat.Player;
-
 import Model.Exploration.Map;
 import Model.Exploration.Puzzle;
 import Model.Exploration.Room;
@@ -140,6 +138,7 @@ public class GameController
 			/* Player's party's turn */
 			List<Companion> activeCompanions = player.getPlayerParty().getActiveCompanions();
 			int totalPartyMembers = 1 + activeCompanions.size(); // 1 for the player + number of active companions
+
 			
 			// Player's turn first //
 			// Do a for loop to iterate through the player's party members, starting with the player and then each active companion
@@ -151,8 +150,9 @@ public class GameController
 				
 				View.separate(3);
 				
-				Combatant combatant;
-				
+				//Combatant combatant;
+
+				Character combatant;
 				// If i == 0, it's the player's turn
 				if (i == 0)
 					combatant = player;
@@ -186,16 +186,81 @@ public class GameController
 				/* Update game state based on combat command */
 				switch (cmdType)
 				{
-					// The user wants to attack their currently targeted monster
-					case "attack":
+					case "fight":
+
 						View.separate(3);
-						View.println("Launching attack...");
+						//prints available attacks / combat skills to player.
+						BattleView.printFightMenu(combatant);
+
+						//store user's fight command and its commandType
+						String fightCmd = "";
+						String fightCmdType = "";
+
+						//validates users command
+						do{
+							//processes users input
+							fightCmd = combatCmdProcessor.getUserInput();
+							combatCmdProcessor.processFightCmd(fightCmd, combatant.getSkills());
+
+							//retrieves command type from processor
+							//EX: basicAttack, combatSkill, cancel, or invalid
+							fightCmdType = combatCmdProcessor.getCommandType();
+
+							//if cmd does not match any valid cmd, disp error.
+							if(combatCmdProcessor.getCommandType().equals("invalid")){
+								View.println("Invalid fight command.");
+							}
+						}
+						while(combatCmdProcessor.getCommandType().equals("invalid"));
+
+						//perform basic attack
+						if(fightCmdType.equals("basicAttack"))
+						{
+							View.separate(3);
+							View.println("Launching attack...");
+							Wait.yield(1f);
+							Battlefield.performAttack(combatant, Battlefield.getTargetMonster());
+							break;
+						}
+
+						//validate and perform combatSkill
+						else if(fightCmdType.equals("combatSkill"))
+						{
+							//retrieve skill name
+							processedCmd = combatCmdProcessor.getProcessedCommand(); //receives combat skill name
+
+							//find object for skill
+							CombatSkill skill = combatant.getSkillByName(processedCmd); //receive skill
+
+							View.separate(3);
+							View.println("Launching attack...");
+							Wait.yield(1f);
+							//attempts to execute skill against target.
+							//battlefield handles skill validation, mana requirements, targeting, damage, and healing
+							Battlefield.performSkillAttack(combatant, skill, Battlefield.getTargetMonster(), player.getInventory()); //WIP
+						}
+
+						//return to main combat menu
+						else if (fightCmdType.equals("cancel"))
+						{
+							cmdType = "cancel";
+							break;
+						}
+
 						Wait.yield(1f);
 
-						Battlefield.performAttack(combatant, Battlefield.getTargetMonster());
-					
 						break;
-				
+
+//					// The user wants to attack their currently targeted monster
+//					case "attack":
+//						View.separate(3);
+//						View.println("Launching attack...");
+//						Wait.yield(1f);
+//
+//						Battlefield.performAttack(combatant, Battlefield.getTargetMonster());
+//
+//						break;
+//
 					// The user wants to switch their target to a different monster
 					case "target":
 						View.separate(3);
@@ -206,7 +271,17 @@ public class GameController
 						player.switchMonsterTarget(userCmd);
 						
 						break;
-					
+
+					// The user wants to use a healing item from their inventory
+					case "use item":
+						View.separate(3);
+						View.println("Attempting to heal...");
+						Wait.yield(1f);
+
+						// Pass in userCmd so that the player can parse it to get the item name
+						player.handleItemInteraction(userCmd);
+
+						break;
 					// The user wants to use a healing item from their inventory
 //					case "heal":
 //						View.separate(3);
@@ -231,13 +306,13 @@ public class GameController
 						View.println("Command not recognized. Type \"help\" to view the game's commands");
 						
 						// Skip the monsters' turn and continue to the next iteration of the combat loop
-						continue;
+						break;
 				}
 				
 				// Skip the monsters' turns if specific commands were used
 				switch (cmdType)
 				{
-					case "help", "target", "":
+					case "help", "target", "", "invalid", "cancel":
 						i--; // Decrement i to keep because it's still the same combatant's turn
 						continue;
 					default:
@@ -300,6 +375,13 @@ public class GameController
 					if (target != null)
 						Battlefield.performAttack(monster, target);
 				}
+			}
+
+			//update party buffs after the combat round.
+			player.decreaseBuffDuration();
+
+			for (Companion companion : player.getPlayerParty().getActiveCompanions()){
+				companion.decreaseBuffDuration();
 			}
 		}
 		
@@ -526,11 +608,16 @@ public class GameController
 					player.printCurrentRoomDetails();
 					break;
 
+				//displays player's status
+				case "player status":
+					View.printPlayerStatus(player);
+					break;
+
 				// The user would like to view the party's status
 				case "status":
 					player.viewPartyStatus();
 					break;
-			
+
 				// The user would like to view the game's commands
                 case "solve":
                     Puzzle puzzle = player.getCurrentPuzzle();
@@ -546,7 +633,7 @@ public class GameController
 				case "help":
 					View.printCommands();
 					break;
-					
+
 				// The user would like to quit the game
 				case "quit":
 					isGameRunning = false;
@@ -689,7 +776,7 @@ public class GameController
 					startingClass.getBaseINT(),
 					startingClass.getBaseARC(),
 					startingClass.getBaseEND(),
-					startingClass.getCombatAbility(),
+					startingClass.getCombatSkill(),
 					startingClass.getDefaultEquipment());
 
 
