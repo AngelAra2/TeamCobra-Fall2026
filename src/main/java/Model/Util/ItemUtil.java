@@ -41,7 +41,7 @@ public class ItemUtil {
             return new Weapon(item.getItemId(), item.getItemName(), item.getItemDescription(), item.getWeight(), item.getValue(),
                     weapon.getSlot(), weapon.getPhysicalDamage(), weapon.getMagicDamage(), weapon.getPhysicalDefense(),
                     weapon.getMagicDefense(), weapon.getStrengthScaling(), weapon.getDexterityScaling(),
-                    weapon.getIntelligenceScaling(), weapon.getArcaneScaling(), weapon.getSpecialEffect());
+                    weapon.getIntelligenceScaling(), weapon.getArcaneScaling(), weapon.getSpecialEffect(), weapon.getWeaponType());
         }
 
 // Copy armor or a shield.

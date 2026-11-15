@@ -172,5 +172,6 @@ public class BattleView
 		View.printColored("It's ", "cyan", false);
 		View.print(characterName + "'s ");
 		View.printColored("turn to act. Fight or Use Item ",  "cyan", false);
+		View.printColored("\nTo target a specific enemy, use \"target [slot #]\".","cyan", true);
 	}
 }

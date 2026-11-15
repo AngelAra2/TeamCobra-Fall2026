@@ -289,7 +289,7 @@ public static void extractWeaponData(Scanner fileScanner, Map worldMap) {
                     Double.parseDouble(a[3]), Integer.parseInt(a[4]),
                     a[5], Integer.parseInt(a[6]), Integer.parseInt(a[7]),
                     Integer.parseInt(a[8]), Integer.parseInt(a[9]),
-                    a[10], a[11], a[12], a[13], a[14]
+                    a[10], a[11], a[12], a[13], a[14],a[16]
             );
 
             worldMap.addItemTemplate(item);

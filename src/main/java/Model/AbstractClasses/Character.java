@@ -21,6 +21,8 @@ public abstract class Character extends Combatant
 	//protected Weapon equippedWeapon;
 	protected List<CombatSkill> skills;
     protected EquipmentLoadout equipmentLoadout;
+	private double physicalDamageBonus = 0.0;
+	private int physicalDamageBonusTurns = 0;
 
 	/* Constructors */
 	public Character(
@@ -86,6 +88,10 @@ public abstract class Character extends Combatant
 	public int getArcane() {return arcane;}
 
 	public List<CombatSkill> getSkills() {return skills;}
+
+	public double getPhysicalDamageBonus() {return physicalDamageBonus;}
+
+	public int getPhysicalDamageBonusTurns() {return physicalDamageBonusTurns;}
 
 	// Calculate maximum equipment load
     public double calculateEquipLoad() {
@@ -174,5 +180,27 @@ public abstract class Character extends Combatant
 		}
 
 		return null;
+	}
+
+	//applies temporary physical damage bonus to character
+	public void applyPhysicalDamageBuff(double bonus, int duration) {
+
+		//stores physical damage bonus applied to character.
+		physicalDamageBonus = bonus;
+
+		//set number of turns before buff expires.
+		physicalDamageBonusTurns = duration;
+	}
+
+	//Decreases remaining turns of an active damage buff.
+	public void decreaseBuffDuration() {
+		//reduce the remaining duration by one if buff is active
+		if (physicalDamageBonusTurns > 0) {
+			physicalDamageBonusTurns--;
+		}
+		//remove physical damage bonus.
+		if (physicalDamageBonusTurns == 0) {
+			physicalDamageBonus = 0.0;
+		}
 	}
 }

@@ -2,6 +2,10 @@ package Model.Combat;
 
 import Model.AbstractClasses.Character;
 import Model.AbstractClasses.Combatant;
+import Model.Items.EquipmentItem;
+import Model.Items.EquipmentLoadout;
+import Model.Items.Inventory;
+import Model.Items.Weapon;
 
 import java.util.ArrayList;
 
@@ -114,6 +118,7 @@ public class CombatSkill
 	public int getRequiredWeaponID() {
 		return requiredWeaponID;
 	}
+	public ArrayList<String> getRequiredCharacters() {return requiredCharacters;}
 
 	// Setters //
 
@@ -122,16 +127,135 @@ public class CombatSkill
 	// (Modified by Angel)
 	public boolean canUse(Character user)
 	{
+
+		if (user == null || !user.isAlive()) {
+			return false;
+		}
+
+		if (user.getCurrentMana() < manaCost) {
+			return false;
+		}
 		String characterName;
 
-//		if(user instanceof Player){
-//			Player player = (Player) user;
-//			characterName = player.getStartingClass();
-//		}
-//		else if(user instanceof Companion){
-//			Companion companion = (Companion) user;
-//			character
-//		}
+		//gets starting class name, or companion name to check skil eligibility.
+		if(user instanceof Player){
+			Player player = (Player) user;
+			characterName = player.getStartingClass();
+		}
+		else if(user instanceof Companion){
+			characterName = user.getName();
+		}
+		else{
+			return false;
+		}
+		//checks character eligibility.
+		boolean allowedCharacter = false;
+
+		if (requiredCharacters == null){
+			return false;
+		}
+
+		for (String required : requiredCharacters){
+			//change allowed character to true if characterName matches required name or skill can be used by anyone
+			if(required.equalsIgnoreCase("ANY") || required.equalsIgnoreCase(characterName)){
+				allowedCharacter = true;
+				break;
+			}
+		}
+		//makes sure character has equipment loadout.
+		if(user.getEquipmentLoadout() == null){
+			return false;
+		}
+
+
+		//The Shaman can use it with any staff, other characters need caduceus staff is equipped
+		if (this.id == 11){
+			EquipmentItem offHand = user.getEquipmentLoadout().getEquippedItem(EquipmentItem.OFF_HAND);
+
+			if (offHand != null && offHand.getItemId() == 12){
+				allowedCharacter = true;
+			}
+		}
+
+		if (!allowedCharacter){
+			return false;
+		}
+
+		// Check if the character has learned or unlocked the skill.
+		boolean hasSkill = false;
+
+		if (user.getSkills() != null) {
+			for (CombatSkill skill : user.getSkills()) {
+				if (skill.getId() == this.id) {
+					hasSkill = true;
+					break;
+				}
+			}
+		}
+
+		// returns true if required weapon type is none.
+		if (requiredWeaponType.equalsIgnoreCase("NONE")) {
+			return hasSkill;
+		}
+
+		String slot;
+
+		if (requiredWeaponSlot.equalsIgnoreCase("Main Hand")){
+			slot = EquipmentItem.MAIN_HAND;
+		}
+		else if (requiredWeaponSlot.equalsIgnoreCase("Off Hand")){
+			slot = EquipmentItem.OFF_HAND;
+		}
+		else {
+			return false;
+		}
+
+		//Gets equipped item in required slot.
+		EquipmentItem equippedItem = user.getEquipmentLoadout().getEquippedItem(slot);
+
+
+		if (!(equippedItem instanceof Weapon)){
+			return false;
+		}
+		Weapon weapon = (Weapon) equippedItem;
+
+
+		// Certain skills require a particular weapon.
+		// Serpent Call is an exception because the Shaman
+		// can cast it with a normal staff.
+		if (requiredWeaponID != -1 && this.id != 11 &&
+				weapon.getItemId() != requiredWeaponID) {
+			return false;
+		}
+
+		String equippedType = weapon.getWeaponType();
+
+
+		if (requiredWeaponType.equalsIgnoreCase("Melee")){
+			//Spears count as melee weapons
+			if(!equippedType.equalsIgnoreCase("Melee") && !equippedType.equalsIgnoreCase("Spear")){
+				return false;
+			}
+		}
+		else if (!requiredWeaponType.equalsIgnoreCase(equippedType)){
+			return false;
+		}
+
+
+		boolean weaponUnlocked = requiredWeaponID != -1
+				&& weapon.getItemId() == requiredWeaponID;
+
+		return hasSkill || weaponUnlocked;
+	}
+
+	public boolean hasEnoughAmmunition(Inventory inventory){
+		if (ammunitionCost <= 0){
+			return true;
+		}
+
+		if(inventory != null && inventory.getQuantity("Wooden Arrow") >= ammunitionCost){
+			return true;
+		}
 
 		return false;
 	}

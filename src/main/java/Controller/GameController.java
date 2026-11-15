@@ -192,6 +192,7 @@ public class GameController
 						//prints available attacks / combat skills to player.
 						BattleView.printFightMenu(combatant);
 
+						//store user's fight command and its commandType
 						String fightCmd = "";
 						String fightCmdType = "";
 
@@ -201,6 +202,8 @@ public class GameController
 							fightCmd = combatCmdProcessor.getUserInput();
 							combatCmdProcessor.processFightCmd(fightCmd, combatant.getSkills());
 
+							//retrieves command type from processor
+							//EX: basicAttack, combatSkill, cancel, or invalid
 							fightCmdType = combatCmdProcessor.getCommandType();
 
 							//if cmd does not match any valid cmd, disp error.
@@ -223,18 +226,27 @@ public class GameController
 						//validate and perform combatSkill
 						else if(fightCmdType.equals("combatSkill"))
 						{
+							//retrieve skill name
 							processedCmd = combatCmdProcessor.getProcessedCommand(); //receives combat skill name
+
+							//find object for skill
 							CombatSkill skill = combatant.getSkillByName(processedCmd); //receive skill
 
-							Battlefield.performSkillAttack(player, skill, Battlefield.getTargetMonster()); //WIP
+							View.separate(3);
+							View.println("Launching attack...");
+							Wait.yield(1f);
+							//attempts to execute skill against target.
+							//battlefield handles skill validation, mana requirements, targeting, damage, and healing
+							Battlefield.performSkillAttack(combatant, skill, Battlefield.getTargetMonster(), player.getInventory()); //WIP
 						}
 
 						//return to main combat menu
 						else if (fightCmdType.equals("cancel"))
 						{
-							return;
+							cmdType = "cancel";
+							break;
 						}
-						//View.println("Attacking monster...");
+
 						Wait.yield(1f);
 
 						break;
@@ -294,13 +306,13 @@ public class GameController
 						View.println("Command not recognized. Type \"help\" to view the game's commands");
 						
 						// Skip the monsters' turn and continue to the next iteration of the combat loop
-						continue;
+						break;
 				}
 				
 				// Skip the monsters' turns if specific commands were used
 				switch (cmdType)
 				{
-					case "help", "target", "":
+					case "help", "target", "", "invalid", "cancel":
 						i--; // Decrement i to keep because it's still the same combatant's turn
 						continue;
 					default:
@@ -363,6 +375,13 @@ public class GameController
 					if (target != null)
 						Battlefield.performAttack(monster, target);
 				}
+			}
+
+			//update party buffs after the combat round.
+			player.decreaseBuffDuration();
+
+			for (Companion companion : player.getPlayerParty().getActiveCompanions()){
+				companion.decreaseBuffDuration();
 			}
 		}
 		
