@@ -2,13 +2,70 @@ package View;
 
 import java.util.*;
 
+import Model.AbstractClasses.Item;
 import Model.Combat.Companion;
+import Model.Exploration.Room;
 
 public class ExplorationView 
 {
 	/* Data Fields */
 	
 	/* Methods */
+	public static void printRoomInfo(Room currentRoom)
+	{
+		/* Prints out the current room's name and description */
+		/* Print out details about the current room */
+		String roomName = "[" + currentRoom.getRoomName() + "]";
+		String roomDesc = currentRoom.getRoomDescription();
+		boolean wasVisited = currentRoom.getWasVisited();
+		
+		View.println("Current room: " + roomName);
+		View.println(View.wrapText(roomDesc, 65));
+		
+		if (wasVisited)
+			View.println("You've been here before...");
+	}
+	
+	public static void printPuzzleInRoom(Room currentRoom)
+	{
+		/* Prints out the current room's puzzle if it exists */
+		if (currentRoom.getPuzzle() != null)
+		{
+			View.println("Puzzle in this room:");
+			View.printlnObject(currentRoom.getPuzzle());
+		}
+		
+		else
+			View.println("No puzzle in this room");
+	}
+
+	public static void printItemsInRoom(HashMap<String, ArrayList<Item>> itemsInRoom)
+	{
+		/* Prints out all items in the current room */
+		int numItems = 0;
+		
+		for (ArrayList<Item> itemList: itemsInRoom.values())
+			numItems += itemList.size();
+		
+		if (numItems > 0)
+		{
+			View.println("Items in this room:");
+			
+			for (Map.Entry<String, ArrayList<Item>> entry: itemsInRoom.entrySet())
+			{
+				String itemType = entry.getKey();
+				ArrayList<Item> itemList = entry.getValue();
+				
+				// Print out each item's quantity
+				for (Item item: itemList)
+					View.println("> " + item.getItemName() + " (x" + itemList.size() + ")");
+			}
+		}
+		
+		else
+			View.println("No items in this room");
+	}
+	
 	public static void printCompanionsInRoom(ArrayList<Companion> companionsInRoom)
 	{
 		/* Prints out the number of companions in the current room */
@@ -43,7 +100,7 @@ public class ExplorationView
 				if (exitRoomId <= 0)
 					continue;
 				
-				View.println("- " + exitDirection);
+				View.println("> " + exitDirection);
 			}
 		}
 		
