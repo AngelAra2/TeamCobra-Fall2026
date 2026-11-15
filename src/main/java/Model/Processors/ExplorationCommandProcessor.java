@@ -33,6 +33,8 @@ public class ExplorationCommandProcessor extends CommandProcessor
 		 * 
 		 * -- NPC Interaction --
 		 * a. "recruit [companion name]" -> recruits a companion to the player's party if the companion is in the current room
+		 * b. "add [companion name]" -> recruits a companion to the player's party and marks them as active
+		 * c. "remove [companion name]" -> removes a companion from the player's party and marks them as inactive
 		 * 
 		 * -- Monster Interaction --
 		 * a. "examine [monster name]" -> prints the monster's details to the console
@@ -144,14 +146,14 @@ public class ExplorationCommandProcessor extends CommandProcessor
 			
 			// Check if the command is one of the monster interaction commands
 			if (cmd.startsWith("recruit")) { cmd = "recruit"; }
-			//else if (cmd.startsWith("attack")) { cmd = "attack"; }
-			//else if (cmd.startsWith("ignore")) { cmd = "ignore"; }
+			else if (cmd.startsWith("add")) { cmd = "add"; }
+			else if (cmd.startsWith("remove")) { cmd = "remove"; }
 			
 			switch (cmd)
 			{
 				// For these commands, the player will take care of the logic for them, 
 				// but the CommandProcessor will process them as "targetNPC" commands
-				case "recruit", "talk":
+				case "recruit", "add", "remove", "talk":
 					this.processedCmd = "targetNPC";
 					break;
 				//-----------------------------//

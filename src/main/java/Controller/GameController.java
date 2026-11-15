@@ -423,8 +423,8 @@ public class GameController
 		// Make the player exit combat state
 		player.resetToDefaultState();
 		
-		// Check whether the player has won or lost the battle
-		if (player.isAlive())
+		// Check whether the player's party has survived the battle
+		if (!player.getPlayerParty().isPartyDefeated())
 			View.printColored("Victory! All monsters downed", "green", true);
 	}
 	
@@ -547,44 +547,6 @@ public class GameController
 				// Let the player handle the logic for this command
 				// Pass in userCmd so that the player can parse it to get the monster name
 				player.handleMonsterInteraction(userCmd);
-
-				// If the player has examined a monster, give them the option to attack or ignore it
-				Monster examinedMonster = player.getExaminedMonster();
-				
-				Wait.yield(1f);
-				
-				if (examinedMonster != null)
-				{
-					View.separate(3);
-					View.println("What now: \"attack\" or \"ignore\" " + examinedMonster.getName() + "?");						
-
-					// Continuously prompt the player to attack or ignore the monster until they do so
-					while (true)
-					{
-						View.println("");
-						View.printColored("Enter a command: ", "cyan", false);
-
-						String subUserCmd = basicCmdProcessor.getUserInput();
-						
-						View.separate(3);
-						View.println("...");
-						View.println("");
-						Wait.yield(1f);
-
-						if (subUserCmd.equals("attack") || subUserCmd.equals("ignore"))
-						{
-							// Pass in userCmd as arbitrary input, the handler will do the rest
-							player.handleMonsterInteraction(subUserCmd);
-							break;
-						}
-						else
-							View.println("Command not recognized. Choose to either \"attack\" or \"ignore\"");
-					}
-				}
-				
-				// Not currently examining a monster in the current room
-				else
-					View.println("Examine a monster first before taking action on it");
 			}
 		}
 		
