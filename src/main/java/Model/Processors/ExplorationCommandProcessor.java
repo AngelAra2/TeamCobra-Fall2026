@@ -164,7 +164,26 @@ public class ExplorationCommandProcessor extends CommandProcessor
 		// Return because a valid NPC interaction command was detected
 		if (this.cmdType.equals("npc"))
 			return;
-		
+        // Detect and process merchant commands
+        if (!this.cmdType.equals("merchant"))
+        {
+            this.cmdType = "merchant";
+
+            if (cmd.equals("shop") || cmd.startsWith("shop "))
+                this.processedCmd = "shop";
+            else if (cmd.equals("buy") || cmd.startsWith("buy "))
+                this.processedCmd = "buy";
+            else if (cmd.equals("sell") || cmd.startsWith("sell "))
+                this.processedCmd = "sell";
+            else if (cmd.equals("cancel"))
+                this.processedCmd = "cancel";
+            else
+                this.reset();
+        }
+
+        if (this.cmdType.equals("merchant"))
+            return;
+
 		// Detect and process monster interaction commands //
 		if (!this.cmdType.equals("monster"))
 		{

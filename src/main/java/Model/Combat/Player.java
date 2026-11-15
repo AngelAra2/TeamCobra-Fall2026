@@ -50,7 +50,7 @@ public class Player extends Character
 				startingClass.getBaseMaxHP(), //max HP
 				0, //physicalDEF
 				0, //magicDEF
-				40, //attack
+				500, //attack IS 40 CHANGE BACK WHEN DONE
 				1, //currentLevel
 
 				0, //currentXP
@@ -280,6 +280,13 @@ public class Player extends Character
 		
 		// Print out NPCs/NPC companions in the current room //
 		ExplorationView.printCompanionsInRoom(currentRoom.getCompanions());
+        View.println("");
+
+        ExplorationView.printMerchantsInRoom(currentRoom);
+        View.println("");
+
+        ExplorationView.printPuzzleInRoom(currentRoom);
+        View.println("");
 	}
 	
 	public void viewInventory()

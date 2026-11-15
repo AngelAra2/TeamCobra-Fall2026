@@ -5,6 +5,8 @@ import java.util.*;
 import Model.AbstractClasses.Item;
 import Model.Combat.Companion;
 import Model.Exploration.Room;
+import Model.Exploration.Puzzle;
+import Model.Exploration.Merchant;
 
 public class ExplorationView 
 {
@@ -25,19 +27,21 @@ public class ExplorationView
 		if (wasVisited)
 			View.println("You've been here before...");
 	}
-	
-	public static void printPuzzleInRoom(Room currentRoom)
-	{
-		/* Prints out the current room's puzzle if it exists */
-		if (currentRoom.getPuzzle() != null)
-		{
-			View.println("Puzzle in this room:");
-			View.printlnObject(currentRoom.getPuzzle());
-		}
-		
-		else
-			View.println("No puzzle in this room");
-	}
+
+    public static void printPuzzleInRoom(Room currentRoom) // Not using the toString here because I
+                                                           // want it to print everything BUT the puzzle description.
+    {
+        if (currentRoom.getPuzzle() != null)
+        {
+            Puzzle puzzle = currentRoom.getPuzzle();
+            View.println("Puzzle in this room:");
+            View.println("[" + puzzle.getPuzzleName() + "] | "
+                    + puzzle.getRemainingAttempts() + "/"
+                    + puzzle.getMaxAttempts() + " attempt(s) remaining");
+        }
+        else
+            View.println("No puzzle in this room");
+    }
 
 	public static void printItemsInRoom(HashMap<String, ArrayList<Item>> itemsInRoom)
 	{
@@ -107,5 +111,19 @@ public class ExplorationView
 		else
 			View.println("No available exits in this room");
 	}
+
+    // Lists merchants in the room, or reports when there are none.
+    public static void printMerchantsInRoom(Room room)
+    {
+        if (room.getMerchants().isEmpty())
+        {
+            View.println("No merchant in this room.");
+            return;
+        }
+
+        View.println("Merchants in this room:");
+        for (Merchant merchant : room.getMerchants())
+            View.println("> " + merchant.getName());
+    }
 }
 
