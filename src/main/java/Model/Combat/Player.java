@@ -32,7 +32,7 @@ public class Player extends Character
 	
 	private float currentEncounterChance; // Current encounter chance for monsters, which increases after each move
 	private int movesSinceLastEncounter; // Keeps track of the number of moves since the last monster encounter
-
+	private String startingClass;
 	/* Constructors */
 	/*
 	11.10.26
@@ -49,7 +49,7 @@ public class Player extends Character
 				1, //currentLevel
 
 				0, //currentXP
-				100, //currentMana
+				30 + (2 * startingClass.getBaseINT()), //currentMana
 				startingClass.getBaseMaxHP(), //baseMaxHP
 				startingClass.getBaseSTR(), //strength
 				startingClass.getBaseINT(), //intelligence
@@ -62,6 +62,7 @@ public class Player extends Character
 		//this.inventory = new HashMap<>();
         this.inventory = new Inventory();
 		this.examinedMonster = null;
+		this.startingClass = startingClass.getName();
 
 		//Create Finite State Machine for Player
 		DataFileExtraction.extractStatesDataToCombatant(DataExtractionMethods::extractFiniteStatesData, STATES_FILE_PATH, this);
@@ -159,7 +160,7 @@ public class Player extends Character
 	public Room getCurrentRoom() { return this.currentRoom; }
 	public Puzzle getCurrentPuzzle() { return this.currentRoom.getPuzzle(); }
 	public Monster getExaminedMonster() { return this.examinedMonster; }
-
+	public String getStartingClass(){return this.startingClass; }
 //	public Item getItemFromInventoryByName(String itemName)
 //	{
 //		// Check if the inventory contains this item name
@@ -175,7 +176,8 @@ public class Player extends Character
     public Item getItemFromInventoryByName(String itemName) {
         return this.inventory.findItem(itemName);
     }
-	
+
+
 	// Setters //
 	public void setCurrentState(String newState) { this.stateMachine.setCurrentState(newState); }
 	public void setExaminedMonster(Monster monster) { this.examinedMonster = monster; }
@@ -266,7 +268,7 @@ public class Player extends Character
 		boolean wasVisited = this.currentRoom.getWasVisited();
 		
 		View.println("Current Room: " + roomName);
-		View.println("Description: " + roomDesc);
+		View.println("Description: " + View.wrapText(roomDesc,65));
 		
 		if (wasVisited)
 			View.println("You've been here before...");
@@ -695,5 +697,16 @@ public class Player extends Character
     public Inventory getInventory() {
         return this.inventory;
     }
+
+	//receives combat skill name, and returns combat skill from Players ArrayList of combat skills
+	public CombatSkill getSkillByName(String name){
+		for (CombatSkill skill : skills){
+			if(skill.getName().equals(name)){
+				return skill;
+			}
+		}
+
+		return null;
+	}
 }
 

@@ -3,6 +3,7 @@ package Model.Combat;
 import java.util.*;
 
 import Model.AbstractClasses.Combatant;
+import Model.AbstractClasses.Character;
 import View.*;
 
 public class Battlefield 
@@ -42,7 +43,7 @@ public class Battlefield
 			Battlefield.monsters.remove(monster);
 	}
 	
-	public static void performAttack(Combatant attacker, Combatant receiver) 
+	public static void performAttack(Combatant attacker, Combatant receiver)
 	{
 		// If receiver is dead, they cannot be attacked
 		if (!receiver.isAlive())
@@ -104,5 +105,18 @@ public class Battlefield
 		Battlefield.playerCombatant = null;	
 		Battlefield.monsters.clear();
 	}
+	//WIP
+	public static void performSkillAttack(Character attacker,CombatSkill skill, Combatant receiver){
+
+		if(attacker.getCurrentMana() < skill.getManaCost()){
+			View.println("You do not have enough mana to use " + skill.getName());
+			return;
+		}
+
+		attacker.spendMana(skill.getManaCost());
+
+
+	}
+
 }
 

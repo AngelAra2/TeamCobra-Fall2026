@@ -28,7 +28,7 @@ public class CombatSkill
 	private String effectType; //string used to determine how effect will be applied to combatant
 	private double effectValue;
 	private int effectDuration; //turns effect is active
-	private double effectChance; //chance of effect occuring
+	private double effectChance; //chance of effect occurring
 	private boolean ignoresDefense; //some skills ignore phys and magic defense, if true, ignore defense stats
 	private int ammunitionCost; //used for skills that require arrows
 	private int flatHolyDamage; //only used for 1 skill - "Great Serpent Hunt"
@@ -77,13 +77,62 @@ public class CombatSkill
 
 	public int getId() {return id;}
 
+	public int getManaCost() {return manaCost;}
+
+	public String getTargetType() { return targetType; }
+
+	public String getEffectType() { return effectType; }
+
+	public int getPhysicalDamage() { return physicalDamage; }
+
+	public int getMagicDamage() { return magicDamage; }
+
+	public int getHitCount() { return hitCount; }
+
+	public int getEffectDuration() { return effectDuration; }
+
+	public int getAmmunitionCost() { return ammunitionCost; }
+
+	public int getFlatHolyDamage() { return flatHolyDamage; }
+
+	public double getDamageMultiplier() { return damageMultiplier; }
+
+	public double getEffectValue() { return effectValue; }
+
+	public double getEffectChance() { return effectChance; }
+
+	public boolean ignoresDefense() { return ignoresDefense; }
+
+	public String getRequiredWeaponType() {
+		return requiredWeaponType;
+	}
+
+	public String getRequiredWeaponSlot() {
+		return requiredWeaponSlot;
+	}
+
+	public int getRequiredWeaponID() {
+		return requiredWeaponID;
+	}
+
 	// Setters //
 
 	// Custom //
-	
-	// (WIP 10.29.2026)
+
+	// (Modified by Angel)
 	public boolean canUse(Character user)
 	{
+		String characterName;
+
+//		if(user instanceof Player){
+//			Player player = (Player) user;
+//			characterName = player.getStartingClass();
+//		}
+//		else if(user instanceof Companion){
+//			Companion companion = (Companion) user;
+//			character
+//		}
+
 		return false;
 	}
 	

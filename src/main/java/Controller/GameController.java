@@ -2,16 +2,12 @@ package Controller;
 
 import java.util.*;
 
-import Model.Combat.StartingClass;
+import Model.Combat.*;
 import Model.Data.DataExtractionMethods;
 import Model.Data.DataFileExtraction;
 import Model.Processors.*;
 import Model.Util.Wait;
 
-import Model.Combat.Battlefield;
-import Model.Combat.Monster;
-import Model.Combat.Player;
-import Model.Combat.StartingClass;
 import Model.Exploration.Map;
 import Model.Exploration.Puzzle;
 import Model.Exploration.Room;
@@ -122,9 +118,9 @@ public class GameController
 		
 		// Print out messages about the encounter
 		BattleView.printMonsterNames(Battlefield.getMonsters());
-		
+
 		Wait.yield(1.25f);
-		
+
 		View.println("");
 		View.printColored("!!! BATTLE START !!!", "red", true);
 
@@ -133,30 +129,73 @@ public class GameController
 		{
 			Wait.yield(1f);
 			View.separate(3);
-			
+
 			// Print battle statuses at the beginning of each iteration of the combat loop
 			Battlefield.displayBattleStatuses();
-			
+
 			/* Player's turn */
 			View.separate(3);
+			View.print("What will " + player.getName() + " do? Fight or Use Item\n");
 			View.println("Type \"help\" to view all of the game's commands");
-			View.printColored("Your turn. Enter a command: ", "cyan", false);
-			
+			View.printColored("Enter a command: ", "cyan", true);
+
 			// Get and process user input
 			userCmd = combatCmdProcessor.getUserInput();
 			combatCmdProcessor.setCurrentCommand(userCmd);
-			
+
 			// Get results
 			cmdType = combatCmdProcessor.getCommandType();
 			processedCmd = combatCmdProcessor.getProcessedCommand();
-			
+
 			/* Update game state based on combat command */
 			switch (cmdType)
 			{
 				// The user wants to attack
-				case "attack":
+				case "fight":
+
 					View.separate(3);
-					View.println("Attacking monster...");
+					//prints available attacks / combat skills to player.
+					BattleView.printFightMenu(player);
+
+					String fightCmd = "";
+					String fightCmdType = "";
+
+					//validates users command
+					do{
+						//processes users input
+						fightCmd = combatCmdProcessor.getUserInput();
+						combatCmdProcessor.processFightCmd(fightCmd, player.getSkills());
+
+						fightCmdType = combatCmdProcessor.getCommandType();
+
+						//if cmd does not match any valid cmd, disp error.
+						if(combatCmdProcessor.getCommandType().equals("invalid")){
+							View.println("Invalid fight command.");
+						}
+					}
+					while(combatCmdProcessor.getCommandType().equals("invalid"));
+
+					//perform basic attack
+					if(fightCmdType.equals("basicAttack"))
+					{
+						Battlefield.performAttack(player, Battlefield.getFirstAliveMonster());
+					}
+
+					//validate and perform combatSkill
+					else if(fightCmdType.equals("combatSkill"))
+					{
+						processedCmd = combatCmdProcessor.getProcessedCommand(); //receives combat skill name
+						CombatSkill skill = player.getSkillByName(processedCmd); //receive skill
+
+						Battlefield.performSkillAttack(player, skill, Battlefield.getFirstAliveMonster()); //WIP
+					}
+
+					//return to main combat menu
+					else if (fightCmdType.equals("cancel"))
+					{
+						return;
+					}
+					//View.println("Attacking monster...");
 					Wait.yield(1f);
 
 					Battlefield.performAttack(player, Battlefield.getFirstAliveMonster());
@@ -164,7 +203,7 @@ public class GameController
 					break;
 					
 				// The user wants to use a healing item from their inventory
-				case "heal":
+				case "use item":
 					View.separate(3);
 					View.println("Attempting to heal...");
 					Wait.yield(1f);

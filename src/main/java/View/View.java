@@ -162,8 +162,8 @@ public class View
 		println("------------[COMBAT COMMANDS]------------");
 		
 		println("");
-		println("\"attack\" --> attack the monster");
-		println("\"heal [item name]\" --> use a consumable item from your inventory to heal yourself");
+		println("\"Fight\" --> attack the monster");
+		println("\"Use Item\" --> use a consumable item from your inventory to heal yourself");
 	}
 
 	/*
