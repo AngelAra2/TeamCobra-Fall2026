@@ -1,7 +1,10 @@
 package View;
 
-import java.lang.reflect.Array;
+import Model.Combat.CombatSkill;
+import Model.Combat.Player;
 import java.util.ArrayList;
+import java.util.*;
+import Model.Exploration.Puzzle;
 
 public class View
 {
@@ -51,7 +54,6 @@ public class View
 			length += word.length();
 
 		}
-
 		return result.toString();
 	}
 	public static void printColored(String line, String color, boolean printOnNewLine) 
@@ -152,6 +154,7 @@ public class View
 		println("");
 		println("MISCELLANEOUS");
 		println("\"room\" or \"location\" --> view the current room's name and description");
+		println("\"player status\" --> view the player's status");
 		println("\"help\" --> view all the game's commands");
 		println("\"q\" or \"quit\" --> quit the game");
 		
@@ -159,8 +162,11 @@ public class View
 		println("------------[COMBAT COMMANDS]------------");
 		
 		println("");
-		println("\"attack\" --> attack the monster");
-		println("\"heal [item name]\" --> use a consumable item from your inventory to heal yourself");
+		println("\"Fight\" --> attack the monster");
+		println("\"Use Item\" --> use a consumable item from your inventory to heal yourself");
+		//println("\"attack\" --> attack the monster");
+		println("\"target [target number]\" --> switch to a different monster target in battle");
+		//println("\"heal [item name]\" --> use a consumable item from your inventory to heal yourself");
 	}
 
 	/*
@@ -169,7 +175,7 @@ public class View
 	 */
 	public static void printStartingClassStats(String background,
 											   int hp, int baseSTR, int baseDEX,
-											   int baseINT, int baseARC, int baseEND, ArrayList<String> combatAbilities,
+											   int baseINT, int baseARC, int baseEND, ArrayList<CombatSkill> skills,
 											   ArrayList<String> defaultEquipment){
 
 		View.println("Background: " + wrapText(background, 65));
@@ -182,8 +188,8 @@ public class View
 
 
 		View.println("\nCombat Abilities: ");
-		for (String ability : combatAbilities){
-			View.println("- " + ability);
+		for (CombatSkill skill : skills){
+			View.println("- " + skill.getName());
 		}
 
 		View.println("\nEquipment:");
@@ -192,5 +198,79 @@ public class View
 		}
 
 	}
+
+	//Angel
+	//Method is used to display player status
+	public static void printPlayerStatus(Player player){
+		printColored("============ PLAYER STATUS ============","blue", true );
+
+		println("Name: " + player.getName());
+		print("Level: " + player.getCurrentLevel());
+
+		println("\nHP: " + player.getCurrentHP() + "/" + player.getMaxHP());
+
+		println("Mana: " + player.getCurrentMana() + "/" + player.calculateMaxMana());
+
+		println("\nPhysical Defense: " + player.getPhysicalDEF());
+		println("Magic Defense: " + player.getMagicDEF());
+
+		println("\nSTR: " + player.getStrength());
+		println("DEX: " + player.getDexterity());
+		println("INT: " + player.getIntelligence());
+		println("ARC: " + player.getArcane());
+		println("END: " + player.getEndurance());
+
+		println("\nCombat Abilities:");
+
+		if(player.getSkills().isEmpty()){
+			println("- None Available");
+		} else{
+			for (CombatSkill skill : player.getSkills()){
+				println("- " + skill.getName());
+			}
+		}
+		printColored("\n=======================================","blue",true);
+
+
+	}
+
+	public static void printPuzzlePrompt(Puzzle puzzle) {
+		separate(3);
+		println("[" + puzzle.getPuzzleName() + "]");
+		println("Puzzle prompt: " + wrapText(puzzle.getPuzzleDescription(), 100));
+		println("");
+		printColored("Enter a solution: ", "cyan", false);
+	}
+
+	public static void printIncorrectFirstGuess() {
+		println("Incorrect solution, please enter a different guess.");
+	}
+
+	public static void printIncorrectSecondGuess() {
+		println("Incorrect solution, try again later.");
+	}
+
+	public static void printPuzzleSolved() {
+		printColored("Correct solution! You have solved the puzzle!", "green", true);
+	}
+
+	public static void printNoPuzzleInRoom() {
+		println("There is no puzzle in the current room to solve.");
+	}
+
+	public static void printPuzzleInputPrompt() {
+		printColored("Enter a solution: ", "cyan", false);
+	}
+
+	public static void printPuzzleHint(String hint) {
+		println("Hint: " + wrapText(hint, 100));
+	}
+
+	public static void printNoMorePuzzleHints() {
+		println("No more hints available for the current puzzle. Attempt to solve the puzzle");
+	}
 }
+
+
+
 

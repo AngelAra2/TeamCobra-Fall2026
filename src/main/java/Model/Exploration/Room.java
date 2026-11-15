@@ -4,11 +4,13 @@ import java.util.*;
 import Model.AbstractClasses.Item;
 import Model.Combat.Monster;
 import Model.Combat.Companion;
-import Model.Exploration.Merchant;
+import Model.Factories.MonsterFactory;
 
 public class Room 
 {
 	/* Data Fields */
+	private static final int MAX_MONSTERS_PER_ROOM = 3;
+	
 	private int roomId;
 	private String roomName;
 	private String roomDesc;
@@ -16,9 +18,11 @@ public class Room
 	private HashMap<String, Integer> exits;
 	private HashMap<String, ArrayList<Item>> items;
 	private HashMap<String, ArrayList<Monster>> monsters;
+	private List<Integer> spawnableMonsterIds;
 	private Puzzle puzzle;
     private ArrayList<Companion> companions;
     private ArrayList<Merchant> merchants;
+	private MonsterFactory monsterFactory;
 	
 	/* Constructors */
 	public Room(
@@ -35,9 +39,11 @@ public class Room
 		this.exits = exits;
 		this.items = new HashMap<>();
 		this.monsters = new HashMap<>();
+		this.spawnableMonsterIds = new ArrayList<>();
 		this.puzzle = null;
 		this.companions = new ArrayList<>();
 		this.merchants = new ArrayList<>();
+		this.monsterFactory = new MonsterFactory();
 	}
 	
 	/* Methods */
@@ -49,7 +55,8 @@ public class Room
 	public boolean getWasVisited() { return this.wasVisited; }
 	public HashMap<String, Integer> getExits() { return this.exits; }
 	public HashMap<String, ArrayList<Item>> getItems() { return this.items; }
-	public HashMap<String, ArrayList<Monster>> getMonsters() { return this.monsters; }	
+	public HashMap<String, ArrayList<Monster>> getMonsters() { return this.monsters; }
+	public List<Integer> getSpawnedMonsterIds() { return this.spawnableMonsterIds; }
 	public Puzzle getPuzzle() { return this.puzzle; }
 	public ArrayList<Companion> getCompanions() { return this.companions; }
 	public ArrayList<Merchant> getMerchants() { return this.merchants; }
@@ -84,6 +91,27 @@ public class Room
 				return monsterList.get(0);
 		}
 		
+		return null;
+	}
+	
+	public Object getNPCByName(String npcName)
+	{
+		/* Returns NPC of corresponding name */
+		
+		// Checks if the room contains at least one NPC of the corresponding
+		// name. If it exists, returns it
+		npcName = npcName.toLowerCase();
+		
+		// Check companions first
+		for (Companion companion: this.companions)
+			if (companion.getName().equalsIgnoreCase(npcName))
+				return companion;
+		
+		// Check merchants next
+		for (Merchant merchant: this.merchants)
+			if (merchant.getName().equalsIgnoreCase(npcName))
+				return merchant;
+
 		return null;
 	}
 	
@@ -212,10 +240,52 @@ public class Room
     public void addCompanion(Companion companion) {
         this.companions.add(companion);
     }
+    
+    public void removeCompanion(Companion companion) {
+		this.companions.remove(companion);
+	}
 
     public void addMerchant(Merchant merchant) {
         this.merchants.add(merchant);
     }
+
+	public void addSpawnableMonsterId(int monsterId)
+	{
+		/* Adds the monsterId to the list of spawned monster IDs if it doesn't already exist in the list */
+		if (!this.spawnableMonsterIds.contains(monsterId))
+			this.spawnableMonsterIds.add(monsterId);
+	}
+	
+	public void generateMonsters()
+	{
+		// Guard Clauses // 
+		// If there are no spawnable monster IDs, return
+		if (this.spawnableMonsterIds.size() <= 0)
+			return;
+		
+		// Generate a random number of monsters to spawn (between 1 and the number of spawnable monster IDs)
+		Random rng = new Random();
+		int numMonstersToSpawn = rng.nextInt(1, this.spawnableMonsterIds.size() + 1);
+		
+		// Spawn the monsters
+		for (int i = 0; i < numMonstersToSpawn; i++)
+		{
+			// Don't generate any more monsters if the room already has enough monsters
+			if (this.monsters.size() >= MAX_MONSTERS_PER_ROOM)
+				break;
+
+			// Randomly select a monster ID from the list of spawnable monster IDs
+			int randomIndex = rng.nextInt(0, this.spawnableMonsterIds.size());
+			int monsterId = this.spawnableMonsterIds.get(randomIndex);
+			
+			// Create a new Monster object using the MonsterFactory
+			Monster newMonster = this.monsterFactory.create(monsterId);
+			
+			// Add the new monster to the room
+			if (newMonster != null)
+				this.addMonster(newMonster.getName(), newMonster);
+		}
+	}
 	
 	// Overrides //
 	

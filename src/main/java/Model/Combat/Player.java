@@ -17,125 +17,123 @@ import View.*;
 public class Player extends Character
 {
 	/* Data Fields */
-	private static String statesFilePath = "/finiteStates/PlayerStates";
+	private static final String STATES_FILE_PATH = "/finiteStates/PlayerStates";
+	private static final String CONSTANTS_FILE_PATH = "/constants/PlayerConstants";
+	
+	// Private constants that cannot be modified
+	private float BASE_ENCOUNTER_CHANCE; // Base encounter chance for monsters
+	private float ENCOUNTER_CHANCE_INCREMENT; // Incremental increase in encounter chance after each move
+	private int ENCOUNTER_GRACE_MOVES; // Number of moves before monster encounters can occur again after a previous encounter
 	
 	private Room currentRoom;
 	//private HashMap<String, ArrayList<Item>> inventory;
     private Inventory inventory;
 	private Monster examinedMonster;
-
+	private Party playerParty;
+	
+	private float currentEncounterChance; // Current encounter chance for monsters, which increases after each move
+	private int movesSinceLastEncounter; // Keeps track of the number of moves since the last monster encounter
+	private String startingClass;
 	/* Constructors */
-	public Player(Room startingRoom)
-	{
-		super(
-			"Player", // name
-			100, // maxHP
-			0, // physicalDEF
-			0, // magicDEF
-			5, // attack
-			
-			1, // currentLevel
-			0, // currentXP
-			100, // currentMana
-			100, // baseMaxHP
-			10, // strength
-			10, // intelligence
-			10, // dexterity
-			10, // arcane
-			10, // endurance
-			new ArrayList<>() // CombatSkills
-		);
-		
-		this.currentRoom = startingRoom;
-		//this.inventory = new HashMap<>();
-        this.inventory = new Inventory();
-		this.examinedMonster = null;
-		
-		// Create Finite State Machine for Player
-		DataFileExtraction.extractStatesDataToCombatant(DataExtractionMethods::extractFiniteStatesData, statesFilePath, this);
-	}
-
 	/*
 	11.10.26
 	Angel
 	Adding new constructor to accept player name and starting class.
 	 */
-
 	public Player(String name, StartingClass startingClass, Room startingRoom){
 		super(
 				name, //name
 				startingClass.getBaseMaxHP(), //max HP
 				0, //physicalDEF
 				0, //magicDEF
-				5, //attack
+				80, //attack
 				1, //currentLevel
 
 				0, //currentXP
-				100, //currentMana
+				30 + (2 * startingClass.getBaseINT()), //currentMana
 				startingClass.getBaseMaxHP(), //baseMaxHP
 				startingClass.getBaseSTR(), //strength
 				startingClass.getBaseINT(), //intelligence
 				startingClass.getBaseDEX(), //dexterity
 				startingClass.getBaseARC(),  //arcane
 				startingClass.getBaseEND(), //endurance
-				new ArrayList<>() //combatSkills
+				startingClass.getCombatSkill() //combatSkills
 		);
 		this.currentRoom = startingRoom;
-		//this.inventory = new HashMap<>();
         this.inventory = new Inventory();
 		this.examinedMonster = null;
+		this.startingClass = startingClass.getName();
+		this.playerParty = new Party(this);
 
 		//Create Finite State Machine for Player
-		DataFileExtraction.extractStatesDataToCombatant(DataExtractionMethods::extractFiniteStatesData, statesFilePath, this);
+		DataFileExtraction.extractStatesDataToCombatant(DataExtractionMethods::extractFiniteStatesData, STATES_FILE_PATH, this);
+		
+		// Populate private constants from file
+		String[] constantsData = DataFileExtraction.extractConstantsData(DataExtractionMethods::extractPlayerConstants, CONSTANTS_FILE_PATH);
+		
+		try
+		{
+			this.BASE_ENCOUNTER_CHANCE = Float.parseFloat(constantsData[0]);
+			this.ENCOUNTER_CHANCE_INCREMENT = Float.parseFloat(constantsData[1]);
+			this.ENCOUNTER_GRACE_MOVES = Integer.parseInt(constantsData[2]);
+		}
+		catch (NullPointerException e)
+		{
+			e.printStackTrace();
+			this.BASE_ENCOUNTER_CHANCE = 0.33f;
+			this.ENCOUNTER_CHANCE_INCREMENT = 0.05f;
+			this.ENCOUNTER_GRACE_MOVES = 3;
+		}
+		catch (NumberFormatException e)
+		{
+			e.printStackTrace();
+			this.BASE_ENCOUNTER_CHANCE = 0.33f;
+			this.ENCOUNTER_CHANCE_INCREMENT = 0.05f;
+			this.ENCOUNTER_GRACE_MOVES = 3;
+		}
+		catch (ArrayIndexOutOfBoundsException e)
+		{
+			e.printStackTrace();
+			this.BASE_ENCOUNTER_CHANCE = 0.33f;
+			this.ENCOUNTER_CHANCE_INCREMENT = 0.05f;
+			this.ENCOUNTER_GRACE_MOVES = 3;
+		}
+		
+		this.currentEncounterChance = this.BASE_ENCOUNTER_CHANCE;
+		this.movesSinceLastEncounter = 0;
 	}
+
 	/* Methods */
 	
 	// Private //
-//	private void _addItemToInventory(Item item)
-//	{
-//		String itemName = item.getItemName();
-//		itemName = itemName.toLowerCase();
-//
-//		// If the inventory doesn't already contain this item ID, create a new ArrayList for it
-//		if (!this.inventory.containsKey(itemName))
-//			this.inventory.put(itemName, new ArrayList<Item>());
-//
-//		// Add the item to the inventory
-//		this.inventory.get(itemName).add(item);
-//	}
-//
-//	private void _removeItemFromInventory(Item item)
-//	{
-//		String itemName = item.getItemName();
-//		itemName = itemName.toLowerCase();
-//
-//		// Check if the item ID is recorded
-//		if (this.inventory.containsKey(itemName))
-//		{
-//			ArrayList<Item> itemList = this.inventory.get(itemName);
-//			itemList.remove(item);
-//
-//			// Remove the item ID from the HashMap if there are no more items of that ID
-//			if (itemList.size() <= 0)
-//				this.inventory.remove(itemName);
-//		}
-//	}
-//
-//	private int _getQuantityOfItemsInInventory(String itemName)
-//	{
-//		itemName = itemName.toLowerCase();
-//
-//		// Check if the inventory contains this item name
-//		if (this.inventory.containsKey(itemName))
-//		{
-//			ArrayList<Item> itemList = this.inventory.get(itemName);
-//			return itemList.size();
-//		}
-//
-//		return 0;
-//	}
+	private boolean forceMonsterEncounter()
+	{
+		// If the current room already has monsters when the player enters, trigger an encounter immediately
+		if (this.currentRoom.getMonsters().size() > 0)
+			return true;
+		
+		// Guard Clauses //
+		// If the player has not made enough moves since the last encounter, return false
+		if (this.movesSinceLastEncounter < this.ENCOUNTER_GRACE_MOVES)
+			return false;
+		
+		// Calculate the encounter chance based on the number of moves since the last encounter
+		float rng = (float) Math.random();
 
-    // Adds an item to the player's inventory if there is enough capacity.
+		// If chance triggers, reset the encounter chance and moves since last encounter, then return true
+		if (rng < this.currentEncounterChance)
+		{
+			this.currentEncounterChance = this.BASE_ENCOUNTER_CHANCE;
+			this.movesSinceLastEncounter = 0;
+			return true;
+		}
+		
+		// Otherwise, increment the encounter chance, then return false
+		this.currentEncounterChance += this.ENCOUNTER_CHANCE_INCREMENT;
+		return false;
+	}
+	
+	// Adds an item to the player's inventory if there is enough capacity.
     private boolean _addItemToInventory(Item item) {
         return this.inventory.addItem(item, this.currentLevel);
     }
@@ -163,6 +161,8 @@ public class Player extends Character
 	public Room getCurrentRoom() { return this.currentRoom; }
 	public Puzzle getCurrentPuzzle() { return this.currentRoom.getPuzzle(); }
 	public Monster getExaminedMonster() { return this.examinedMonster; }
+	public String getStartingClass(){return this.startingClass; }
+	public Party getPlayerParty() { return this.playerParty; }
 
 //	public Item getItemFromInventoryByName(String itemName)
 //	{
@@ -179,7 +179,8 @@ public class Player extends Character
     public Item getItemFromInventoryByName(String itemName) {
         return this.inventory.findItem(itemName);
     }
-	
+
+
 	// Setters //
 	public void setCurrentState(String newState) { this.stateMachine.setCurrentState(newState); }
 	public void setExaminedMonster(Monster monster) { this.examinedMonster = monster; }
@@ -203,7 +204,7 @@ public class Player extends Character
 			
 			// Print out room details
 			View.println("Now entering: " + roomName);
-			View.println("Description: " + roomDesc);
+			View.println(roomDesc);
 			
 			// Print out message if this room has been visited before
 			if (wasVisited)
@@ -211,10 +212,35 @@ public class Player extends Character
 			
 			/* Move player to this room */
 			this._setCurrentRoom(targetRoom);
+			this.movesSinceLastEncounter++; // Increase the number of moves since the last combat encounter
 			
 			// Reset monster being examined when moving to a new room
 			this.resetExaminedMonster();
 			
+			/* Check for monster encounter */
+			boolean encounterTriggered = this.forceMonsterEncounter();
+
+			// If an encounter with monsters is triggered, have the current room generate random monsters
+			if (encounterTriggered)
+				this.currentRoom.generateMonsters();
+			
+			/* Check if the current room has monsters */
+			// If there are monsters, the player and co. will enter combat
+			if (this.currentRoom.getMonsters().size() > 0)
+			{
+				// Populate battlefield with player and monsters
+				ArrayList<Monster> monstersInRoom = new ArrayList<>();
+				for (ArrayList<Monster> monsterList: this.currentRoom.getMonsters().values()) // HashMap
+					for (Monster monster: monsterList) // ArrayList
+						monstersInRoom.add(monster);
+				
+				Battlefield.populateBattlefield(this.playerParty, monstersInRoom);
+				
+				// Set the player's state to "inCombat"
+				this.setCurrentState("inCombat");
+			}
+			
+			// NOTE TO MERGERS. MERGE USING THIS PLEASE FOR THE LOVE OF GOD.
 			// Movement successful
 			return true;
 		}
@@ -231,7 +257,7 @@ public class Player extends Character
 		boolean wasVisited = this.currentRoom.getWasVisited();
 		
 		View.println("Current Room: " + roomName);
-		View.println("Description: " + roomDesc);
+		View.println("Description: " + View.wrapText(roomDesc,65));
 		
 		if (wasVisited)
 			View.println("You've been here before...");
@@ -239,49 +265,16 @@ public class Player extends Character
 	
 	public void exploreCurrentRoom()
 	{
-		/* Return the HashMap of items in the current room */
+		/* Explore the current room */
+		Room currentRoom = this.getCurrentRoom();
 		
-		// Get all items in the current room
-		HashMap<String, ArrayList<Item>> allItems = this.currentRoom.getItems();
-		if (allItems.size() > 0)
-		{
-			View.println("Items found in this room:");
-			for (ArrayList<Item> itemList: allItems.values())
-			{
-				// Print out item name and quantity of each item in the room
-				Item getFirstItem = itemList.get(0);
-				String itemName = getFirstItem.getItemName();
-				int itemQuantity = itemList.size();
-				
-				View.println("- " + itemName + " (x" + itemQuantity + ")");
-			}
-		}
-		
-		// If no items were found, print message
-		else
-			View.println("No items found in this room");
+		// Print out all available exits in the current room
+		ExplorationView.printRoomExits(currentRoom.getExits());
 		
 		View.println("");
 		
-		// Get all monsters in the current room //
-		HashMap<String, ArrayList<Monster>> allMonsters = this.currentRoom.getMonsters();
-		if (allMonsters.size() > 0)
-		{
-			View.println("Monsters found in this room:");
-			for (ArrayList<Monster> monsterList: allMonsters.values())
-			{
-				// Print out item name and quantity of each item in the room
-				Monster getFirstMonster = monsterList.get(0);
-				String monsterName = getFirstMonster.getName();
-				int monsterQuantity = monsterList.size();
-				
-				View.println("- " + monsterName + " (x" + monsterQuantity + ")");
-			}
-		}
-		
-		// If no monsters were found, print message
-		else
-			View.println("No monsters found in this room");
+		// Print out NPCs/NPC companions in the current room //
+		ExplorationView.printCompanionsInRoom(currentRoom.getCompanions());
 	}
 	
 	public void viewInventory()
@@ -575,13 +568,65 @@ public class Player extends Character
 				else
 					View.println("No such consumable to use in your inventory");
 				
-				BattleView.printCombatantStatus(this);
+				BattleView.printCombatantStatus(this, false);
 			}
         }
 
         // If item name is empty, print error message and return
         else
             View.println("Invalid command: no item name provided.");
+    }
+    
+    public void handleNPCInteraction(String cmd)
+    {
+    	/* Handles interaction commands with NPCs and NPC companions */
+    	
+    	// Normalize the command (NPC names are case-insensitive), then split it into
+        // the action and the monster name at the first run of whitespace
+        String[] cmdParts = cmd.trim().toLowerCase().split("\\s+", 2);
+
+        // Declare attributes
+        String action = cmdParts[0];
+        String npcName = (cmdParts.length > 1) ? cmdParts[1].trim() : "";
+        
+        // Handle the proper interaction with the given NPC name //
+        if (!npcName.isEmpty())
+		{
+			// Recruit NPC companion
+			if (action.equals("recruit"))
+			{
+				// The player recruits the NPC companion in the current room and adds them to their party
+				// The NPC companion is removed from the current room's companions list
+				Object targetNPC = this.currentRoom.getNPCByName(npcName);
+				if (targetNPC != null)
+				{
+					if (targetNPC instanceof Companion)
+					{
+						// Have the Party class handle the recruitment of the companion
+						Companion companion = (Companion) targetNPC;
+						//this.playerParty.recruit(companion);
+						
+						boolean recruitmentSuccessful = this.playerParty.recruit(companion);
+						
+						// Remove companion from current room if recruitment was successful
+						if (recruitmentSuccessful)
+							this.currentRoom.removeCompanion(companion);
+					}
+					
+					// Not an NPC companion, so cannot be recruited
+					else
+						View.println("Cannot recruit " + npcName + " since they are not a companion");
+				}
+				
+				// No NPC companion with that name was found in the current room
+				else
+					View.println("No such companion to recruit in the current room");
+			}
+		}
+        
+        // No NPC name provided
+		else
+			View.println("Invalid command: no NPC name provided");
     }
     
     public void handleMonsterInteraction(String cmd)
@@ -599,51 +644,8 @@ public class Player extends Character
         /* Handle the proper interaction with the given monster name */
         // Check if player is examining a monster
         Monster targetMonster;
-        if (this.examinedMonster != null)
-		{
-        	// Attack/ignore monster
-        	if (action.equals("attack") || action.equals("ignore"))
-			{       		
-        		targetMonster = this.getExaminedMonster();
-        		
-        		// Attack monster
-        		if (action.equals("attack"))
-        		{
-        			// The player attacks the monster in the current room and initiates combat
-        			if (targetMonster != null)
-    				{
-    					// Populate battlefield with player and monsters
-    					Battlefield.populateBattlefield(this, new ArrayList<>(Arrays.asList(targetMonster)));
-    					
-    					// Change player's state to "inCombat"
-    					this.setCurrentState("inCombat");
-
-    					View.println("You've attacked " + targetMonster.getName() + "!");
-    				}
-    				else
-    					View.println("No such monster to attack in the current room");
-        		}
-        		
-        		// Ignore monster
-				else
-				{
-					// Remove the monster from the current room and reset the examined monster
-					monsterName = targetMonster.getName();
-					this.getCurrentRoom().removeMonster(monsterName, targetMonster);
-
-					View.println("You've chosen to ignore " + monsterName + ". You won't see them again...for now");
-				}
-        		
-        		// Reset the examined monster after taking action
-        		this.resetExaminedMonster();
-			}
-        }
-        
-        // Currently not examining a monster
-        else
+    		if (!monsterName.isEmpty())
         {
-        	if (!monsterName.isEmpty())
-            {
             	// Examine monster
             	if (action.equals("examine"))
             	{
@@ -657,26 +659,40 @@ public class Player extends Character
     					View.println("");
     					View.printlnObject(targetMonster);
     				}
+    				
     				else
     					View.println("No such monster to examine in the current room");
             	}
-            }
-            
-            // If monster name is empty, print error message and return
+        }
+        
+        // If monster name is empty, print error message and return
     		else
-    			View.println("Invalid: no monster name provided");
-        }  
+    			View.println("Invalid command: no monster name provided"); 
     }
-     
+    
+    public void switchMonsterTarget(String cmd)
+    {
+    		/* While in combat, the player can switch their party's current target to a different monster on the battlefield */
+    	
+    		// Guard Clauses //
+    		// If the player is not in combat, they cannot switch targets
+    		if (!this.getCurrentState().equalsIgnoreCase("inCombat"))
+    			return;
+    		
+    		String[] cmdParts = cmd.trim().toLowerCase().split("\\s+", 2);
+    		
+    		// Get the target monster index from the command (subtract 1 to convert to 0-based index)
+    		int targetMonsterIndex = cmdParts.length > 1 ? Integer.parseInt(cmdParts[1].trim()) - 1 : -1;
+    		
+    		// Attempt to switch the monster target on the battlefield
+    		Battlefield.switchMonsterTarget(targetMonsterIndex);
+    }
+    
 	public boolean attemptToSolvePuzzle(String userInput)
 	{
 		/* Guard Clauses */
 		// Do not attempt to solve a puzzle if there is no puzzle in the current room
 		if (this.currentRoom.getPuzzle() == null)
-			return false;
-		
-		// Do not attempt to solve a puzzle if it has no remaining attempts
-		if (this.currentRoom.getPuzzle().getRemainingAttempts() <= 0)
 			return false;
 		
 		// Do not attempt to solve a puzzle if the player has already solved it
@@ -687,13 +703,15 @@ public class Player extends Character
 		return this.currentRoom.getPuzzle().checkSolution(userInput);
 	}
 
+	public void viewPartyStatus()
+	{
+		/* View the player's party's status */
+		//this.playerParty.printPartyStatus();
+	}
+	
 	// Reset to default state (exploring) when the player is not in combat or solving a puzzle
     public void resetToDefaultState() { this.setCurrentState("exploring"); }
 
-    // Add item to inventory; public method that calls private method
-//    public void addItemToInventory(Item item) {
-//        this._addItemToInventory(item);
-//    }
     // Allows other classes to add an item while checking carrying capacity.
     public boolean addItemToInventory(Item item) {
         return this._addItemToInventory(item);
@@ -703,5 +721,6 @@ public class Player extends Character
     public Inventory getInventory() {
         return this.inventory;
     }
+
 }
 

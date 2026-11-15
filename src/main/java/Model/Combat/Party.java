@@ -3,6 +3,8 @@ package Model.Combat;
 import java.util.ArrayList;
 import java.util.List;
 
+import View.View;
+
 /*
 Party class
 Refer to 3.2.2 User Class 2: NPC Companions
@@ -30,7 +32,7 @@ public class Party {
 
         //if companion already exists in player's party, disp message, and return false.
         if (activeCompanions.contains(companion) || inactiveCompanions.contains(companion)){
-            System.out.println(companion.getName() + " already exists in party.");
+            View.println(companion.getName() + " already exists in party.");
             return false;
         }
 
@@ -40,13 +42,13 @@ public class Party {
 
         //if statement checks if party has max active companions, if so, add companion to inactiveCompanions list
         if(activeCompanions.size() == maxActiveCompanions){
-            System.out.println("New companion recruited!" + companion.getName() + " added to inactive party.");
+            View.println("New companion recruited!" + companion.getName() + " added to inactive party.");
             inactiveCompanions.add(companion);
             return true;
         }
 
 
-        System.out.println("New companion recruited! " + companion.getName() + " added to the active party!");
+        View.println("New companion recruited! " + companion.getName() + " added to the active party!");
         activeCompanions.add(companion);
         return true;
 
@@ -106,17 +108,13 @@ public class Party {
 
 
     //temp
-    public void getActiveCompanions(){
-        for (Companion companion: activeCompanions){
-            System.out.println(companion.getName());
-        }
+    public List<Companion> getActiveCompanions(){
+        return activeCompanions;
     }
 
     //temp
-    public void getInactiveCompanions(){
-        for (Companion companion : inactiveCompanions){
-            System.out.println(companion.getName());
-        }
+    public List<Companion> getInactiveCompanions(){
+        return inactiveCompanions;
     }
 
     //temp

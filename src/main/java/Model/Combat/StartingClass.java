@@ -12,12 +12,12 @@ public class StartingClass {
     private int baseINT;
     private int baseARC;
     private int baseEND;
-    private ArrayList<String> combatAbility;
+    private ArrayList<CombatSkill> combatSkills;
     private ArrayList<String> defaultEquipment;
 
     public StartingClass(int id, String name, String background, int baseMaxHP, int baseSTR,
                          int baseDEX, int baseINT, int baseARC, int baseEND,
-                         ArrayList<String> combatAbility, ArrayList<String> defaultEquipment){
+                         ArrayList<CombatSkill> combatSkills, ArrayList<String> defaultEquipment){
         this.id = id;
         this.name = name;
         this.background = background;
@@ -27,7 +27,7 @@ public class StartingClass {
         this.baseINT = baseINT;
         this.baseARC = baseARC;
         this.baseEND = baseEND;
-        this.combatAbility = combatAbility;
+        this.combatSkills = combatSkills;
         this.defaultEquipment = defaultEquipment;
 
 
@@ -72,8 +72,8 @@ public class StartingClass {
         return baseEND;
     }
 
-    public ArrayList<String> getCombatAbility() {
-        return combatAbility;
+    public ArrayList<CombatSkill> getCombatSkill() {
+        return combatSkills;
     }
 
     public ArrayList<String> getDefaultEquipment() {
@@ -81,4 +81,3 @@ public class StartingClass {
     }
 }
 
-//bleh

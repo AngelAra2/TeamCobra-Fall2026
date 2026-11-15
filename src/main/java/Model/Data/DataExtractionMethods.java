@@ -2,6 +2,7 @@ package Model.Data;
 
 import java.util.*;
 
+import Model.Combat.CombatSkill;
 import Model.Combat.Companion;
 import Model.Exploration.Merchant;
 import Model.AbstractClasses.Combatant;
@@ -10,18 +11,25 @@ import Model.Combat.Monster;
 import Model.Exploration.Map;
 import Model.Exploration.Puzzle;
 import Model.Exploration.Room;
+import Model.Factories.CombatSkillFactory;
+import Model.Factories.MonsterFactory;
 import Model.Items.Consumable;
 import Model.Items.Weapon;
+
 import Model.Items.Armor;
 import Model.Items.UtilityItem;
+
 import Model.Combat.StartingClass;
 import Model.Util.ItemUtil;
+import Model.Rewards.LoreReward;
+import Model.Rewards.RoomReward;
 
 public class DataExtractionMethods {
 
     /* Data Fields */
-    private static String delimiterA = "_";
-    private static String delimiterB = ",";
+	public static final String DELIMITER_A = "_";
+	public static final String DELIMITER_B = ",";
+	public static final String DELIMITER_C = "*";
 
     //------------------------------------//
 
@@ -47,7 +55,7 @@ public class DataExtractionMethods {
             String currentLine = fileScanner.nextLine().trim();
 
             // Use delimiter to split string into readable attributes
-            String[] attributes = trimStringArray(currentLine.split(delimiterA));
+            String[] attributes = trimStringArray(currentLine.split(DELIMITER_A));
 
             // Declare required attributes
             int roomId;
@@ -81,7 +89,7 @@ public class DataExtractionMethods {
             // Read exits //
             try {
                 // Read exits as a single string and split it into an array of strings
-                String[] roomExits = trimStringArray(attributes[attributes.length - 1].split(delimiterB));
+                String[] roomExits = trimStringArray(attributes[attributes.length - 1].split(DELIMITER_B));
 
                 // Store each exit as its own entry in the HashMap
                 int exitRoomId;
@@ -137,7 +145,7 @@ public class DataExtractionMethods {
 //            String currentLine = fileScanner.nextLine().trim();
 //
 //            // Use delimiter to split string into readable attributes
-//            String[] attributes = trimStringArray(currentLine.split(delimiterA));
+//            String[] attributes = trimStringArray(currentLine.split(DELIMITER_A));
 //
 //            // Declare required attributes
 //            int itemId;
@@ -180,7 +188,7 @@ public class DataExtractionMethods {
 //            // Depending on the number of room IDs listed in the file, a new Item object will be created for each room ID
 //            try {
 //                // Read room IDs as a single string and split it into an array of strings
-//                String[] targetRoomIds = trimStringArray(attributes[attributes.length - 1].split(delimiterB));
+//                String[] targetRoomIds = trimStringArray(attributes[attributes.length - 1].split(DELIMITER_B));
 //
 //                // Create a new Item object for each room ID listed
 //                int roomId;
@@ -273,7 +281,7 @@ public static void extractWeaponData(Scanner fileScanner, Map worldMap) {
         String line = fileScanner.nextLine().trim();
         if (line.isEmpty()) continue;
 
-        String[] a = trimStringArray(line.split(delimiterA, -1));
+        String[] a = trimStringArray(line.split(DELIMITER_A, -1));
 
         try {
             Weapon item = new Weapon(
@@ -281,7 +289,7 @@ public static void extractWeaponData(Scanner fileScanner, Map worldMap) {
                     Double.parseDouble(a[3]), Integer.parseInt(a[4]),
                     a[5], Integer.parseInt(a[6]), Integer.parseInt(a[7]),
                     Integer.parseInt(a[8]), Integer.parseInt(a[9]),
-                    a[10], a[11], a[12], a[13], a[14]
+                    a[10], a[11], a[12], a[13], a[14],a[16]
             );
 
             worldMap.addItemTemplate(item);
@@ -299,7 +307,7 @@ public static void extractWeaponData(Scanner fileScanner, Map worldMap) {
             String line = fileScanner.nextLine().trim();
             if (line.isEmpty()) continue;
 
-            String[] a = trimStringArray(line.split(delimiterA, -1));
+            String[] a = trimStringArray(line.split(DELIMITER_A, -1));
 
             try {
                 Armor item = new Armor(
@@ -325,7 +333,7 @@ public static void extractWeaponData(Scanner fileScanner, Map worldMap) {
             String line = fileScanner.nextLine().trim();
             if (line.isEmpty()) continue;
 
-            String[] a = trimStringArray(line.split(delimiterA, -1));
+            String[] a = trimStringArray(line.split(DELIMITER_A, -1));
 
             try {
                 Consumable item = new Consumable(
@@ -344,44 +352,19 @@ public static void extractWeaponData(Scanner fileScanner, Map worldMap) {
     }
 
     // Loads utility item definitions.
-//    public static void extractUtilityData(Scanner fileScanner, Map worldMap) {
-//        while (fileScanner.hasNextLine()) {
-//            String line = fileScanner.nextLine().trim();
-//            if (line.isEmpty()) continue;
-//
-//            String[] a = trimStringArray(line.split(delimiterA, -1));
-//
-//            try {
-//                UtilityItem item = new UtilityItem(
-//                        Integer.parseInt(a[0]), a[1], a[2],
-//                        Double.parseDouble(a[3]), Integer.parseInt(a[4])
-//                );
-//
-//                worldMap.addItemTemplate(item);
-//            } catch (NumberFormatException e) {
-//                continue;
-//            } catch (ArrayIndexOutOfBoundsException e) {
-//                continue;
-//            }
-//        }
-//    }
-
     public static void extractUtilityData(Scanner fileScanner, Map worldMap) {
         while (fileScanner.hasNextLine()) {
             String line = fileScanner.nextLine().trim();
+            if (line.isEmpty()) continue;
 
-            if (line.isEmpty()) {
-                continue;
-            }
-
-            String[] a = trimStringArray(line.split(delimiterA, -1));
+            String[] a = trimStringArray(line.split(DELIMITER_A, -1));
 
             try {
                 UtilityItem item = new UtilityItem(
                         Integer.parseInt(a[0]), a[1], a[2],
                         Double.parseDouble(a[3]),
-                        Integer.parseInt(a[4]), a[5], a[6], a[7].equalsIgnoreCase("YES"));
-
+                        Integer.parseInt(a[4]), a[5], a[6],
+                        a[7].equalsIgnoreCase("YES"));
                 worldMap.addItemTemplate(item);
 
             } catch (NumberFormatException e) {
@@ -402,18 +385,20 @@ public static void extractWeaponData(Scanner fileScanner, Map worldMap) {
             /* Read current line to get Puzzle data */
             String currentLine = fileScanner.nextLine().trim();
 
-            // Use delimiter to split string into readable attributes
-            String[] attributes = trimStringArray(currentLine.split(delimiterA));
+            // Use delimiter to split the line into puzzle attributes.
+            String[] attributes = trimStringArray(currentLine.split(DELIMITER_A));
 
-            // Declare required attributes
+            // Declare required attributes and set defaults for optional values.
             int puzzleId;
             int targetRoomId;
             String puzzleName = "Puzzle";
             String puzzleDesc = "...";
             String puzzleSolution = "Answer";
             int attempts = 3;
+            String hint1 = "";
+            String hint2 = "";
 
-            // Read puzzleId
+            // Read puzzleId; skip this line if it is missing or invalid.
             try {
                 puzzleId = Integer.parseInt(attributes[0]);
             } catch (NumberFormatException e) {
@@ -422,7 +407,7 @@ public static void extractWeaponData(Scanner fileScanner, Map worldMap) {
                 continue;
             }
 
-            // Read targetRoomId
+            // Read targetRoomId; skip this line if it is missing or invalid.
             try {
                 targetRoomId = Integer.parseInt(attributes[1]);
             } catch (NumberFormatException e) {
@@ -431,28 +416,28 @@ public static void extractWeaponData(Scanner fileScanner, Map worldMap) {
                 continue;
             }
 
-            // Read puzzleName
+            // Read puzzleName; keep the default if it is missing.
             try {
                 puzzleName = attributes[2];
             } catch (ArrayIndexOutOfBoundsException e) {
-                // Leave blank
+                // Leave default value
             }
 
-            // Read puzzleDesc
+            // Read puzzleDesc; keep the default if it is missing.
             try {
                 puzzleDesc = attributes[3];
             } catch (ArrayIndexOutOfBoundsException e) {
-                // Leave blank
+                // Leave default value
             }
 
-            // Read puzzleSolution
+            // Read puzzleSolution; keep the default if it is missing.
             try {
                 puzzleSolution = attributes[4];
             } catch (ArrayIndexOutOfBoundsException e) {
-                // Leave blank
+                // Leave default value
             }
 
-            // Read attempts
+            // Read the configured attempt count; keep the default if missing or invalid.
             try {
                 attempts = Integer.parseInt(attributes[5]);
             } catch (NumberFormatException e) {
@@ -461,169 +446,190 @@ public static void extractWeaponData(Scanner fileScanner, Map worldMap) {
                 // Leave default value
             }
 
-            /* Create Puzzle object */
-            Puzzle puzzle = new Puzzle(puzzleId, puzzleName, puzzleDesc, puzzleSolution, attempts);
+            // Read hint1; keep it blank if it is missing.
+            try {
+                hint1 = attributes[6];
+            } catch (ArrayIndexOutOfBoundsException e) {
+                // Leave default value
+            }
 
-            // Attach the puzzle to the room with the matching room ID, if it exists
+            // Read hint2; keep it blank if it is missing.
+            try {
+                hint2 = attributes[7];
+            } catch (ArrayIndexOutOfBoundsException e) {
+                // Leave default value
+            }
+
+            /* Create Puzzle object */
+            Puzzle puzzle = new Puzzle(
+                    puzzleId, puzzleName, puzzleDesc, puzzleSolution, attempts, hint1, hint2
+            );
+
+            // Attach the puzzle to its target room, if that room exists.
             if (rooms.containsKey(targetRoomId))
                 rooms.get(targetRoomId).setPuzzle(puzzle);
         }
     }
 
-    /* Extract data from a file and parse it into Monster objects */
-    public static void extractMonsterData(Scanner fileScanner, Map worldMap) {
-        HashMap<Integer, Room> rooms = worldMap.getRooms();
+    /* Extract data from a file and parse it into monster data */
+	public static void extractMonsterData(Scanner fileScanner, Map worldMap)
+	{
+		// Have MonsterFactory variable set up just in case it's needed for creating Monster objects here
+		MonsterFactory monsterFactory = new MonsterFactory();
+		
+		// Read monster data //
+		while (fileScanner.hasNextLine())
+		{
+			/* Read current line to get Monster data */
+			String currentLine = fileScanner.nextLine().trim();
 
-        // Read monster data and create Monster objects //
+			// Use delimiter to split string into readable attributes
+			String[] attributes = trimStringArray(currentLine.split(DELIMITER_A));
+			
+			// Declare required attributes
+			int monsterId;
+			boolean isBoss = false;
+			String[] targetRoomIds;
+
+			// Read monsterId
+			try { monsterId = Integer.parseInt(attributes[0]); }
+			catch (NumberFormatException e) { continue; }
+			catch (ArrayIndexOutOfBoundsException e) { continue; }
+			
+			// Read isBoss
+			try { isBoss = Boolean.parseBoolean(attributes[10]); }
+			catch (NumberFormatException e) { continue; }
+			catch (ArrayIndexOutOfBoundsException e) { continue; }
+			
+			// Read targetRoomIds
+			try 
+			{
+				// Read room IDs as a single string and split it into an array of strings
+				targetRoomIds = trimStringArray(attributes[11].split(DELIMITER_B));
+
+				for (int i = 0; i < targetRoomIds.length; i++)
+				{
+					int roomId;
+					try 
+					{ 
+						roomId = Integer.parseInt(targetRoomIds[i]);
+						Room targetRoom = worldMap.getRoomById(roomId);
+
+						if (targetRoom != null)
+						{
+							// If the monster is a boss, create the Monster object and add it to the room with the matching room ID
+							// If not, add the monsterId to the list of spawnable monster IDs for the room with the matching room ID
+							
+							if (!isBoss)
+								// Find the Room object with the matching room ID and add the monster to it
+								targetRoom.addSpawnableMonsterId(monsterId);
+
+							// Create boss Monster object and add it to the room with the matching room ID
+							else
+							{
+								Monster bossMonster = monsterFactory.create(monsterId);
+								targetRoom.addMonster(bossMonster.getName(), bossMonster);
+							}
+						}
+						
+					}
+					catch (NumberFormatException e) { System.out.println("NumberFormatException"); continue; }
+					catch (ArrayIndexOutOfBoundsException e) { System.out.println("ArrayIndexOutOfBoundsException"); continue; }
+				}
+			}
+			catch (ArrayIndexOutOfBoundsException e) { continue; }
+		}
+	}
+
+    /* Extract reward data and attach rewards to Puzzle objects */
+    public static void extractPuzzleRewardsData(Scanner fileScanner, Map worldMap) {
+        // Track the line number so invalid reward entries can be identified.
+        int lineNumber = 0;
+
+        // Read each reward entry from the file.
         while (fileScanner.hasNextLine()) {
-            /* Read current line to get Monster data */
+            lineNumber++;
             String currentLine = fileScanner.nextLine().trim();
 
-            // Use delimiter to split string into readable attributes
-            String[] attributes = trimStringArray(currentLine.split(delimiterA));
-
-            // Declare required attributes
-            int monsterId;
-            String monsterName = "Monster";
-            String monsterDesc = "...";
-            int maxHP = 10;
-            int physicalDEF = 0;
-            int magicDEF = 0;
-            int attack = 1;
-            int xpReward = 1;
-            int goldReward = 1;
-            boolean isBoss = false;
-
-            // Read monsterId
-            try {
-                monsterId = Integer.parseInt(attributes[0]);
-            } catch (NumberFormatException e) {
+            // Ignore blank lines and comment lines.
+            if (currentLine.isEmpty())
                 continue;
-            } catch (ArrayIndexOutOfBoundsException e) {
-                continue;
-            }
 
-            // Read monsterName
+            // Split the entry into fields, preserving empty fields for validation.
+            String[] attributes = trimStringArray(currentLine.split("\\|", -1));
+
             try {
-                monsterName = attributes[1];
-            } catch (ArrayIndexOutOfBoundsException e) {
-                // Leave blank
-            }
+                // Read the puzzle ID and reward type from the entry.
+                int puzzleId = Integer.parseInt(attributes[0]);
+                String rewardType = attributes[1].toUpperCase();
 
-            // Read monsterDesc
-            try {
-                monsterDesc = attributes[2];
-            } catch (ArrayIndexOutOfBoundsException e) {
-                // Leave blank
-            }
-
-            // Read maxHP
-            try {
-                maxHP = Integer.parseInt(attributes[3]);
-            } catch (NumberFormatException e) {
-                // Leave blank
-            } catch (ArrayIndexOutOfBoundsException e) {
-                // Leave blank
-            }
-
-            // Read physicalDEF
-            try {
-                physicalDEF = Integer.parseInt(attributes[4]);
-            } catch (NumberFormatException e) {
-                // Leave blank
-            } catch (ArrayIndexOutOfBoundsException e) {
-                // Leave blank
-            }
-
-            // Read magicDEF
-            try {
-                magicDEF = Integer.parseInt(attributes[5]);
-            } catch (NumberFormatException e) {
-                // Leave blank
-            } catch (ArrayIndexOutOfBoundsException e) {
-                // Leave blank
-            }
-
-            // Read attack
-            try {
-                attack = Integer.parseInt(attributes[6]);
-            } catch (NumberFormatException e) {
-                // Leave blank
-            } catch (ArrayIndexOutOfBoundsException e) {
-                // Leave blank
-            }
-
-            // Read xpReward
-            try {
-                xpReward = Integer.parseInt(attributes[7]);
-            } catch (NumberFormatException e) {
-                // Leave blank
-            } catch (ArrayIndexOutOfBoundsException e) {
-                // Leave blank
-            }
-
-            // Read goldReward
-            try {
-                goldReward = Integer.parseInt(attributes[8]);
-            } catch (NumberFormatException e) {
-                // Leave blank
-            } catch (ArrayIndexOutOfBoundsException e) {
-                // Leave blank
-            }
-
-            // Read isBoss
-            try {
-                isBoss = Boolean.parseBoolean(attributes[9]);
-            } catch (ArrayIndexOutOfBoundsException e) {
-                // Leave blank
-            }
-
-            // There may be more than one of the same monster in the game
-            // Depending on the number of room IDs listed in the file, a new Monster object will be created for each room ID
-            try {
-                // Read room IDs as a single string and split it into an array of strings
-                String[] targetRoomIds = trimStringArray(attributes[attributes.length - 1].split(delimiterB));
-
-                // Create a new Item object for each room ID listed
-                int roomId;
-                for (int i = 0; i < targetRoomIds.length; i++) {
-                    // Read roomId this item is located in
-                    try {
-                        roomId = Integer.parseInt(targetRoomIds[i]);
-                    } catch (NumberFormatException e) {
-                        continue;
-                    } catch (ArrayIndexOutOfBoundsException e) {
-                        continue;
+                // Find the puzzle with the matching ID.
+                Puzzle puzzle = null;
+                for (Room room : worldMap.getRooms().values()) {
+                    if (room.getPuzzle() != null
+                            && room.getPuzzle().getPuzzleId() == puzzleId) {
+                        puzzle = room.getPuzzle();
+                        break;
                     }
-
-                    // Guard clause
-                    // If the room ID does not exist in the world map, skip creating this object
-                    if (!rooms.containsKey(roomId))
-                        continue;
-
-                    /* Create Monster object */
-                    Monster monster = new Monster(
-                            monsterName,
-                            maxHP,
-                            physicalDEF,
-                            magicDEF,
-                            attack,
-
-                            monsterId,
-                            monsterDesc,
-                            xpReward,
-                            goldReward,
-                            isBoss
-                    );
-
-                    // Add monster to the room with the matching room ID, if it exists
-                    rooms.get(roomId).addMonster(monsterName.toLowerCase(), monster);
                 }
-            } catch (ArrayIndexOutOfBoundsException e) {
-                continue;
+
+                // Reject entries that refer to a puzzle that was not loaded.
+                if (puzzle == null)
+                    throw new IllegalArgumentException("Unknown puzzle ID: " + puzzleId);
+
+                // Create the appropriate reward based on the entry type.
+                switch (rewardType) {
+                    case "LORE":
+                        // LORE entries contain a puzzle ID, type, and lore text.
+                        if (attributes.length != 3 || attributes[2].isBlank())
+                            throw new IllegalArgumentException(
+                                    "LORE format: puzzleId|LORE|lore text");
+
+                        puzzle.addReward(new LoreReward(List.of(attributes[2])));
+                        break;
+
+                    case "ROOM":
+                        // ROOM entries contain the source room, exit direction, and destination room.
+                        if (attributes.length != 5)
+                            throw new IllegalArgumentException(
+                                    "ROOM format: puzzleId|ROOM|fromRoomId|direction|toRoomId");
+
+                        int fromRoomId = Integer.parseInt(attributes[2]);
+                        String direction = attributes[3].toLowerCase();
+                        int toRoomId = Integer.parseInt(attributes[4]);
+
+                        // Only accept the four supported exit directions.
+                        if (!List.of("north", "east", "south", "west").contains(direction))
+                            throw new IllegalArgumentException(
+                                    "Direction must be north, east, south, or west");
+
+                        // Look up both rooms that the reward connects.
+                        Room fromRoom = worldMap.getRoomById(fromRoomId);
+                        Room toRoom = worldMap.getRoomById(toRoomId);
+
+                        // Reject room rewards that refer to rooms missing from the map.
+                        if (fromRoom == null || toRoom == null)
+                            throw new IllegalArgumentException(
+                                    "Room reward refers to an unknown room");
+
+                        // Attach this exit reward to the puzzle.
+                        puzzle.addReward(new RoomReward(fromRoom, direction, toRoom));
+                        break;
+
+                    default:
+                        // Reject reward types that this loader does not support.
+                        throw new IllegalArgumentException(
+                                "Unsupported reward type: " + rewardType);
+                }
+            } catch (RuntimeException e) {
+                // Include the line and entry in the error to help locate bad file data.
+                throw new IllegalArgumentException(
+                        "Invalid Rewards entry on line " + lineNumber + ": " + currentLine,
+                        e);
             }
         }
     }
+
     // This reads each Merchant record and adds the Merchant to the room listed in the file.
     public static void extractMerchantData(Scanner fileScanner, Map worldMap) {
         // Each non-empty line in the file represents one Merchant.
@@ -633,7 +639,7 @@ public static void extractWeaponData(Scanner fileScanner, Map worldMap) {
                 continue;
 
             // A Merchant record contains an ID, a name, dialogue, stock item IDs, and a room ID.
-            String[] fields = trimStringArray(line.split(delimiterA, -1));
+            String[] fields = trimStringArray(line.split(DELIMITER_A, -1));
 
             // Skip records that do not have all five fields or are missing the Merchant's ID or name.
             if (fields.length != 5 || fields[0].isEmpty() || fields[1].isEmpty())
@@ -661,7 +667,7 @@ public static void extractWeaponData(Scanner fileScanner, Map worldMap) {
                 // rather than sharing the same instances with other Merchants or Rooms.
                 HashMap<String, ArrayList<Item>> stock = new HashMap<>();
                 if (!fields[3].isEmpty()) {
-                    for (String id : fields[3].split(delimiterB)) {
+                    for (String id : fields[3].split(DELIMITER_B)) {
                         Item template = ItemUtil.findItemById(worldMap, Integer.parseInt(id.trim()));
                         // Skip stock IDs that do not match an item loaded into the world.
                         if (template == null)
@@ -695,7 +701,7 @@ public static void extractWeaponData(Scanner fileScanner, Map worldMap) {
             String currentLine = fileScanner.nextLine().trim();
 
             // Use delimiter to split string into readable states
-            String[] states = trimStringArray(currentLine.split(delimiterA));
+            String[] states = trimStringArray(currentLine.split(DELIMITER_A));
 
             // Trim all string attributes to remove whitespace
             for (int i = 0; i < states.length; i++)
@@ -712,7 +718,7 @@ public static void extractWeaponData(Scanner fileScanner, Map worldMap) {
     // Splits a comma-separated field into trimmed, non-empty values.
     private static ArrayList<String> parseCompanionValues(String value) {
         ArrayList<String> values = new ArrayList<>();
-        for (String part : value.split(delimiterB)) {
+        for (String part : value.split(DELIMITER_B)) {
             String trimmed = part.trim();
             if (!trimmed.isEmpty())
                 values.add(trimmed);
@@ -731,7 +737,7 @@ public static void extractWeaponData(Scanner fileScanner, Map worldMap) {
             // Fields: 0 ID, 1 name, 2 backstory, 3 base max HP, 4 STR, 5 DEX,
             // 6 INT, 7 ARC, 8 END, 9 perk, 10 default abilities,
             // 11 default equipment, 12 room ID.
-            String[] attributes = trimStringArray(line.split(delimiterA, -1));
+            String[] attributes = trimStringArray(line.split(DELIMITER_A, -1));
             if (attributes.length != 13)
                 continue;
 
@@ -744,10 +750,24 @@ public static void extractWeaponData(Scanner fileScanner, Map worldMap) {
                 int arcane = Integer.parseInt(attributes[7]);
                 int endurance = Integer.parseInt(attributes[8]);
                 int roomId = Integer.parseInt(attributes[12]);
+                ArrayList<CombatSkill> combatSkills = new ArrayList<>();
 
+                //split combat abilities using " , " as the delimiter
+                ArrayList<String> combatAbilitiesList = parseCompanionValues(attributes[10]);
+
+                //adds combat ability to list
+                for(String abilities : combatAbilitiesList){
+                    //creates CombatSkill factory
+                    CombatSkillFactory factory = new CombatSkillFactory();
+                    //creates skill by name received from text file
+                    CombatSkill skill = factory.createByName(abilities);
+                    //add to arrayList
+                    combatSkills.add(skill);
+                }
                 Room room = worldMap.getRoomById(roomId);
                 if (room == null)
                     continue;
+
 
                 Companion companion = new Companion(
                         attributes[1],
@@ -759,7 +779,7 @@ public static void extractWeaponData(Scanner fileScanner, Map worldMap) {
                         arcane,
                         endurance,
                         attributes[9],
-                        parseCompanionValues(attributes[10]),
+                        combatSkills,
                         parseCompanionValues(attributes[11]),
                         companionId,
                         room
@@ -778,20 +798,20 @@ public static void extractWeaponData(Scanner fileScanner, Map worldMap) {
 
                 String line = fileScanner.nextLine();
                 //splits line string using " _ " as the delimiter.
-                String parsedLine[] = line.split(delimiterA);
+                String parsedLine[] = line.split(DELIMITER_A);
 
-                // Declare required attributes
-                int id = 0;
-                String className = "";
-                String background = "";
-                int baseMaxHP = 0;
-                int baseSTR = 0;
-                int baseDEX = 0;
-                int baseINT = 0;
-                int baseARC = 0;
-                int baseEND = 0;
-                ArrayList<String> combatAbilities = new ArrayList<>();
-                ArrayList<String> defaultEquipment = new ArrayList<>();
+			// Declare required attributes
+			int id = 0;
+			String className = "";
+			String background = "";
+			int baseMaxHP = 0;
+			int baseSTR = 0;
+			int baseDEX = 0;
+			int baseINT = 0;
+			int baseARC = 0;
+			int baseEND = 0;
+			ArrayList<CombatSkill> combatSkills = new ArrayList<>();
+			ArrayList<String> defaultEquipment = new ArrayList<>();
 
                 //assigns starting class ID
                 try{
@@ -858,93 +878,139 @@ public static void extractWeaponData(Scanner fileScanner, Map worldMap) {
                     // Leave blank
                 }
 
-                //assigns starting class base INT
-                try{
-                    baseINT = Integer.parseInt(parsedLine[6]);
-                }
-                catch (NumberFormatException e)
-                {
-                    continue;
-                }
-                catch (ArrayIndexOutOfBoundsException e)
-                {
-                    // Leave blank
-                }
+			//assigns starting class base INT
+			try{
+				baseINT = Integer.parseInt(parsedLine[6]);
+			}
+			catch (NumberFormatException e)
+			{
+				continue;
+			}
+			catch (ArrayIndexOutOfBoundsException e)
+			{
+				// Leave blank
+			}
 
-                //assigns starting class base ARC
-                try{
-                    baseARC = Integer.parseInt(parsedLine[7]);
-                }
-                catch (NumberFormatException e)
-                {
-                    continue;
-                }
-                catch (ArrayIndexOutOfBoundsException e)
-                {
-                    // Leave blank
-                }
+			//assigns starting class base ARC
+			try{
+				baseARC = Integer.parseInt(parsedLine[7]);
+			}
+			catch (NumberFormatException e)
+			{
+				continue;
+			}
+			catch (ArrayIndexOutOfBoundsException e)
+			{
+				// Leave blank
+			}
 
-                try{
-                    baseEND = Integer.parseInt(parsedLine[8]);
-                }
-                catch (NumberFormatException e)
-                {
-                    continue;
-                }
-                catch (ArrayIndexOutOfBoundsException e)
-                {
-                    // Leave blank
-                }
+			try{
+				baseEND = Integer.parseInt(parsedLine[8]);
+			}
+			catch (NumberFormatException e)
+			{
+				continue;
+			}
+			catch (ArrayIndexOutOfBoundsException e)
+			{
+				// Leave blank
+			}
 
-                //assigns starting class combat abilities
-                //starting class could have more than one ability
-                try{
-                    //split combat abilities using " , " as the delimiter
-                    String[] combatAbilitiesList = trimStringArray(parsedLine[9].split(delimiterB));
+			//assigns starting class combat abilities
+			//starting class could have more than one ability
+			try{
+				//split combat abilities using " , " as the delimiter
+				String[] combatAbilitiesList = trimStringArray(parsedLine[9].split(DELIMITER_B));
 
-                    //adds combat ability to list
-                    for(String abilities : combatAbilitiesList){
-                        combatAbilities.add(abilities);
-                    }
-                }
-                catch (ArrayIndexOutOfBoundsException e)
-                {
-                    // Leave blank
-                }
+				//adds combat ability to list
+				for(String abilities : combatAbilitiesList){
+                    //creates CombatSkill factory
+                    CombatSkillFactory factory = new CombatSkillFactory();
+                    //creates skill by name received from text file
+                    CombatSkill skill = factory.createByName(abilities);
+                    //add to arrayList
+                    combatSkills.add(skill);
+				}
+			}
+			catch (ArrayIndexOutOfBoundsException e)
+			{
+				// Leave blank
+			}
 
-                //assigns starting class equipment
-                //starting class will have more than one equipment
-                try{
-                    //split combat abilities using " , " as the delimiter
-                    String[] targetItemIds = trimStringArray(parsedLine[10].split(delimiterB));
+			//assigns starting class equipment
+			//starting class will have more than one equipment
+			try{
+				//split combat abilities using " , " as the delimiter
+				String[] targetItemIds = trimStringArray(parsedLine[10].split(DELIMITER_B));
 
-                    //adds equipment name to list
-                    for(int i = 0; i <targetItemIds.length; i++){
-                        defaultEquipment.add(targetItemIds[i]);
-                    }
-                    //create a StartingClass object, and add it into list of StartingClasses
-                    StartingClass tempClass = new StartingClass(
-                            id,
-                            className,
-                            background,
-                            baseMaxHP,
-                            baseSTR,
-                            baseDEX,
-                            baseINT,
-                            baseARC,
-                            baseEND,
-                            combatAbilities,
-                            defaultEquipment
-                    );
+				//adds equipment name to list
+				for(int i = 0; i <targetItemIds.length; i++){
+					defaultEquipment.add(targetItemIds[i]);
+				}
+				//create a StartingClass object, and add it into list of StartingClasses
+				StartingClass tempClass = new StartingClass(
+							id,
+							className,
+							background,
+							baseMaxHP,
+							baseSTR,
+							baseDEX,
+							baseINT,
+							baseARC,
+							baseEND,
+							combatSkills,
+						    defaultEquipment
+				);
 
-                    classes.add(tempClass);
+				classes.add(tempClass);
 
-                }
-                catch (ArrayIndexOutOfBoundsException e)
-                {
-                    // Leave blank
-            }
-        }
-    }
+			}
+			catch (ArrayIndexOutOfBoundsException e)
+			{
+				// Leave blank
+			}
+		}
+
+	}
+
+	public static String[] extractPlayerConstants(Scanner fileScanner)
+	{
+		String[] constantsData = null;
+
+		// Read player constants data //
+		if (fileScanner.hasNextLine())
+		{
+			/* Read current line to get player constants data */
+			String currentLine = fileScanner.nextLine().trim();
+			constantsData = trimStringArray(currentLine.split(DELIMITER_A));
+		}
+
+		return constantsData;
+	}
+
+	/* Extract data from a file and return the string of data that matches the given object ID */
+	public static String extractObjectData(Scanner fileScanner, int objectId)
+	{
+		// Read data and find the line that matches the given object ID //
+		while (fileScanner.hasNextLine())
+		{
+			/* Read current line to get object data */
+			String currentLine = fileScanner.nextLine().trim();
+
+			// Use delimiter to split string into readable attributes
+			String[] attributes = trimStringArray(currentLine.split(DELIMITER_A));
+			
+			// Read objectId
+			int currentObjectId;
+			try { currentObjectId = Integer.parseInt(attributes[0]); }
+			catch (NumberFormatException e) { continue; }
+			catch (ArrayIndexOutOfBoundsException e) { continue; }
+			
+			// Return the matching line of data
+			if (currentObjectId == objectId)
+				return currentLine;
+		}
+		
+		return ""; // No matching line found
+	}
 }
-

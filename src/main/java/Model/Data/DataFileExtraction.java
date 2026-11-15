@@ -94,5 +94,70 @@ public class DataFileExtraction
 
 		finally {} // Left blank on purpose
 	}
+
+	/* Extracts data from a file and stores in an object */
+	public static String[] extractConstantsData(Function<Scanner, String[]> dataParsingMethod, String filePath)
+	{
+		String[] constantsData = null;
+		
+		/* Get specific data file */
+		try (InputStream stream = Resources.getResourceAsStream(filePath))
+		{
+			// Try opening this file and extracting data from it
+			// using the provided data parsing method
+			try
+			{
+				Scanner fileScanner = new Scanner(stream, StandardCharsets.UTF_8);
+				constantsData = dataParsingMethod.apply(fileScanner);
+
+				// Clean up
+				fileScanner.close();
+			}
+
+			finally {} // Left blank on purpose
+		}
+
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
+
+		finally {} // Left blank on purpose
+		
+		return constantsData;
+	}
+	
+	/* Extracts a line of data needed to create a game object */
+	// Note: BiFunction takes in two arguments (Scanner/Integer) and returns a String
+	public static String extractObjectData(BiFunction<Scanner, Integer, String> dataParsingMethod, String filePath, int id)
+	{
+		String objectData = "";
+		
+		/* Get specific data file */
+		try (InputStream stream = Resources.getResourceAsStream(filePath))
+		{
+			// Try opening this file and extracting data from it
+			// using the provided data parsing method
+			try
+			{
+				Scanner fileScanner = new Scanner(stream, StandardCharsets.UTF_8);
+				objectData = dataParsingMethod.apply(fileScanner, id);
+
+				// Clean up
+				fileScanner.close();
+			}
+
+			finally {} // Left blank on purpose
+		}
+
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
+
+		finally {} // Left blank on purpose
+		
+		return objectData;
+	}
 }
 
