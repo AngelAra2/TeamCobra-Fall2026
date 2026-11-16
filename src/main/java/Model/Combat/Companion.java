@@ -92,15 +92,6 @@ public class Companion extends Character implements NPCable
     // Custom //
     public void recruit() { this.isRecruited = true; }
 
-
-    // (WIP 10.29.2026)
-	/*
-	public void applyPerk()
-	{
-		
-	}
-	*/
-
     // Overrides //
 
 

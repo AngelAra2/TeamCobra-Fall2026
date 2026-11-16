@@ -50,7 +50,7 @@ public class Player extends Character
 				startingClass.getBaseMaxHP(), //max HP
 				0, //physicalDEF
 				0, //magicDEF
-				60, //attack
+				70, //attack
 				1, //currentLevel
 
 				0, //currentXP
@@ -823,14 +823,21 @@ public class Player extends Character
 		this._adjustGoldBalance();
 	}
 
-    public void gainXP(int amount) 
+    public boolean gainXP(int amount) 
 	{
-    		/* Adds XP to the player and their active companions */
-		super.addXP(amount); // XP for player
+    	/* Adds XP to the player and their active companions */
+		boolean hasLeveledUp = this.addXP(amount); // XP for player
 		
-		// Add XP to all active companions in the player's party
+		// Add XP to all active Companions in the player's party
 		for (Companion companion: this.playerParty.getActiveCompanions())
 			companion.addXP(amount);
+		
+		// Add XP to all inactive Companions in the player's party
+		for (Companion companion: this.playerParty.getInactiveCompanions())
+			companion.addXP(amount);
+		
+		// Return whether the player has leveled up
+		return hasLeveledUp;
 	}
     
     // Allows other classes to add an item while checking carrying capacity.

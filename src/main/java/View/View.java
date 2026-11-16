@@ -2,6 +2,7 @@ package View;
 
 import Model.AbstractClasses.Item;
 import Model.Combat.CombatSkill;
+import Model.Combat.Companion;
 import Model.Combat.Player;
 import java.util.ArrayList;
 import java.util.*;
@@ -228,6 +229,37 @@ public class View
 
 	//Angel
 	//Method is used to display player status
+	public static void printCompanionStatus(Companion character){
+		printColored("============ COMPANION STATUS ============","blue", true );
+
+		println("Name: " + character.getName());
+		print("Level: " + character.getCurrentLevel());
+
+		println("\nHP: " + character.getCurrentHP() + "/" + character.getMaxHP());
+
+		println("Mana: " + character.getCurrentMana() + "/" + character.calculateMaxMana());
+
+		println("\nPhysical Defense: " + character.getPhysicalDEF());
+		println("Magic Defense: " + character.getMagicDEF());
+
+		println("\nSTR: " + character.getStrength());
+		println("DEX: " + character.getDexterity());
+		println("INT: " + character.getIntelligence());
+		println("ARC: " + character.getArcane());
+		println("END: " + character.getEndurance());
+
+		println("\nCombat Abilities:");
+
+		if(character.getSkills().isEmpty()){
+			println("- None Available");
+		} else{
+			for (CombatSkill skill : character.getSkills()){
+				println("- " + skill.getName());
+			}
+		}
+		printColored("\n=======================================","blue",true);
+	}
+
 	public static void printPlayerStatus(Player player){
 		printColored("============ PLAYER STATUS ============","blue", true );
 
@@ -260,8 +292,6 @@ public class View
 			}
 		}
 		printColored("\n=======================================","blue",true);
-
-
 	}
 
 	public static void printPuzzlePrompt(Puzzle puzzle) {

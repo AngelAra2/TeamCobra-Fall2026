@@ -2,9 +2,9 @@ package View;
 
 import java.util.*;
 
+import Model.Combat.*;
+import Model.Util.Wait;
 import Model.AbstractClasses.Combatant;
-import Model.Combat.CombatSkill;
-import Model.Combat.Monster;
 import Model.AbstractClasses.Character;
 
 public class BattleView 
@@ -174,4 +174,50 @@ public class BattleView
 		View.printColored("turn to act. Fight or Use Item ",  "cyan", false);
 		View.printColored("\nTo target a specific enemy, use \"target [slot #]\".","cyan", true);
 	}
+	
+	public static void printPartyLevelUp(Party party) 
+	{
+		/* Prints out a message indicating that the player's party has leveled up */
+		Player player = party.getPlayer();
+		List<Companion> activeCompanions = party.getActiveCompanions();
+		List<Companion> inactiveCompanions = party.getInactiveCompanions();
+		
+		View.println("");
+		View.printColored("Your party has leveled up!!! Stat points have been distributed to all members", "yellow", true);
+		View.printColored("----------<<< Lv. " + player.getCurrentLevel() + " >>>----------", "yellow", true);
+		
+		// Print stats of the player
+		View.separate(3);
+		Wait.yield(1f);
+		
+		View.printPlayerStatus(player);
+		
+		// Print stats of each party member
+		// Active Party
+		for (Companion companion : activeCompanions)
+		{
+			View.separate(3);
+			Wait.yield(1f);
+			
+			View.printCompanionStatus(companion);
+		}
+		
+		// Inactive Party
+		for (Companion companion : inactiveCompanions)
+		{
+			View.separate(3);
+			Wait.yield(1f);
+			
+			View.printCompanionStatus(companion);
+		}
+		
+		// Print out the amount of XP needed for the next level
+		int nextLevel = player.getCurrentLevel() + 1;
+		long currentXP = player.getCurrentXP();
+		long xpForNextLevel = player.getTotalXPRequiredForLevel(nextLevel);
+		
+		View.println("");
+		View.println("XP to reach Lv. " + nextLevel + ": " + currentXP + "/" + xpForNextLevel);
+	}
 }
+

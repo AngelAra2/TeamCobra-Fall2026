@@ -38,6 +38,9 @@ public class Party {
         //updates companion's party status to recruited
         companion.recruit();
         companion.setPartyStatus("Recruited");
+        
+        // Set companion's XP to match the player's XP
+        companion.addXP(this.player.getCurrentXP());
 
         //if statement checks if party has max active companions, if so, add companion to inactiveCompanions list
         if(activeCompanions.size() == maxActiveCompanions){
