@@ -1067,7 +1067,7 @@ public class GameController
 		// Player //
 		// Start the player in the first room of the map and assign player name, and starting class
 		player = new Player(playerName,startingClass,worldMap.getRoomById(1));
-
+        player.getCurrentRoom().generateItems(worldMap);
 		// Print welcome message
 		View.separate(25);
 		View.printWelcomeMessage();

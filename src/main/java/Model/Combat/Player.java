@@ -218,6 +218,7 @@ public class Player extends Character
 			
 			/* Move player to this room */
 			this._setCurrentRoom(targetRoom);
+            this.currentRoom.generateItems(worldMap);
 			this.movesSinceLastEncounter++; // Increase the number of moves since the last combat encounter
 			
 			// Reset monster being examined when moving to a new room
