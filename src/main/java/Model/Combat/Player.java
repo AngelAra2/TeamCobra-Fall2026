@@ -286,6 +286,13 @@ public class Player extends Character
 		
 		// Print out NPCs/NPC companions in the current room //
 		ExplorationView.printCompanionsInRoom(currentRoom.getCompanions());
+        View.println("");
+
+        ExplorationView.printMerchantsInRoom(currentRoom);
+        View.println("");
+
+        ExplorationView.printPuzzleInRoom(currentRoom);
+        View.println("");
 	}
 	
 	public void viewInventory()
@@ -645,7 +652,7 @@ public class Player extends Character
 						// Remove companion from current room if recruitment was successful
 						if (recruitmentSuccessful)
 							this.currentRoom.removeCompanion(companion);
-						
+
 						// Print information about the companion being recruited
 						ExplorationView.printCompanionRecruitment(recruitmentSuccessful, this.playerParty, companion);
 					}
@@ -659,53 +666,53 @@ public class Player extends Character
 				else
 					View.println("No such Companion to recruit in the current room");
 			}
-			
+
 			// Add/remove NPC companion to/from party and mark them as active/inactive
 			else if (action.equalsIgnoreCase("add") || action.equalsIgnoreCase("remove"))
 			{
 				Object targetNPC;
 				List<Companion> companions;
-				
+
 				// Adding party member
 				if (action.equalsIgnoreCase("add"))
 				{
 					companions = this.playerParty.getInactiveCompanions();
-					
+
 					// Attempts to find the companion in the inactive companions list
 					targetNPC = companions.stream()
 							.filter(companion -> companion.getName().equalsIgnoreCase(npcName))
 							.findFirst()
 							.orElse(null);
-					
+
 					// Print information about the companion being added to the active party
 					if (targetNPC != null && targetNPC instanceof Companion)
 					{
 						Companion companion = (Companion) targetNPC;
 						ExplorationView.printAddedCompanionToParty(this.playerParty.addCompanionToActiveParty(companion), companion);
 					}
-					
+
 					else
 						View.println("No such Companion in the Inactive Party to add to the Active Party");
 				}
-				
+
 				// Removing party member
 				else if (action.equalsIgnoreCase("remove"))
 				{
 					companions = this.playerParty.getActiveCompanions();
-					
+
 					// Attempts to find the companion in the active companions list
 					targetNPC = companions.stream()
 							.filter(companion -> companion.getName().equalsIgnoreCase(npcName))
 							.findFirst()
 							.orElse(null);
-					
+
 					// Print information about the companion being removed from the active party
 					if (targetNPC != null && targetNPC instanceof Companion)
 					{
 						Companion companion = (Companion) targetNPC;
 						ExplorationView.printRemovedCompanionFromParty(this.playerParty.removeCompanionFromActiveParty(companion), companion);
 					}
-					
+
 					else
 						View.println("No such Companion in the Active Party to remove to the Inactive Party");
 				}

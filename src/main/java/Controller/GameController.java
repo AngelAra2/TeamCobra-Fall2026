@@ -9,6 +9,7 @@ import Model.Data.DataFileExtraction;
 import Model.Processors.*;
 import Model.Util.Wait;
 import Model.AbstractClasses.Combatant;
+import Model.AbstractClasses.Item;
 import Model.Combat.*;
 import Model.Combat.Battlefield;
 import Model.Combat.Monster;
@@ -16,6 +17,7 @@ import Model.Combat.Player;
 import Model.Exploration.Map;
 import Model.Exploration.Puzzle;
 import Model.Exploration.Room;
+import Model.Exploration.Merchant;
 import View.BattleView;
 import View.View;
 
@@ -33,6 +35,7 @@ public class GameController
 	// Core Game Objects //
 	private static Map worldMap;
 	private static Player player;
+    private static Merchant activeMerchant;
 
 	// Command Processors //
 	private static BasicCommandProcessor basicCmdProcessor;
@@ -576,7 +579,11 @@ public class GameController
 				player.handleNPCInteraction(userCmd);
 			}
 		}
-		
+        // Merchant interaction command
+        else if (cmdType.equalsIgnoreCase("merchant"))
+        {
+            handleMerchantCommand();
+        }
 		// Monster interaction command
 		else if (cmdType.equalsIgnoreCase("monster"))
 		{
@@ -657,7 +664,9 @@ public class GameController
 
                     if (puzzle == null) {
                         View.printNoPuzzleInRoom();
-                    } else if (!puzzle.getIsSolved()) {
+                    } else if (puzzle.getIsSolved()) { // Check if the puzzle has already been solved and outputs respectively.
+                        View.println("You have already solved this puzzle.");
+                    } else {
                         player.setCurrentState("solvingPuzzle");
                     }
                     break;
@@ -824,6 +833,190 @@ public class GameController
 		}
 
 	}
+
+    // Routes a parsed merchant command to the selected merchant.
+    // A merchant must be selected with "shop" before buy or sell can be used.
+    private static void handleMerchantCommand()
+    {
+        // Split the command into its action and optional target.
+        // For example, "shop Trader Joe" becomes ["shop", "Trader Joe"].
+        String[] parts = userCmd.trim().split("\\s+", 2);
+        Room currentRoom = player.getCurrentRoom();
+
+        switch (processedCmd)
+        {
+            case "shop":
+            {
+                Merchant merchant = null;
+
+                // If a merchant name was provided, look for that NPC in this room
+                // and select it only if it is actually a merchant.
+                if (parts.length > 1)
+                {
+                    Object npc = currentRoom.getNPCByName(parts[1]);
+                    if (npc instanceof Merchant)
+                        merchant = (Merchant) npc;
+                }
+                // If no name was provided, select the merchant automatically
+                // only when there is exactly one merchant in the room.
+                else if (currentRoom.getMerchants().size() == 1)
+                    merchant = currentRoom.getMerchants().get(0);
+
+                // Do not open a trading session if the name was invalid
+                // or the room has multiple merchants and none was specified.
+                if (merchant == null)
+                {
+                    View.println("There is no matching merchant here.");
+                    return;
+                }
+
+                // Remember this merchant for later buy, sell, and cancel commands.
+                activeMerchant = merchant;
+                View.println("Wares offered by " + activeMerchant.getName() + ":");
+                printMerchantStock(activeMerchant);
+                break;
+            }
+
+            // Buy and sell share session/item validation; dispatch to the matching transaction below.
+            case "buy":
+            case "sell":
+            {
+                if (activeMerchant == null
+                        || !player.getCurrentRoom().getMerchants().contains(activeMerchant))
+                {
+                    activeMerchant = null;
+                    View.println("Use \"shop\" with a merchant here before trading.");
+                    break;
+                }
+
+                if (parts.length < 2 || parts[1].isBlank())
+                {
+                    View.println("Invalid transaction. The item is not available.");
+                    break;
+                }
+
+                if (processedCmd.equals("buy"))
+                    buyMerchantItem(parts[1].trim());
+                else
+                    sellItemToMerchant(parts[1].trim());
+
+                break;
+            }
+            case "cancel":
+            {
+                if (activeMerchant != null)
+                {
+                    activeMerchant = null;
+                    View.println("That's a pity.");
+                }
+                else
+                {
+                    View.println("You are not currently shopping.");
+                }
+                break;
+            }
+        }
+    }
+
+    // Displays each stocked item with its description, quantity, and per-item price.
+    private static void printMerchantStock(Merchant merchant)
+    {
+        HashMap<String, ArrayList<Item>> stock = merchant.getStock();
+
+        if (stock.isEmpty())
+        {
+            View.println("This merchant has no wares right now.");
+            return;
+        }
+
+        for (ArrayList<Item> items : stock.values())
+        {
+            // Each stock list contains copies of the same item, so use its first copy
+            // for the shared name, description, and price.
+            Item item = items.get(0);
+
+            View.println(item.getItemName() + " | Stock: " + items.size()
+                    + " | Price: " + item.getValue() + " Gold");
+            View.println(item.getItemDescription());
+            View.println("");
+        }
+    }
+    // Finds one stocked item by its full name, ignoring letter case.
+    private static Item findMerchantItem(String itemName)
+    {
+        ArrayList<Item> items = activeMerchant.getStock()
+                .get(itemName.toLowerCase());
+
+        return items == null || items.isEmpty() ? null : items.get(0);
+    }
+
+    // Buys one item, changing stock, inventory, and gold only after the checks pass.
+    private static void buyMerchantItem(String itemName)
+    {
+        Item item = findMerchantItem(itemName);
+
+        if (item == null)
+        {
+            View.println("Invalid transaction. The item is not available.");
+            return;
+        }
+
+        int price = item.getValue();
+        if (!player.hasSufficientGold(price))
+        {
+            View.println("You don’t have enough money, sell some items to make it back.");
+            return;
+        }
+
+        if (!player.getInventory().canCarry(item, player.getCurrentLevel()))
+        {
+            View.println("You don’t have enough space in your inventory, drop or sell items to make room.");
+            return;
+        }
+
+        // Merchant.sellItem adds the item to the player's inventory and removes it from stock.
+        if (!activeMerchant.sellItem(item, player))
+        {
+            View.println("Invalid transaction. The item is not available.");
+            return;
+        }
+
+        player.spendGold(price);
+        View.println("Bought " + item.getItemName() + " for " + price + " Gold.");
+    }
+
+    // Sells one un-equipped inventory item after the player confirms the sale.
+    private static void sellItemToMerchant(String itemName)
+    {
+        Item item = player.getItemFromInventoryByName(itemName);
+
+        if (item == null)
+        {
+            View.println("Invalid transaction. The item is not available.");
+            return;
+        }
+
+        int value = item.getValue();
+        View.println("Are you sure you want to sell " + item.getItemName()
+                + " for " + value + " Gold? (Yes/No)");
+
+        if (!getYesNoInput())
+        {
+            View.println("Sale cancelled.");
+            return;
+        }
+
+        // Inventory refuses to remove equipped items; do not credit gold unless removal succeeds.
+        if (!player.getInventory().removeItem(item))
+        {
+            View.println("Unequip the item before selling it.");
+            return;
+        }
+
+        activeMerchant.addStock(item);
+        player.addGold(value);
+        View.println("Sold " + item.getItemName() + " for " + value + " Gold.");
+    }
 
 
 	//------------------------------------//

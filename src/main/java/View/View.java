@@ -150,6 +150,14 @@ public class View
 		println("\"examine [monster name]\" --> examines a monster in the current room, giving details about the monster");
 		println("\"attack\" --> after examining a monster, initiate combat with it");
 		println("\"ignore\" --> after examining a monster, ignore it and continue exploring. The monster will disappear from the room when ignored");
+
+        // Merchant Interaction
+        println("");
+        println("MERCHANT INTERACTION");
+        println("\"shop [merchant name]\" --> view a merchant's wares");
+        println("\"buy [item name]\" --> buy one item from the active merchant");
+        println("\"sell [item name]\" --> sell one item to the active merchant");
+        println("\"cancel\" --> end the current merchant interaction");
 		
 		// Miscellaneous
 		println("");
