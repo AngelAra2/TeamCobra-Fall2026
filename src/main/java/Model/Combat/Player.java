@@ -25,10 +25,13 @@ public class Player extends Character
 	private float BASE_ENCOUNTER_CHANCE; // Base encounter chance for monsters
 	private float ENCOUNTER_CHANCE_INCREMENT; // Incremental increase in encounter chance after each move
 	private int ENCOUNTER_GRACE_MOVES; // Number of moves before monster encounters can occur again after a previous encounter
-	
-	private Room currentRoom;
+
+    private Room currentRoom;
     private Inventory inventory;
-	private Monster examinedMonster;
+    private HashMap<String, ArrayList<Item>> chestItems; // Stores items placed inside the player's storage chest.
+    private boolean chestOpen; // Tracks whether the storage chest is currently open.
+
+    private Monster examinedMonster;
 	private Party playerParty;
 	
 	private float currentEncounterChance; // Current encounter chance for monsters, which increases after each move
@@ -39,11 +42,7 @@ public class Player extends Character
 	private int goldBalance;
 	
 	/* Constructors */
-	/*
-	11.10.26
-	Angel
-	Adding new constructor to accept player name and starting class.
-	 */
+
 	public Player(String name, StartingClass startingClass, Room startingRoom){
 		super(
 				name, //name
@@ -65,6 +64,8 @@ public class Player extends Character
 		);
 		this.currentRoom = startingRoom;
         this.inventory = new Inventory();
+        this.chestItems = new HashMap<>(); // Create an empty storage chest.
+        this.chestOpen = false;
 
 		//add starting class equipment to player inventory
 		for (Item item : startingClass.getDefaultEquipment()){
@@ -187,18 +188,6 @@ public class Player extends Character
 	
 	public boolean hasSufficientGold(int amount) { return this.goldBalance >= amount; }
 
-//	public Item getItemFromInventoryByName(String itemName)
-//	{
-//		// Check if the inventory contains this item name
-//		if (this.inventory.containsKey(itemName))
-//		{
-//			ArrayList<Item> itemList = this.inventory.get(itemName);
-//			if (itemList.size() > 0)
-//				return itemList.get(0);
-//		}
-//
-//		return null;
-//	}
     public Item getItemFromInventoryByName(String itemName) {
         return this.inventory.findItem(itemName);
     }
@@ -362,25 +351,134 @@ public class Player extends Character
         {
             Item targetItem;
 
-            // Pickup item
-//            if (action.equalsIgnoreCase("pickup"))
-//            {
-//                // The player picks up the item from the current room and adds it to their inventory
-//                // The item is removed from the current room's items
-//                targetItem = this.currentRoom.getItemByName(itemName);
-//                if (targetItem != null)
-//                {
-//                    // Add item to inventory
-//                    this._addItemToInventory(targetItem);
-//
-//                    // Remove item from current room
-//                    this.currentRoom.removeItem(itemName, targetItem);
-//
-//                    View.println("Picked up " + targetItem.getItemName() + ". Added to Inventory");
-//                }
-//                else
-//                    View.println("No such item to pick up in the current room.");
-//            }
+            // Open the storage chest in Player's Room (R01).
+            if (action.equalsIgnoreCase("open") && itemName.equalsIgnoreCase("chest")) {
+                if (this.currentRoom.getRoomId() != 1) {
+                    View.println("You can only access the storage chest in your Room.");
+                    return;
+                }
+
+                this.chestOpen = true;
+                View.println("You've opened the storage chest. You can now store or retrieve items from it.");
+
+                if (this.chestItems.isEmpty()) {
+                    View.println("The storage chest is empty.");
+                } else {
+                    View.println("Storage chest contents: ");
+                    ArrayList<String> chestItemNames = new ArrayList<String>(this.chestItems.keySet());
+
+                    for (int i = 0; i < chestItemNames.size(); i++) {
+                        ArrayList<Item> itemList = this.chestItems.get(chestItemNames.get(i));
+
+                        if (itemList != null && !itemList.isEmpty()) {
+                            View.println("- " + itemList.get(0).getItemName() + " (x" + itemList.size() + ")");
+                        }
+                    }
+                }
+            }
+
+            // Close the storage chest.
+            else if (action.equalsIgnoreCase("close") && itemName.equalsIgnoreCase("chest")) {
+                if (this.currentRoom.getRoomId() != 1) {
+                    View.println("The storage chest is in your room. You are not near the chest to close it.");
+                    return;
+                }
+
+                if (!this.chestOpen) {
+                    View.println("The storage chest is already closed.");
+                    return;
+                }
+
+                this.chestOpen = false;
+                View.println("Storage chest closed.");
+            }
+
+            // Store an item from the player's inventory in the open chest.
+            else if (action.equalsIgnoreCase("store")) {
+                if (this.currentRoom.getRoomId() != 1) {
+                    View.println("You can only access the storage chest in your room.");
+                    return;
+                }
+
+                if (!this.chestOpen) {
+                    View.println("Open the storage chest before storing items.");
+                    return;
+                }
+
+                targetItem = this.getItemFromInventoryByName(itemName);
+
+                if (targetItem == null) {
+                    View.println("You do not have that item in your inventory.");
+                    return;
+                }
+
+                // Unequip equipment before moving it out of the player's inventory.
+                if (targetItem instanceof EquipmentItem) {
+                    EquipmentItem equipment = (EquipmentItem) targetItem;
+
+                    if (equipment.isEquipped()) {
+                        this.equipmentLoadout.unequipItem(equipment.getSlot());
+                    }
+                }
+
+                if (!this._removeItemFromInventory(targetItem)) {
+                    View.println("Unable to store that item in the chest.");
+                    return;
+                }
+
+                String chestItemName = targetItem.getItemName().toLowerCase();
+
+                if (!this.chestItems.containsKey(chestItemName)) {
+                    this.chestItems.put(chestItemName, new ArrayList<Item>());
+                }
+
+                this.chestItems.get(chestItemName).add(targetItem);
+                targetItem.setCollected(true);
+
+                View.println("Stored " + targetItem.getItemName() + " in the chest.");
+            }
+
+            // Retrieve an item from the open chest if the player's inventory has space.
+            else if (action.equalsIgnoreCase("retrieve")) {
+                if (this.currentRoom.getRoomId() != 1) {
+                    View.println("You can only access the storage chest in your room.");
+                    return;
+                }
+
+                if (!this.chestOpen)
+                {
+                    View.println("Open the storage chest before retrieving items.");
+                    return;
+                }
+
+                String chestItemName = itemName.toLowerCase();
+                ArrayList<Item> itemList = this.chestItems.get(chestItemName);
+
+                if (itemList == null || itemList.isEmpty())
+                {
+                    View.println("That item is not in the storage chest.");
+                    return;
+                }
+
+                targetItem = itemList.get(0);
+
+                if (!this.inventory.canCarry(targetItem, this.currentLevel))
+                {
+                    View.println("You do not have enough inventory space to retrieve that item.");
+                    return;
+                }
+
+                // Remove the item from the chest only after it is added successfully.
+                if (this._addItemToInventory(targetItem)) {
+                    itemList.remove(targetItem);
+
+                    if (itemList.isEmpty()) {
+                        this.chestItems.remove(chestItemName);
+                    }
+                    View.println("Retrieved " + targetItem.getItemName() + " from the chest.");
+                }
+            }
+
             // Pickup item
             if (action.equalsIgnoreCase("pickup")) {
 
@@ -424,31 +522,6 @@ public class Player extends Character
                     View.println("No such item to inspect in your inventory.");
             }
 
-            // Drop item
-//            else if (action.equalsIgnoreCase("drop"))
-//            {
-//                // The player drops the item from their inventory and adds it to the current room's items HashMap
-//                // The item is removed from the inventory
-//                targetItem = this.getItemFromInventoryByName(itemName);
-//                if (targetItem != null)
-//                {
-//                    // Remove item from inventory
-//                    this._removeItemFromInventory(targetItem);
-//
-//                    // Add item to current room
-//                    this.currentRoom.addItem(itemName, targetItem);
-//
-//                    View.println("Dropped " + targetItem.getItemName() + ". Added to " + this.currentRoom.getRoomName());
-//
-//                    // If the dropped item was the currently equipped weapon, unequip it
-//                    if (targetItem instanceof Weapon && this.equippedWeapon == targetItem)
-//                    {
-//                    	this.handleItemInteraction("unequip " + itemName);
-//                    }
-//                }
-//                else
-//                    View.println("No such item to drop in your inventory");
-//            }
 
             // Drop item
             else if (action.equalsIgnoreCase("drop")) {
@@ -481,48 +554,7 @@ public class Player extends Character
                     View.println("No such item to drop in your inventory");
                 }
             }
-            
-            // Equip item (weapon)
-//            else if (action.equalsIgnoreCase("equip"))
-//			{
-//				// The player equips the item from their inventory
-//				targetItem = this.getItemFromInventoryByName(itemName);
-//				if (targetItem != null)
-//				{
-//					if (targetItem instanceof Weapon)
-//					{
-//						// Unequip the currently equipped weapon
-//						if (this.equippedWeapon != null)
-//						{
-//							this.handleItemInteraction("unequip " + this.equippedWeapon.getItemName());
-//						}
-//
-//						// Equip the weapon
-//						this.equipWeapon((Weapon) targetItem);
-//						View.println("Equipped " + targetItem.getItemName());
-//					}
-//					else
-//						View.println("Cannot equip " + targetItem.getItemName() + " since it isn't a weapon");
-//				}
-//				else
-//					View.println("No such weapon to equip in your inventory");
-//			}
-//
-//            // Unequip item (weapon)
-//			else if (action.equalsIgnoreCase("unequip"))
-//			{
-//				// Check if the player has a weapon equipped
-//				if (this.equippedWeapon != null)
-//				{
-//					// Unequip the weapon
-//					Weapon unequippedWeapon = this.equippedWeapon;
-//
-//					this.unequipWeapon();
-//					View.println("Unequipped " + unequippedWeapon.getItemName());
-//				}
-//				else
-//					View.println("No weapon is currently equipped");
-//			}
+
             // Equip an item.
             else if (action.equalsIgnoreCase("equip")) {
                 targetItem = this.getItemFromInventoryByName(itemName);
