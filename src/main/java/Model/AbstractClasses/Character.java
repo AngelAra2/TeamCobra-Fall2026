@@ -5,6 +5,7 @@ import java.util.*;
 import Model.Combat.CombatSkill;
 import Model.Items.*;
 
+//Danh, Dylan, Priscilla
 public abstract class Character extends Combatant 
 {
 	/* Data Fields */

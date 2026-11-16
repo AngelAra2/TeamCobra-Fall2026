@@ -6,6 +6,7 @@ import java.util.List;
 import Model.Combat.Player;
 import Model.Interfaces.Rewardable;
 
+//Dylan, Danh
 public class Puzzle
 {
 	/* Data Fields */

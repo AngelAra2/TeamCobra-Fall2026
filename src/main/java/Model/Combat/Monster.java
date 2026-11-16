@@ -5,6 +5,7 @@ import java.util.List;
 import Model.AbstractClasses.Combatant;
 import Model.AbstractClasses.Item;
 
+//Danh
 public class Monster extends Combatant 
 {
 	/* Data Fields */

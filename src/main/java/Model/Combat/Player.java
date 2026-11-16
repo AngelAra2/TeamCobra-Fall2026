@@ -15,6 +15,8 @@ import Model.Items.EquipmentItem;
 import Model.Items.Weapon;
 import View.*;
 
+
+//Angel,Danh,Priscilla,Dylan
 public class Player extends Character
 {
 	/* Data Fields */

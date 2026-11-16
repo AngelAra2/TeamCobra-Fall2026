@@ -50,7 +50,7 @@
 package Model.Items;
 
 import java.util.HashMap;
-
+//Priscilla
 public class EquipmentLoadout {
 
     /* Data Fields */
@@ -106,36 +106,7 @@ public class EquipmentLoadout {
 
 
         return true;
-//        // Check whether another item already occupies this slot.
-//        EquipmentItem oldItem = equippedItems.get(slot);
-//
-//
-//        // Account for the weight of the item being replaced.
-//        if (oldItem != null) {
-//            newTotalWeight = newTotalWeight - oldItem.getWeight();
-//        }
-//
-//        // Add the new item's weight.
-//        newTotalWeight = newTotalWeight + item.getWeight();
-//
-//        // Prevent the player from exceeding their equipment load.
-//        if (newTotalWeight > maxLoad) {
-//            return false;
-//        }
-//
-//        // Mark the previous item as unequipped.
-//        if (oldItem != null) {
-//            oldItem.setEquipped(false);
-//        }
-//
-//        // Store the new item in its equipment slot.
-//        equippedItems.put(slot, item);
-//
-//        // Update the item's status and total equipment weight.
-//        item.setEquipped(true);
-//        totalWeight = newTotalWeight;
-//
-//        return true;
+
     }
 
     // Removes the item occupying the requested equipment slot.

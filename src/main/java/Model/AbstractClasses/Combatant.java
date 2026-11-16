@@ -3,6 +3,7 @@ package Model.AbstractClasses;
 import Model.Exploration.Room;
 import Model.Util.*;
 
+//Danh, Angel, Priscilla
 public abstract class Combatant 
 {
 	/* Data Fields */

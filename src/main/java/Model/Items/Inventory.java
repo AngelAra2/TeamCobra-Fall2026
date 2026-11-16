@@ -161,6 +161,7 @@ import java.util.HashMap;
 import Model.AbstractClasses.Item;
 
 // Stores the items a character is carrying and tracks their total weight.
+//Priscilla
 public class Inventory {
 
     // Stores items by lowercase name. Multiple copies can share a name.

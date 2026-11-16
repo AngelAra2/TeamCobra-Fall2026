@@ -6,6 +6,7 @@ package Model.AbstractClasses;
  * items, or other game objects
  */
 
+//Danh
 public abstract class Factory<T>
 {
 	/* Data Fields */

@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.*;
 import Model.Exploration.Puzzle;
 
+//Angel, Dylan, Danh
 public class View
 {
 	/* Data Fields */

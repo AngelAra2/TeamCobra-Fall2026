@@ -6,7 +6,7 @@ import Model.Combat.*;
 import Model.Util.Wait;
 import Model.AbstractClasses.Combatant;
 import Model.AbstractClasses.Character;
-
+//Danh, Angel
 public class BattleView 
 {
 	/* Data Fields */

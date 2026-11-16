@@ -11,6 +11,7 @@ import Model.AbstractClasses.Item;
 import Model.Items.Inventory;
 import Model.Items.EquipmentItem;
 import View.View;
+//Angel,Dylan,Danh
 public class Companion extends Character implements NPCable
 {
     /* Data Fields */

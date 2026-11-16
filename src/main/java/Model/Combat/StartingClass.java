@@ -4,6 +4,7 @@ import Model.AbstractClasses.Item;
 
 import java.util.ArrayList;
 
+//Angel
 public class StartingClass {
     private int id;
     private String name;

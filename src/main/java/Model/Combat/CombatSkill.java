@@ -12,6 +12,7 @@ import java.util.ArrayList;
 //11.14.26
 //Angel Aragon
 //Finished CombatSkills class
+//Angel, Danh
 public class CombatSkill 
 {
 	/* Data Fields */

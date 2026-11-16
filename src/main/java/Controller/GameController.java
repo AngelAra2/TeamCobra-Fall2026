@@ -46,6 +46,7 @@ public class GameController
 	//------------------------------------//
 	
 	/* Helper Methods */
+	//Dylan Morrison
     private static void puzzleSolvingLoop()
     {
         // Get the puzzle in the player's current room.
@@ -105,7 +106,8 @@ public class GameController
         // Return the player to normal exploration after the attempt ends.
         player.resetToDefaultState();
     }
-	
+
+	//Danh and Angel
 	private static void combatLoop()
 	{
 		/* In combat state, the player can:
@@ -448,6 +450,7 @@ public class GameController
 	//------------------------------------//
 	
 	/* Gameplay Loop Helper Methods */
+	//Danh
 	private static void quit()
 	{
 		/* Clean up class objects */
@@ -459,7 +462,8 @@ public class GameController
 		View.separate(10);
 		View.printColored("Thanks for playing. Goodbye~", "blue", true);
 	}
-	
+
+	//Danh
 	private static boolean gameOverScreen()
 	{
 		/* Give the player two options: restart the game or quit */
@@ -489,6 +493,7 @@ public class GameController
 		}
 	}
 
+	//Angel
 	private static boolean handleCompanionCommand(String userCmd){
 		String input = userCmd.trim();
 
@@ -532,6 +537,7 @@ public class GameController
 		return false;
 
 	}
+	//Danh,Angel,Dylan
 	private static boolean exploration()
 	{
 		/* In exploration state, the player can:
@@ -715,7 +721,8 @@ public class GameController
 		// Continue with the current iteration of the main gameplay loop
 		return false;
 	}
-	
+
+	//Danh
 	private static boolean checkIfPlayerIsAlive()
 	{
 		/* Check player's status */
@@ -731,7 +738,8 @@ public class GameController
 		
 		return false; // Continue with the current iteration of the main gameplay loop
 	}
-	
+
+	//Danh
 	private static boolean checkPlayerState()
 	{
 		/* Check the player's current state */
@@ -752,7 +760,8 @@ public class GameController
 				return false; // Continue with current iteration of the main gameplay loop
 		}
 	}
-	
+
+	//Danh
 	private static void resetVariables()
 	{
 		userCmd = "";
@@ -765,6 +774,7 @@ public class GameController
 
 
 	//makes sure user enters a starting class name, and returns starting class object
+	//Angel
 	private static StartingClass getValidStartingClass(ArrayList<StartingClass> classes){
 
 		//gets user input, if class exists, return the starting class, if it doesn't exist
@@ -784,6 +794,7 @@ public class GameController
 
 	}
 	//method gets user's input, and validates it to ensure user enter's either yes or no.
+	//Angel
 	private static boolean getYesNoInput(){
 
 		//validates user's input, user cannot exit loop unless they enter yes or no.
@@ -803,6 +814,7 @@ public class GameController
 		}
 	}
 
+	//Angel
 	private static StartingClass pickStartingClass(){
 		ArrayList<StartingClass> classes = new ArrayList<>();
 
@@ -857,6 +869,7 @@ public class GameController
 
     // Routes a parsed merchant command to the selected merchant.
     // A merchant must be selected with "shop" before buy or sell can be used.
+	//Dylan
     private static void handleMerchantCommand()
     {
         // Split the command into its action and optional target.
@@ -940,6 +953,7 @@ public class GameController
     }
 
     // Displays each stocked item with its description, quantity, and per-item price.
+	//Dylan
     private static void printMerchantStock(Merchant merchant)
     {
         HashMap<String, ArrayList<Item>> stock = merchant.getStock();
@@ -963,7 +977,9 @@ public class GameController
         }
     }
     // Finds one stocked item by its full name, ignoring letter case.
-    private static Item findMerchantItem(String itemName)
+	//Dylan
+	private static Item findMerchantItem(String itemName)
+
     {
         ArrayList<Item> items = activeMerchant.getStock()
                 .get(itemName.toLowerCase());
@@ -972,6 +988,7 @@ public class GameController
     }
 
     // Buys one item, changing stock, inventory, and gold only after the checks pass.
+	//Dylan
     private static void buyMerchantItem(String itemName)
     {
         Item item = findMerchantItem(itemName);
@@ -1007,6 +1024,7 @@ public class GameController
     }
 
     // Sells one un-equipped inventory item after the player confirms the sale.
+	//Dylan
     private static void sellItemToMerchant(String itemName)
     {
         Item item = player.getItemFromInventoryByName(itemName);
@@ -1043,6 +1061,7 @@ public class GameController
 	//------------------------------------//
 
 
+	//Danh, Angel, Dylan
 	private static void preGameSetup()
 	{
 		/* Pre-game setup */
@@ -1076,7 +1095,8 @@ public class GameController
 	}
 	
 	//------------------------------------//
-	
+
+	//Danh
 	private static void mainGameplayLoop()
 	{
 		preGameSetup();
@@ -1102,7 +1122,8 @@ public class GameController
 	}
 	
 	//------------------------------------//
-	
+
+	//Danh
 	public static void start() 
 	{
 		mainGameplayLoop();

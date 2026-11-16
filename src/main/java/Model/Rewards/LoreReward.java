@@ -5,7 +5,7 @@ import java.util.*;
 import Model.Combat.Player;
 import Model.Interfaces.Rewardable;
 import View.View;
-
+//Dylan
 public class LoreReward implements Rewardable
 {
     /* Data Fields */

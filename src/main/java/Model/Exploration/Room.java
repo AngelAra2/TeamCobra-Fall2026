@@ -7,6 +7,7 @@ import Model.Combat.Companion;
 import Model.Factories.MonsterFactory;
 import Model.Util.ItemUtil;
 
+//Danh, Dylan, Priscilla, Angel
 public class Room 
 {
 	/* Data Fields */
@@ -335,42 +336,7 @@ public class Room
 	
 	// Overrides //
 	
-	/*
-	@Override
-	public String toString()
-	{
-		String a = "Room ID: " + this.roomId + "\n";
-		String b = "Room Name: " + this.roomName + "\n";
-		String c = "Room Desc: " + this.roomDesc + "\n";
-		String d = "Has been visited: " + this.wasVisited + "\n\n";
-		String e = "Room Exits: {";
-		
-		// Print exits
-		try
-		{
-			for (HashMap.Entry<String, Integer> exit: this.exits.entrySet())
-			{
-				String direction = exit.getKey();
-				String roomId = String.valueOf(exit.getValue());
-				
-				e += direction + " = " + roomId + ", ";
-			}
-		}
-		catch (NullPointerException ex)
-		{
-			// Leave blank
-		}
-		catch (ConcurrentModificationException ex)
-		{
-			// Leave blank
-		}
-		finally
-		{
-			e += "}\n";
-		}
 
-		return a + b + c + d + e;
-	}
-	*/
+
 }
 

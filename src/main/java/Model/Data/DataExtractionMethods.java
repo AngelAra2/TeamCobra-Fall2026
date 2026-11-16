@@ -24,6 +24,8 @@ import Model.Util.ItemUtil;
 import Model.Rewards.LoreReward;
 import Model.Rewards.RoomReward;
 import Model.Rewards.ItemReward;
+
+//Angel, Dylan, Priscilla, Danh
 public class DataExtractionMethods {
 
     /* Data Fields */
@@ -135,144 +137,6 @@ public class DataExtractionMethods {
         }
     }
 
-    /* Extract data from a file and parse it into Item objects */
-//    public static void extractItemData(Scanner fileScanner, Map worldMap) {
-//        HashMap<Integer, Room> rooms = worldMap.getRooms();
-//
-//        // Read puzzle data and create Puzzle objects //
-//        while (fileScanner.hasNextLine()) {
-//            /* Read current line to get Puzzle data */
-//            String currentLine = fileScanner.nextLine().trim();
-//
-//            // Use delimiter to split string into readable attributes
-//            String[] attributes = trimStringArray(currentLine.split(DELIMITER_A));
-//
-//            // Declare required attributes
-//            int itemId;
-//            String itemType = "...";
-//            String itemName = "Item";
-//            String itemDesc = "...";
-//
-//
-//            // Read itemId
-//            try {
-//                itemId = Integer.parseInt(attributes[0]);
-//            } catch (NumberFormatException e) {
-//                continue;
-//            } catch (ArrayIndexOutOfBoundsException e) {
-//                continue;
-//            }
-//
-//            // Read itemType
-//            try {
-//                itemType = attributes[1];
-//            } catch (ArrayIndexOutOfBoundsException e) {
-//                continue;
-//            }
-//
-//            // Read itemName
-//            try {
-//                itemName = attributes[2];
-//            } catch (ArrayIndexOutOfBoundsException e) {
-//                // Leave blank
-//            }
-//
-//            // Read itemDesc
-//            try {
-//                itemDesc = attributes[3];
-//            } catch (ArrayIndexOutOfBoundsException e) {
-//                // Leave blank
-//            }
-//
-//            // There may be more than one of the same item in the game
-//            // Depending on the number of room IDs listed in the file, a new Item object will be created for each room ID
-//            try {
-//                // Read room IDs as a single string and split it into an array of strings
-//                String[] targetRoomIds = trimStringArray(attributes[attributes.length - 1].split(DELIMITER_B));
-//
-//                // Create a new Item object for each room ID listed
-//                int roomId;
-//                for (int i = 0; i < targetRoomIds.length; i++) {
-//                    // Read roomId this item is located in
-//                    try {
-//                        roomId = Integer.parseInt(targetRoomIds[i]);
-//                    } catch (NumberFormatException e) {
-//                        continue;
-//                    } catch (ArrayIndexOutOfBoundsException e) {
-//                        continue;
-//                    }
-//
-//                    /* Create Item object */
-//
-//                    // Check item type and create the appropriate subclass object
-//                    Item item;
-//                    switch (itemType.toLowerCase()) {
-//                        case "weapon":
-//                            //int baseAttack;
-//                            double weight = Double.parseDouble(attributes[4]);
-//                            int value = Integer.parseInt(attributes[5]);
-//                            String slot = attributes[6];
-//                            int physicalDamage = Integer.parseInt(attributes[7]);
-//                            int magicDamage = Integer.parseInt(attributes[8]);
-//                            int physicalDefense = Integer.parseInt(attributes[9]);
-//                            int magicDefense = Integer.parseInt(attributes[10]);
-//                            String strengthScaling = attributes[11];
-//                            String dexterityScaling = attributes[12];
-//                            String intelligenceScaling = attributes[13];
-//                            String arcaneScaling = attributes[14];
-//                            String specialEffect = attributes[15];
-//
-////                            try {
-////                                baseAttack = Integer.parseInt(attributes[4]);
-////                            } catch (NumberFormatException e) {
-////                                // Leave default value
-////                            } catch (ArrayIndexOutOfBoundsException e) {
-////                                // Leave default value
-////                            }
-//
-////                            item = new Weapon(itemId, itemName, itemDesc, baseAttack);
-////                            break;
-//                            item = new Weapon(itemId, itemName, itemDesc, weight, value, slot, physicalDamage,
-//                            magicDamage, physicalDefense, magicDefense, strengthScaling, dexterityScaling,
-//                                intelligenceScaling, arcaneScaling, specialEffect);
-//                            break;
-//
-//                        case "consumable":
-//                            //int healingAmount = 0;
-////                            try {
-////                                healingAmount = Integer.parseInt(attributes[4]);
-////                            } catch (NumberFormatException e) {
-////                                // Leave default value
-////                            } catch (ArrayIndexOutOfBoundsException e) {
-////                                // Leave default value
-////                            }
-////                            double weight = Double.parseDouble(attributes[4]);
-////                            int value = Integer.parseInt(attributes[5]);
-//                            weight = Double.parseDouble(attributes[4]);
-//                            value = Integer.parseInt(attributes[5]);
-//                            String effectType = attributes[6];
-//                            int effectAmount = Integer.parseInt(attributes[7]);
-//                            int effectDuration = Integer.parseInt(attributes[8]);
-//
-//                            item = new Consumable(itemId, itemName, itemDesc,
-//                                    weight, value, effectType, effectAmount, effectDuration);
-//                            break;
-////                            item = new Consumable(itemId, itemName, itemDesc, healingAmount);
-////                            break;
-//
-//                        default:
-//                            continue; // Skip this item if the type is unrecognized
-//                    }
-//
-//                    // Add item to the room with the matching room ID, if it exists
-//                    if (rooms.containsKey(roomId))
-//                        rooms.get(roomId).addItem(itemName.toLowerCase(), item);
-//                }
-//            } catch (ArrayIndexOutOfBoundsException e) {
-//                continue;
-//            }
-//        }
-//    }
 
 
 // Loads weapon definitions.

@@ -5,6 +5,7 @@ import Model.Combat.Monster;
 import Model.Data.DataExtractionMethods;
 import Model.Data.DataFileExtraction;
 
+//Danh
 public class MonsterFactory extends Factory<Monster>
 {
 	/* Data Fields */

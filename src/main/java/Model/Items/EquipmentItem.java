@@ -130,6 +130,7 @@ package Model.Items;
 import Model.AbstractClasses.Item;
 
 // Parent class for all equippable items.
+//Priscilla
 public abstract class EquipmentItem extends Item {
 
     // Equipment slot names.

@@ -1,5 +1,6 @@
 package Model.Interfaces;
 
+//Dylan
 public interface NPCable {
     String talk();
 }

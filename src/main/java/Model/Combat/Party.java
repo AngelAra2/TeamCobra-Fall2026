@@ -10,6 +10,7 @@ Party class
 Refer to 3.2.2 User Class 2: NPC Companions
 ID: FR32, FR33, FR34, FR35
  */
+//Priscilla, Danh, Dylan
 public class Party {
     private Player player;
 

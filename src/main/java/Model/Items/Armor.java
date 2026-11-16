@@ -2,6 +2,7 @@
 package Model.Items;
 
 // Represents armor and shields that characters can equip.
+//Priscilla
 public class Armor extends EquipmentItem {
 
     // Creates armor using its equipment and defensive information.

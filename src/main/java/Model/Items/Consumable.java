@@ -23,7 +23,7 @@
 package Model.Items;
 
 import Model.AbstractClasses.Item;
-
+//Priscilla
 public class Consumable extends Item {
 
     /* Data Fields */

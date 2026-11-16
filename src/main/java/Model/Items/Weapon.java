@@ -22,6 +22,7 @@
 package Model.Items;
 
 // Represents weapons that characters can equip.
+//Priscilla, Angel
 public class Weapon extends EquipmentItem {
     private String weaponType;
     // Full constructor for weapons loaded from item data.
