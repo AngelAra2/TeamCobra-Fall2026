@@ -276,6 +276,13 @@ public class View
 				printColored("Description: ","cyan", true);
 				println("");
 				println(wrapText(skill.getDescription(), 50));
+
+				if (skill.getRequiredWeaponType().equalsIgnoreCase("NONE")){
+					continue;
+				} else{
+					println("Must have " + skill.getRequiredWeaponType() + " equipped in " + skill.getRequiredWeaponSlot() + " slot." );
+				}
+
 				separate(2);
 			}
 		}
@@ -291,7 +298,7 @@ public class View
 		println("\nHP: " + player.getCurrentHP() + "/" + player.getMaxHP());
 
 		println("Mana: " + player.getCurrentMana() + "/" + player.calculateMaxMana());
-
+		printColored("Gold: " + player.getGoldBalance(), "yellow", true);
 		println("\nPhysical Defense: " + player.getPhysicalDEF());
 		println("Magic Defense: " + player.getMagicDEF());
 
@@ -314,6 +321,7 @@ public class View
 				printColored("Description: ","cyan", true);
 				println("");
 				println(wrapText(skill.getDescription(), 50));
+				println("Must have " + skill.getRequiredWeaponType() + " equipped in " + skill.getRequiredWeaponSlot() + " slot." );
 				separate(2);
 			}
 		}

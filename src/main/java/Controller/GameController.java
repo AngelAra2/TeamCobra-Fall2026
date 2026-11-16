@@ -242,7 +242,13 @@ public class GameController
 							Wait.yield(1f);
 							//attempts to execute skill against target.
 							//battlefield handles skill validation, mana requirements, targeting, damage, and healing
-							Battlefield.performSkillAttack(combatant, skill, Battlefield.getTargetMonster(), player.getInventory());
+							if(combatant instanceof Companion){
+								Companion c = (Companion) combatant;
+								Battlefield.performSkillAttack(combatant,skill, Battlefield.getTargetMonster(), c.getInventory());
+							}else{
+								Battlefield.performSkillAttack(combatant, skill, Battlefield.getTargetMonster(), player.getInventory());
+							}
+
 						}
 
 						//return to main combat menu
@@ -256,16 +262,7 @@ public class GameController
 
 						break;
 
-//					// The user wants to attack their currently targeted monster
-//					case "attack":
-//						View.separate(3);
-//						View.println("Launching attack...");
-//						Wait.yield(1f);
-//
-//						Battlefield.performAttack(combatant, Battlefield.getTargetMonster());
-//
-//						break;
-//
+
 					// The user wants to switch their target to a different monster
 					case "target":
 						View.separate(3);

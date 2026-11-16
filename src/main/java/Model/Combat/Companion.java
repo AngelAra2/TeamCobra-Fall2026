@@ -199,6 +199,8 @@ public class Companion extends Character implements NPCable
             View.println(getName() + " unequipped " + equipment.getItemName());
         }
     }
+
+
     @Override
     public String talk() {
         return "";

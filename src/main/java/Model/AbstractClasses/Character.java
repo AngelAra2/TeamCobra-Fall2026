@@ -190,7 +190,7 @@ public abstract class Character extends Combatant
 	public boolean addXP(long amount)
 	{
 		/* Adds XP to the character and checks if they level up */
-		this.currentXP += (amount);
+		this.currentXP += (amount * 10);
 		this.checkLevelUp();
 		
 		// Return true if the character leveled up at least 1 level, false otherwise

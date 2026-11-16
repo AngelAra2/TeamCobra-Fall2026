@@ -133,7 +133,7 @@ public class CombatSkill
 		if (user == null || !user.isAlive()) {
 			return false;
 		}
-
+		//checks if character has enough mana
 		if (user.getCurrentMana() < manaCost) {
 			return false;
 		}
@@ -153,10 +153,12 @@ public class CombatSkill
 		//checks character eligibility.
 		boolean allowedCharacter = false;
 
+		//returns false if no eligible characters are defined.
 		if (requiredCharacters == null){
 			return false;
 		}
 
+		// Loops through the list of characters allowed to use the skill.
 		for (String required : requiredCharacters){
 			//change allowed character to true if characterName matches required name or skill can be used by anyone
 			if(required.equalsIgnoreCase("ANY") || required.equalsIgnoreCase(characterName)){
@@ -170,7 +172,9 @@ public class CombatSkill
 		}
 
 
-		//The Shaman can use it with any staff, other characters need caduceus staff is equipped
+		// Special exception for Serpent Call (skill ID 11).
+		// The Shaman can use it with any staff, while other
+		// characters need the Caduceus staff equipped.
 		if (this.id == 11){
 			EquipmentItem offHand = user.getEquipmentLoadout().getEquippedItem(EquipmentItem.OFF_HAND);
 
@@ -187,7 +191,9 @@ public class CombatSkill
 		boolean hasSkill = false;
 
 		if (user.getSkills() != null) {
+			//Searches the character's skills for matching skill ID
 			for (CombatSkill skill : user.getSkills()) {
+
 				if (skill.getId() == this.id) {
 					hasSkill = true;
 					break;
@@ -202,6 +208,7 @@ public class CombatSkill
 
 		String slot;
 
+		// Determines which equipment slot the skill requires.
 		if (requiredWeaponSlot.equalsIgnoreCase("Main Hand")){
 			slot = EquipmentItem.MAIN_HAND;
 		}
@@ -215,7 +222,7 @@ public class CombatSkill
 		//Gets equipped item in required slot.
 		EquipmentItem equippedItem = user.getEquipmentLoadout().getEquippedItem(slot);
 
-
+		//makes sure the equipped item is a weapon
 		if (!(equippedItem instanceof Weapon)){
 			return false;
 		}
@@ -230,9 +237,10 @@ public class CombatSkill
 			return false;
 		}
 
+		//get the weapon type of equipped weapon.
 		String equippedType = weapon.getWeaponType();
 
-
+		//checks if equipped weapon matches required weapon type
 		if (requiredWeaponType.equalsIgnoreCase("Melee")){
 			//Spears count as melee weapons
 			if(!equippedType.equalsIgnoreCase("Melee") && !equippedType.equalsIgnoreCase("Spear")){
@@ -256,7 +264,6 @@ public class CombatSkill
 		}
 
 		if(inventory != null && inventory.getQuantity("Wooden Arrow") >= ammunitionCost){
-			System.out.println("ARROWS: " +inventory.getQuantity("Wooden Arrow"));
 			return true;
 		}
 
