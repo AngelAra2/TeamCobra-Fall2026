@@ -166,6 +166,10 @@ public class Battlefield
 		//deduct required mana from attacker.
 		attacker.spendMana(skill.getManaCost());
 
+		// Remove ammunition required by the combat skill.
+		for (int i = 0; i < skill.getAmmunitionCost(); i++) {
+			inventory.removeItem(inventory.findItem("Wooden Arrow"));
+		}
 		//apply damage to selected target for single target skills.
 		if (skill.getTargetType().equalsIgnoreCase("Single")) {
 			applySkillDamage(attacker, skill, receiver);

@@ -236,7 +236,7 @@ public class GameController
 							CombatSkill skill = combatant.getSkillByName(processedCmd); //receive skill
 
 							View.separate(3);
-							View.println("Launching attack...");
+							View.println("Launching skill...");
 							Wait.yield(1f);
 							//attempts to execute skill against target.
 							//battlefield handles skill validation, mana requirements, targeting, damage, and healing
@@ -363,12 +363,7 @@ public class GameController
 							BattleView.printPartyLevelUp(player.getPlayerParty());
 					}
 				}
-				
-				// TEST CODE
-				View.println("Has leveled up: " + hasPartyLeveledUp);
-				View.println("XP for next level: " + player.getTotalXPRequiredForLevel(player.getCurrentLevel() + 1));
-				
-				View.println("Current XP: " + player.getCurrentXP());
+
 			}
 
 			/* Monsters' turn */
@@ -526,6 +521,8 @@ public class GameController
 					c.handleEquipmentCommand(action, itemName);
 					return true;
 
+				case "status":
+					View.printCompanionStatus(c);
 				default:
 					View.println("Invalid companion command.");
 					return true;
@@ -668,13 +665,17 @@ public class GameController
 					break;
 
 				//displays player's status
-				case "player status":
+				case "status":
 					View.printPlayerStatus(player);
 					break;
 
 				// The user would like to view the party's status
-				case "status":
-					player.viewPartyStatus();
+				case "party status":
+					View.printPlayerStatus(player);
+
+					for (Companion companion : player.getPlayerParty().getActiveCompanions()){
+						View.printCompanionStatus(companion);
+					}
 					break;
 
 				// The user would like to view the game's commands

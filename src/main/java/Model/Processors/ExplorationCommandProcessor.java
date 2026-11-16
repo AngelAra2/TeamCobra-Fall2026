@@ -233,12 +233,12 @@ public class ExplorationCommandProcessor extends CommandProcessor
 					this.processedCmd = "location";
 					break;
 				//-----------------------------//
-				case "player status":
-					this.processedCmd = "player status";
-					break;
-				//----------------------------//
 				case "status":
 					this.processedCmd = "status";
+					break;
+				//----------------------------//
+				case "party status":
+					this.processedCmd = "party status";
 					break;
 				//-----------------------------//
                 case "solve":

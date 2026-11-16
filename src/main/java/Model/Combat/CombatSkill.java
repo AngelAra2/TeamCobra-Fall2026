@@ -255,6 +255,7 @@ public class CombatSkill
 		}
 
 		if(inventory != null && inventory.getQuantity("Wooden Arrow") >= ammunitionCost){
+			System.out.println("ARROWS: " +inventory.getQuantity("Wooden Arrow"));
 			return true;
 		}
 

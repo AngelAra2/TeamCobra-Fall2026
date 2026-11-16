@@ -144,13 +144,22 @@ public class View
 		println("\"unequip [item name]\" --> unequip your currently equipped weapon");
 		println("\"heal [item name]\" --> use a consumable item from your inventory to heal yourself");
 		println("\"inventory\" --> view all items in your inventory");
-		
+
+		// Item Interaction
+		println("");
+		println("COMPANION ITEM INTERACTION");
+		println("\"[companion name] equip [item name]\" --> equip a weapon from your inventory, increasing your Attack stat");
+		println("\"[companion name] unequip [item name]\" --> unequip your currently equipped weapon");
+		println("\"[companion name] heal [item name]\" --> use a consumable item from your inventory to heal yourself");
+		println("\"[companion name] inventory\" --> view all items in your inventory");
+		println("\"[companion name] status\" --> view companion status");
+
+
 		// Monster Interaction
 		println("");
-		println("MONSTER INTERACTION");
-		println("\"examine [monster name]\" --> examines a monster in the current room, giving details about the monster");
-		println("\"attack\" --> after examining a monster, initiate combat with it");
-		println("\"ignore\" --> after examining a monster, ignore it and continue exploring. The monster will disappear from the room when ignored");
+		println("PARTY");
+		println("\"add [companion name]\" --> adds companion to active party");
+		println("\"remove [companion name]\" --> removes companion to active party");
 
         // Merchant Interaction
         println("");
@@ -164,7 +173,7 @@ public class View
 		println("");
 		println("MISCELLANEOUS");
 		println("\"room\" or \"location\" --> view the current room's name and description");
-		println("\"player status\" --> view the player's status");
+		println("\"status\" --> view the player's status");
         println("\"solve\" --> attempt to solve a puzzle in a room."); // Dylan 11.15.26
 		println("\"help\" --> view all the game's commands");
 		println("\"q\" or \"quit\" --> quit the game");
@@ -254,7 +263,14 @@ public class View
 			println("- None Available");
 		} else{
 			for (CombatSkill skill : character.getSkills()){
-				println("- " + skill.getName());
+				print("- ");
+				printColored(skill.getName(),"cyan", true);
+				print("- ");
+
+				printColored("Description: ","cyan", true);
+				println("");
+				println(wrapText(skill.getDescription(), 50));
+				separate(2);
 			}
 		}
 		printColored("\n=======================================","blue",true);
@@ -285,8 +301,12 @@ public class View
 			println("- None Available");
 		} else{
 			for (CombatSkill skill : player.getSkills()){
-				println("- " + skill.getName());
-				print("- Description: ");
+				print("- ");
+				printColored(skill.getName(),"cyan", true);
+				print("- ");
+
+				printColored("Description: ","cyan", true);
+				println("");
 				println(wrapText(skill.getDescription(), 50));
 				separate(2);
 			}

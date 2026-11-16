@@ -87,7 +87,7 @@ public class CombatCommandProcessor extends CommandProcessor
 
 		String cmd = input.trim();
 
-		if(cmd.equals("basic attack")){
+		if(cmd.equals("attack")){
 			this.cmdType = "basicAttack";
 			this.processedCmd = "basicAttack";
 			return;

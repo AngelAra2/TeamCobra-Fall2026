@@ -58,6 +58,21 @@ public class BattleView
 		// If critical HP, print HP text and progress bar in red; print in green otherwise
 		View.printColored(hpText, hpColor, false);
 		View.print(" ");
+
+		if(combatant instanceof Character){
+			Character character = (Character) combatant;
+			float totalMana =  character.calculateMaxMana();
+			float manaUsed = character.getCurrentMana();
+
+			String tManaTxt = "/" + (int) totalMana;
+			String uManaTxt = "Mana: " + (int) manaUsed;
+			View.printProgressBar(hpPercentage, PROGRESS_BAR_LENGTH, hpColor, false);
+
+			View.printColored(" | " + pDefText + " | " + mDefText + " | " + uManaTxt + tManaTxt, "cyan", true);
+			View.println("");
+
+			return;
+		}
 		View.printProgressBar(hpPercentage, PROGRESS_BAR_LENGTH, hpColor, false);
 
 		View.printColored(" | " + pDefText + " | " + mDefText, "cyan", true);
