@@ -1,6 +1,6 @@
 package Model.AbstractClasses;
 
-import java.util.List;
+import java.util.*;
 
 import Model.Combat.CombatSkill;
 import Model.Items.*;
@@ -8,19 +8,37 @@ import Model.Items.*;
 public abstract class Character extends Combatant 
 {
 	/* Data Fields */
+	private static final int baseMana = 30;
+	private static final int addedManaPerIntelligence = 2;
+	private static final int addedMaxHPPerLevel = 5;
+	private static final int baseXP = 100;
+	private static final int addedXPPerLevel = 20;
+	private static final int baseEquipLoad = 15;
+	private static final int addedOtherStatsPerLevel = 2;
 
+	protected int previousLevel;
+	
+	// Base stats for the character
+	protected int _baseMaxHP;
+	protected int _baseStrength;
+	protected int _baseIntelligence;
+	protected int _baseDexterity;
+	protected int _baseArcane;
+	protected int _baseEndurance;
+	
+	// Current stats for the character
 	protected int currentLevel;
-	protected int currentXP;
+	protected long currentXP;
 	protected int currentMana;
-	protected int baseMaxHP;
 	protected int strength;
 	protected int intelligence;
 	protected int dexterity;
 	protected int arcane;
 	protected int endurance;
-	//protected Weapon equippedWeapon;
+	
 	protected List<CombatSkill> skills;
     protected EquipmentLoadout equipmentLoadout;
+    
 	private double physicalDamageBonus = 0.0;
 	private int physicalDamageBonusTurns = 0;
 
@@ -46,10 +64,21 @@ public abstract class Character extends Combatant
 	{
 
 		super(name, maxHP, physicalDEF, magicDEF, attack);
+		
+		this.previousLevel = currentLevel;
+		
+		// Base stats for the character
+		this._baseMaxHP = baseMaxHP;
+		this._baseStrength = strength;
+		this._baseIntelligence = intelligence;
+		this._baseDexterity = dexterity;
+		this._baseArcane = arcane;
+		this._baseEndurance = endurance;
+
+		// Current stats for the character
 		this.currentLevel = currentLevel;
 		this.currentXP = currentXP;
 		this.currentMana = currentMana;
-		this.baseMaxHP = baseMaxHP;
 		this.strength = strength;
 		this.intelligence = intelligence;
 		this.dexterity = dexterity;
@@ -62,6 +91,16 @@ public abstract class Character extends Combatant
 	/* Methods */
 	
 	// Private //
+
+	private void checkLevelUp()
+	{
+		/* Check if the character has enough XP to level up */
+		while (this.currentXP >= this.getTotalXPRequiredForLevel(this.currentLevel + 1) )
+		{
+			this.currentLevel++;
+			this.levelUp();
+		}
+	}
 	
 	// Keep currentMana within 0 and maxMana
 	private void setMana(int mana) { this.currentMana = Math.clamp(mana, 0, this.calculateMaxMana()); }
@@ -71,31 +110,31 @@ public abstract class Character extends Combatant
         return this.equipmentLoadout;
     }
 
-    public int getEndurance() {
-        return this.endurance;
-    }
+    public long getCurrentXP() { return this.currentXP; }
+    
+	public int getCurrentLevel() { return this.currentLevel; }
 
-	public int getCurrentLevel() { return this.currentLevel;}
+	public int getCurrentMana() {return this.currentMana; }
 
-	public int getCurrentMana() {return this.currentMana;}
+	public int getStrength() {return strength; }
 
-	public int getStrength() {return strength;}
+	public int getIntelligence() {return intelligence; }
 
-	public int getIntelligence() {return intelligence;}
+	public int getDexterity() {return dexterity; }
 
-	public int getDexterity() {return dexterity;}
+	public int getArcane() {return arcane; }
+	
+	public int getEndurance() { return this.endurance; }
 
-	public int getArcane() {return arcane;}
+	public List<CombatSkill> getSkills() {return skills; }
 
-	public List<CombatSkill> getSkills() {return skills;}
+	public double getPhysicalDamageBonus() {return physicalDamageBonus; }
 
-	public double getPhysicalDamageBonus() {return physicalDamageBonus;}
-
-	public int getPhysicalDamageBonusTurns() {return physicalDamageBonusTurns;}
+	public int getPhysicalDamageBonusTurns() {return physicalDamageBonusTurns; }
 
 	// Calculate maximum equipment load
     public double calculateEquipLoad() {
-        return 15 + this.endurance;
+        return baseEquipLoad + this.endurance;
     }
 
 // Calculates the character's total physical attack.
@@ -110,51 +149,57 @@ public abstract class Character extends Combatant
         return totalAttack;
     }
 
-    public int getXPToNextLevel() {
-		/* Calculate the XP required for the next level using a simple formula */
-    	// Base XP for level 1 is 100, and it increases by 20 for each subsequent level
-		return 100 + (20 * this.currentLevel - 1);
-	}
+    /* Returns the total XP required for a given level */
+    public long getTotalXPRequiredForLevel(int level) { return (level - 1) * (2 * baseXP + (level - 2) * addedXPPerLevel) / 2; }
     
 	// Setters //
 
 	// Custom //
 	
 	// Gain 5 Max HP per level beyond the first
-	public int calculateMaxHP() { return this.baseMaxHP + (5 * (this.currentLevel - 1)); }
+	public int calculateMaxHP() { return this._baseMaxHP + (addedMaxHPPerLevel * (this.currentLevel - 1)); }
 	
 	// Base Mana is 30
 	// Gain 2 Max Mana per point of Intelligence
-	public int calculateMaxMana() { return 30 + (2 * this.intelligence); }
+	public int calculateMaxMana() { return baseMana + (addedManaPerIntelligence * this.intelligence); }
 
 	public void spendMana(int amount) { this.setMana(this.currentMana - amount); }
 	public void restoreMana(int amount) { this.setMana(this.currentMana + amount); }
-//	public void equipWeapon(Weapon weapon) { this.equippedWeapon = weapon; }
-//	public void unequipWeapon() { this.equippedWeapon = null; }
-	
+
 	public void levelUp()
 	{
-		// Max Mana is recalculated every time Mana is spent or restored
+		/* Update stats and attributes when the character levels up */
 		
-		// Update Max HP on new level
+		// Update Max HP and Max Mana on new level
 		this.setMaxHP(this.calculateMaxHP());
+		this.setMana(this.calculateMaxMana()); // Max Mana is recalculated every time Mana is spent or restored
 		
-		// Restore HP and Mana to full on level up
+		// Restore Current HP to Max HP on level up
 		this.setCurrentHP(this.getMaxHP());
-		this.setMana(this.calculateMaxMana());
+
+		// Calculate all other stats based on base stats and current level
+		// Update Strength, Intelligence, Dexterity, Arcane, and Endurance: each stat increases by 2 per level	
+		this.strength = this._baseStrength + (addedOtherStatsPerLevel * (this.currentLevel - 1));
+		this.intelligence = this._baseIntelligence + (addedOtherStatsPerLevel * (this.currentLevel - 1));
+		this.dexterity = this._baseDexterity + (addedOtherStatsPerLevel * (this.currentLevel - 1));
+		this.arcane = this._baseArcane + (addedOtherStatsPerLevel * (this.currentLevel - 1));
+		this.endurance = this._baseEndurance + (addedOtherStatsPerLevel * (this.currentLevel - 1));
 	}
 	
-	public void addXP(int amount)
+	public boolean addXP(long amount)
 	{
-		this.currentXP += amount;
+		/* Adds XP to the character and checks if they level up */
+		this.currentXP += (amount * 10);
+		this.checkLevelUp();
 		
-		// Check if the character has enough XP to level up
-		while (this.currentXP >= this.getXPToNextLevel())
+		// Return true if the character leveled up at least 1 level, false otherwise
+		if (this.currentLevel > this.previousLevel)
 		{
-			this.currentXP -= this.getXPToNextLevel();
-			this.currentLevel++;
-			this.levelUp();
+			this.previousLevel = this.currentLevel;
+			return true;
 		}
+		
+		return false;
 	}
 
 	// Overrides //
@@ -211,4 +256,6 @@ public abstract class Character extends Combatant
 			physicalDamageBonus = 0.0;
 		}
 	}
+	
+	// Overrides //
 }

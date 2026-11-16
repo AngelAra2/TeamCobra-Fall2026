@@ -139,6 +139,8 @@ public class GameController
 			List<Companion> activeCompanions = player.getPlayerParty().getActiveCompanions();
 			int totalPartyMembers = 1 + activeCompanions.size(); // 1 for the player + number of active companions
 			
+			boolean hasPartyLeveledUp = false; // Keeps track of whether any party member has leveled up during this combat round
+			
 			// Player's turn first //
 			// Do a for loop to iterate through the player's party members, starting with the player and then each active companion
 			for (int i = 0; i < totalPartyMembers; i++)
@@ -147,6 +149,7 @@ public class GameController
 				if (!Battlefield.canBattleContinue())
 					continue outerLoop;
 				
+				hasPartyLeveledUp = false;
 				View.separate(3);
 
 				Character combatant;
@@ -346,18 +349,28 @@ public class GameController
 						int goldReward = monster.getGoldReward();
 						int xpReward = monster.getXPReward();
 						player.addGold(goldReward);
-						player.addXP(xpReward);
+						hasPartyLeveledUp = player.gainXP(xpReward);
 							
 						// Reduce i by 1 to keep loop in sync
 						j--;
 						
 						Wait.yield(1f);
+						// If player and co. have leveled up, print out a message			
+						if (hasPartyLeveledUp)
+							BattleView.printPartyLevelUp(player.getPlayerParty());
 					}
 				}
+				
+				// TEST CODE
+				View.println("Has leveled up: " + hasPartyLeveledUp);
+				View.println("XP for next level: " + player.getTotalXPRequiredForLevel(player.getCurrentLevel() + 1));
+				
+				View.println("Current XP: " + player.getCurrentXP());
 			}
 
 			/* Monsters' turn */
 			ArrayList<Monster> monstersList = Battlefield.getMonsters();
+			List<Character> deadPartyMembers = new ArrayList<>(); 
 			for (int i = 0; i < monstersList.size(); i++)
 			{
 				Monster monster = monstersList.get(i);
@@ -394,8 +407,11 @@ public class GameController
 						combatant = activeCompanions.get(j - 1);
 					
 					// If the character is defeated, print out a message
-					if (!combatant.isAlive())
+					if (!combatant.isAlive() && !deadPartyMembers.contains(combatant))
 					{
+						// Prevents them from being printed more than once
+						deadPartyMembers.add(combatant);
+						
 						View.separate(3);
 						BattleView.printCombatantDeath(combatant);
 						
@@ -403,6 +419,9 @@ public class GameController
 					}
 				}
 			}
+			
+			// Clear out dead party members list
+			deadPartyMembers.clear();
 
 			//update party buffs after the combat round.
 			player.decreaseBuffDuration();
