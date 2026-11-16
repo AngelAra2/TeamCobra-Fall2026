@@ -55,10 +55,10 @@ public class Battlefield
 		int attackerTotalAttack = attacker.getAttack();
 		
 		// Check if the attacker is of the Character class
-		if (attacker instanceof Player)
+		if (attacker instanceof Character)
 		{
-			Player player = (Player) attacker;
-			attackerTotalAttack = player.getTotalAttack();
+			Character character  = (Character) attacker;
+			attackerTotalAttack = character.getTotalAttack();
 		}
 		
 		// Store receiver's current HP before taking damage

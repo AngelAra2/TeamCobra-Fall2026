@@ -246,6 +246,9 @@ public class View
 		} else{
 			for (CombatSkill skill : player.getSkills()){
 				println("- " + skill.getName());
+				print("- Description: ");
+				println(wrapText(skill.getDescription(), 50));
+				separate(2);
 			}
 		}
 		printColored("\n=======================================","blue",true);

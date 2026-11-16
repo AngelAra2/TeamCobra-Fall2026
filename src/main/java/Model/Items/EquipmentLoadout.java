@@ -87,37 +87,55 @@ public class EquipmentLoadout {
             return false;
         }
 
-        // Check whether another item already occupies this slot.
-        EquipmentItem oldItem = equippedItems.get(slot);
-
-        double newTotalWeight = totalWeight;
-
-        // Account for the weight of the item being replaced.
-        if (oldItem != null) {
-            newTotalWeight = newTotalWeight - oldItem.getWeight();
-        }
-
-        // Add the new item's weight.
-        newTotalWeight = newTotalWeight + item.getWeight();
-
-        // Prevent the player from exceeding their equipment load.
-        if (newTotalWeight > maxLoad) {
+        //prevents equipping item into an occupied slot.
+        if (equippedItems.containsKey(slot)){
             return false;
         }
 
-        // Mark the previous item as unequipped.
-        if (oldItem != null) {
-            oldItem.setEquipped(false);
+        double newTotalWeight = totalWeight + item.getWeight();
+
+        if (newTotalWeight > maxLoad){
+            return false;
         }
 
-        // Store the new item in its equipment slot.
-        equippedItems.put(slot, item);
+        //equip item
 
-        // Update the item's status and total equipment weight.
+        equippedItems.put(slot, item);
         item.setEquipped(true);
         totalWeight = newTotalWeight;
 
+
         return true;
+//        // Check whether another item already occupies this slot.
+//        EquipmentItem oldItem = equippedItems.get(slot);
+//
+//
+//        // Account for the weight of the item being replaced.
+//        if (oldItem != null) {
+//            newTotalWeight = newTotalWeight - oldItem.getWeight();
+//        }
+//
+//        // Add the new item's weight.
+//        newTotalWeight = newTotalWeight + item.getWeight();
+//
+//        // Prevent the player from exceeding their equipment load.
+//        if (newTotalWeight > maxLoad) {
+//            return false;
+//        }
+//
+//        // Mark the previous item as unequipped.
+//        if (oldItem != null) {
+//            oldItem.setEquipped(false);
+//        }
+//
+//        // Store the new item in its equipment slot.
+//        equippedItems.put(slot, item);
+//
+//        // Update the item's status and total equipment weight.
+//        item.setEquipped(true);
+//        totalWeight = newTotalWeight;
+//
+//        return true;
     }
 
     // Removes the item occupying the requested equipment slot.

@@ -115,6 +115,7 @@ public class CombatSkill
 		return requiredWeaponSlot;
 	}
 
+	public String getDescription () { return description;}
 	public int getRequiredWeaponID() {
 		return requiredWeaponID;
 	}

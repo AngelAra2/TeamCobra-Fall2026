@@ -12,6 +12,7 @@ import Model.Items.Consumable;
 //import Model.Items.Weapon;
 import Model.Items.Inventory;
 import Model.Items.EquipmentItem;
+import Model.Items.Weapon;
 import View.*;
 
 public class Player extends Character
@@ -304,10 +305,34 @@ public class Player extends Character
 				String itemName = getFirstItem.getItemName();
 				int itemQuantity = this._getQuantityOfItemsInInventory(itemName);
 				
-				View.println("- " + itemName + " (x" + itemQuantity + ")");
+				String itemInfo = "- " + itemName + " (x" + itemQuantity + ")";
+
+				// Check if item is equipment
+				if (getFirstItem instanceof EquipmentItem) {
+
+					EquipmentItem equipment = (EquipmentItem) getFirstItem;
+
+					String itemSlot = equipment.getSlot();
+					//adds item slot name.
+					itemInfo += " [" + itemSlot + "]";
+
+					// Check if any copy is equipped
+					for (Item inventoryItem : itemList) {
+						if (inventoryItem instanceof EquipmentItem) {
+							EquipmentItem equippedItem = (EquipmentItem) inventoryItem;
+
+							//if item is equipped, add (Equipped)
+							if (equippedItem.isEquipped()) {
+								itemInfo += " (Equipped)";
+								break;
+							}
+						}
+					}
+				}
+				//display item info
+				View.println(itemInfo);
 			}
 		}
-		
 		// If no items were found, print message
 		else
 			View.println("Inventory empty");

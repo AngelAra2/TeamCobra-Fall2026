@@ -234,7 +234,7 @@ public class GameController
 							Wait.yield(1f);
 							//attempts to execute skill against target.
 							//battlefield handles skill validation, mana requirements, targeting, damage, and healing
-							Battlefield.performSkillAttack(combatant, skill, Battlefield.getTargetMonster(), player.getInventory()); //WIP
+							Battlefield.performSkillAttack(combatant, skill, Battlefield.getTargetMonster(), player.getInventory());
 						}
 
 						//return to main combat menu
@@ -471,7 +471,47 @@ public class GameController
 			}
 		}
 	}
-	
+
+	private static boolean handleCompanionCommand(String userCmd){
+		String input = userCmd.trim();
+
+		for (Companion c : player.getPlayerParty().getActiveCompanions()){
+			String name = c.getName();
+
+			if(!input.toLowerCase().startsWith(name.toLowerCase() + " ")){
+				continue;
+			}
+
+			//remove companion name from command
+			String remaining = input.substring(name.length()).trim();
+
+			//splits command and possible item name
+			String[] parts = remaining.split("\\s+", 2);
+			String action = parts[0].toLowerCase();
+
+			//checks if parts contains at least 2 elements, if so, trim, otherwise, set item name to blank: ""
+			String itemName = parts.length > 1 ? parts[1].trim() : "";
+
+			switch (action){
+				case "inventory":
+					//view companion inventory
+					c.viewInventory();
+					return true;
+
+				case "equip":
+				case "unequip":
+					//equips or unequips item
+					c.handleEquipmentCommand(action, itemName);
+					return true;
+
+				default:
+					View.println("Invalid companion command.");
+					return true;
+			}
+		}
+		return false;
+
+	}
 	private static boolean exploration()
 	{
 		/* In exploration state, the player can:
@@ -486,6 +526,10 @@ public class GameController
 		
 		// Get and process user input
 		userCmd = explorationCmdProcessor.getUserInput();
+
+		if(handleCompanionCommand(userCmd)){
+			return true;
+		}
 		explorationCmdProcessor.setCurrentCommand(userCmd);
 		
 		// Get results
