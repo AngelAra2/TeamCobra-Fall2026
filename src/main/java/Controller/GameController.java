@@ -523,6 +523,7 @@ public class GameController
 
 				case "status":
 					View.printCompanionStatus(c);
+					return true;
 				default:
 					View.println("Invalid companion command.");
 					return true;

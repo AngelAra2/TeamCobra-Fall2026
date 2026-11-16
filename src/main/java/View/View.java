@@ -112,10 +112,15 @@ public class View
 	public static void printWelcomeMessage()
 	{
 		/* Prints out the welcome message to the console */
-		
+
+		println(wrapText("Sol Invictus was a great warrior, who came from a faraway land in search of a Distant Light, after his home was surrounded by Darkness and fell to ruin soon after."
+				,50));
+
+		printColored("You must become the INHERITOR", "yellow",true);
+
+		separate(3);
 		printColored("-----<< Welcome to Inheritor >>-----", "yellow", true);
 		println("");
-		println("Explore the world, solve puzzles, and collect items to progress through the game");
 		println("Type \"help\" to view all available commands");
 	}
 	
