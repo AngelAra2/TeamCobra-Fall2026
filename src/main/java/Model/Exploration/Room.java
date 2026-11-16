@@ -5,6 +5,7 @@ import Model.AbstractClasses.Item;
 import Model.Combat.Monster;
 import Model.Combat.Companion;
 import Model.Factories.MonsterFactory;
+import Model.Util.ItemUtil;
 
 public class Room 
 {
@@ -24,6 +25,7 @@ public class Room
     private ArrayList<Companion> companions;
     private ArrayList<Merchant> merchants;
 	private MonsterFactory monsterFactory;
+    private boolean itemsGenerated;
 	
 	/* Constructors */
 	public Room(
@@ -46,6 +48,7 @@ public class Room
 		this.companions = new ArrayList<>();
 		this.merchants = new ArrayList<>();
 		this.monsterFactory = new MonsterFactory();
+		this.itemsGenerated = false;
 	}
 	
 	/* Methods */
@@ -295,6 +298,40 @@ public class Room
 				this.addMonster(newMonster.getName(), newMonster);
 		}
 	}
+
+    public void generateItems(Map worldMap)
+    {
+        if (this.itemsGenerated)
+            return;
+
+        if (this.spawnableItemIds.isEmpty()) {
+            this.itemsGenerated = true;
+            return;
+        }
+
+        Random rng = new Random();
+        int numItemsToSpawn = rng.nextInt(1, this.spawnableItemIds.size() + 1);
+        ArrayList<Item> generatedItems = new ArrayList<>();
+
+        for (int i = 0; i < numItemsToSpawn; i++) {
+            int itemId = this.spawnableItemIds.get(rng.nextInt(this.spawnableItemIds.size()));
+            Item template = worldMap.getItemTemplate(itemId);
+
+            if (template == null)
+                throw new IllegalStateException("No item template found for item ID " + itemId);
+
+            Item item = ItemUtil.copyItem(template);
+            if (item == null)
+                throw new IllegalStateException("Cannot copy item ID " + itemId);
+
+            generatedItems.add(item);
+        }
+
+        for (Item item : generatedItems)
+            this.addItem(item.getItemName(), item);
+
+        this.itemsGenerated = true;
+    }
 	
 	// Overrides //
 	
